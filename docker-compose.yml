@@ -1,0 +1,18 @@
+services:
+  database:
+    image: postgres
+    restart: always
+    shm_size: 128mb
+    volumes:
+      - ./pg-data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: salus
+      POSTGRES_PASSWORD: salus
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - "8081:8080"

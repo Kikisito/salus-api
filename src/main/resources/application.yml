@@ -1,0 +1,43 @@
+spring:
+  profiles:
+    active: "dev"
+  jpa:
+    hibernate:
+      ddl-auto: update
+  datasource:
+    url: "jdbc:postgresql://localhost:5432/salus"
+    username: "salus"
+    password: "salus"
+    hikari:
+      pool-name: SalusPool
+      maximum-pool-size: 10
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+  mail:
+    from-header: "Project Salus <ua-pracs@kikisito.com>"
+    host: "mail.kikisito.com"
+    port: 587
+    username: "ua-pracs@kikisito.com"
+    password: "b$ATbJS$o3bajmGs5Ns*tmbmyhRRYRD9U7NAX1v^q@tI&QPejtz3Gc3RaAs9g312&W0LR#jPrHev%Gy5K@Qgf97XhsV#@a7YJEffqV198&$&@d&q^AcOey&Zz9DAhTa2"
+    properties:
+      mail:
+        debug: true
+        smtp:
+          from: "ua-pracs@kikisito.com"
+          auth: 'true'
+          starttls:
+            enable: 'true'
+
+application:
+  name: "Salus"
+  host: http://localhost:8080
+  security:
+    jwt:
+      secret-key: "qBcwXDAgtkWw0LL1IY/aIOr/3+EmHPfMhWytjgrUo8FeYDuZaVlRg6A5vh6ETRykYI0wQZpcBSb9OEnCcDNjgw=="
+      access-token:
+        expiration: 86400000 # CAMBIAR
+      refresh-token:
+        expiration: 2592000000 # CAMBIAR
+      password-reset-token:
+        expiration: 3600000 # 1 hora
