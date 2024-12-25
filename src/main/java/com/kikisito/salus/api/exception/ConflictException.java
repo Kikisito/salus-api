@@ -20,6 +20,6 @@ public class ConflictException extends ApiRuntimeException {
     }
 
     public static ConflictException emailIsVerified() {
-        return new ConflictException(ErrorMessages.EMAIL_ALREADY_VERIFIED, EMAIL_IS_VERIFIED);
+        return new ConflictException(ErrorMessages.EMAIL_IS_VERIFIED, EMAIL_IS_VERIFIED);
     }
 }

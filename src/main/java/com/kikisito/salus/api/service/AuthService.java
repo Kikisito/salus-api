@@ -183,6 +183,10 @@ public class AuthService {
     public void verifyEmailByToken(String token) {
         UserEntity userEntity = userRepository.findByVerificationToken(token).orElseThrow(InvalidTokenException::tokenAlreadyUsed);
 
+        if(userEntity.getAccountStatusType() == AccountStatusType.VERIFIED) {
+            throw ConflictException.emailIsVerified();
+        }
+
         userEntity.setVerificationToken(null);
         userEntity.setAccountStatusType(AccountStatusType.VERIFIED);
 

@@ -1,11 +1,9 @@
 package com.kikisito.salus.api.dto;
 
 import com.kikisito.salus.api.constants.ErrorMessages;
+import com.kikisito.salus.api.constants.PasswordConstraint;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Past;
+import jakarta.validation.constraints.*;
 import lombok.Builder;
 import lombok.Data;
 
@@ -28,6 +26,7 @@ public class RegisterRequest {
     private String email;
 
     @NotBlank(message = ErrorMessages.FIELD_CANNOT_BE_BLANK)
+    @PasswordConstraint(message = ErrorMessages.INVALID_PASSWORD_FORMAT)
     private String password;
 
     private String telefono;

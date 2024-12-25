@@ -12,10 +12,8 @@ public final class ErrorMessages {
     public static final String EMAIL_IS_VERIFIED = "Email is already verified.";
     public static final String NOT_AUTHORIZED = "Not authorized";
     public static final String PASSWORDS_DONT_MATCH = "Passwords do not match";
-    public static final String EMAIL_ALREADY_VERIFIED = "This account has its email already verified";
     public static final String TOKEN_NOT_FOUND = "Token not found";
     public static final String TOKEN_EXPIRED = "This token has expired before being used";
     public static final String TOKEN_ALREADY_USED = "This token has already been used";
-    public static final String INVALID_NAME = "Debes especificar un nombre y apellidos o una razón social";
     public static final String INVALID_DATE_PAST = "La fecha de nacimiento debe ser anterior a la fecha actual";
 }
