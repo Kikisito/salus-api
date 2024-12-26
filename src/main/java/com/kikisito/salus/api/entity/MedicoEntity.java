@@ -2,6 +2,7 @@ package com.kikisito.salus.api.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 import java.util.List;
 
@@ -10,6 +11,7 @@ import java.util.List;
 @Setter
 @Getter
 @Entity
+@SuperBuilder
 @Table(name = "medicos")
 @PrimaryKeyJoinColumn(name = "user_id")
 public class MedicoEntity extends UserEntity {
@@ -22,5 +24,8 @@ public class MedicoEntity extends UserEntity {
             joinColumns = @JoinColumn(name = "medico_id"),
             inverseJoinColumns = @JoinColumn(name = "especialidad_id"))
     private List<EspecialidadEntity> especialidades;
+
+    @OneToMany(mappedBy = "medico")
+    private List<CitaEntity> citasMedico;
 
 }

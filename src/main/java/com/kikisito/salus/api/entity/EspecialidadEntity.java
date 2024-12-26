@@ -27,4 +27,7 @@ public class EspecialidadEntity {
     @ManyToMany(mappedBy = "especialidades")
     private List<MedicoEntity> medicos;
 
+    @OneToMany(mappedBy = "especialidad")
+    private List<CitaEntity> citas;
+
 }

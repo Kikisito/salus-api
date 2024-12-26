@@ -10,11 +10,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+
+import lombok.*;
+import lombok.experimental.SuperBuilder;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -24,7 +22,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 @Setter
 @Getter
 @Entity
-@Builder
+@SuperBuilder
 @Inheritance(strategy = InheritanceType.JOINED)
 @Table(name = "users")
 public class UserEntity implements UserDetails {
@@ -81,6 +79,9 @@ public class UserEntity implements UserDetails {
         }
         return authoritiesList;
     }
+
+    @OneToMany(mappedBy = "paciente", fetch = FetchType.LAZY)
+    private List<CitaEntity> citasPaciente;
 
     @Override
     public String getUsername() {

@@ -14,7 +14,7 @@ import java.util.Date;
 @Table(name = "password_reset_tokens")
 public class PasswordResetEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Integer id;
 
     @Column(unique = true, nullable = false)
