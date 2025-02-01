@@ -34,6 +34,7 @@ application:
   host: http://localhost:8080
   security:
     jwt:
+      cookieMaxAge: 604800
       secret-key: "qBcwXDAgtkWw0LL1IY/aIOr/3+EmHPfMhWytjgrUo8FeYDuZaVlRg6A5vh6ETRykYI0wQZpcBSb9OEnCcDNjgw=="
       access-token:
         expiration: 86400 # 1 dia

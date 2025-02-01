@@ -3,11 +3,16 @@ package com.kikisito.salus.api.jwt;
 import com.kikisito.salus.api.service.JwtService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.constraints.NotNull;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Optional;
+
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -22,7 +27,10 @@ import org.slf4j.LoggerFactory;
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-    private static final Logger log = LoggerFactory.getLogger(JwtAuthenticationFilter.class);
+    @Value("${application.security.jwt.cookieMaxAge}")
+    private int cookieMaxAge;
+
+    private static final String COOKIE_NAME = "auth-token";
     private final JwtService jwtService;
     private final UserDetailsService userDetailsService;
 
@@ -40,16 +48,20 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
 
-        final String authHeader = request.getHeader("Authorization");
+        Optional<Cookie> tokenCookie = Optional.ofNullable(request.getCookies())
+                .flatMap(cookies -> Arrays.stream(cookies)
+                        .filter(cookie -> COOKIE_NAME.equals(cookie.getName()))
+                        .findFirst()
+                );
 
-        // Si no hay un token JWT en el encabezado de autorización, continuar con la cadena de filtros
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+        // Si no hay una cookie de token, continuar con la cadena de filtros
+        if(tokenCookie.isEmpty()) {
             filterChain.doFilter(request, response);
             return;
         }
 
-        // Extraemos el token JWT del encabezado de autorización
-        final String jwt = authHeader.substring(7);
+        // Extraemos el token JWT de la cookie
+        final String jwt = tokenCookie.get().getValue();
 
         // Si el token JWT es válido y comprueba que el usuario no está autenticado
         if (jwtService.isTokenValid(jwt) && SecurityContextHolder.getContext().getAuthentication() == null) {
@@ -64,21 +76,24 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     var newToken = jwt;
                     if (jwtService.isTokenExpired(sessionEntity.getAccessToken())) {
                         if (jwtService.isTokenExpired(sessionEntity.getRefreshToken())) {
-                            closeSession(jwt);
+                            closeSession(jwt, response);
                             return;
                         }
                         sessionEntity.setRefreshToken(jwtService.generateRefreshToken(userDetails));
                         sessionEntity.setAccessToken(jwtService.generateAccessToken(userDetails));
                         jwtService.saveSession(sessionEntity);
                         newToken = jwtService.getNewJWT(userDetails, sessionEntity);
+
+                        // Actualizamos la cookie con el nuevo token JWT
+                        Cookie newCookie = createJwtCookie(newToken);
+                        response.addCookie(newCookie);
                     }
 
                     UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
                     authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                     SecurityContextHolder.getContext().setAuthentication(authToken);
-                    response.setHeader("Authorization", "Bearer ".concat(newToken));
                 },
-                () -> closeSession(jwt)
+                () -> closeSession(jwt, response)
             );
         }
 
@@ -86,7 +101,25 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 
-    private void closeSession(String jwt) {
+    private Cookie createJwtCookie(String jwt) {
+        Cookie cookie = new Cookie(COOKIE_NAME, jwt);
+        cookie.setMaxAge(this.cookieMaxAge); // 7 días
+        cookie.setPath("/");
+        cookie.setHttpOnly(true);
+        cookie.setSecure(true);
+        return cookie;
+    }
+
+    private void closeSession(String jwt, HttpServletResponse response) {
+        // Eliminamos la sesión de la base de datos
         jwtService.deleteSession(jwt);
+
+        // Eliminamos la cookie de token
+        Cookie cookie = new Cookie(COOKIE_NAME, null);
+        cookie.setMaxAge(0);
+        cookie.setPath("/");
+        cookie.setHttpOnly(true);
+        cookie.setSecure(true);
+        response.addCookie(cookie);
     }
 }
