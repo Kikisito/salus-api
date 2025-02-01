@@ -204,10 +204,10 @@ public class AuthService {
     }
 
     public AuthenticationResponse login(LoginRequest request) {
-        UserEntity userEntity = userRepository.findByEmail(request.getEmail())
+        UserEntity userEntity = userRepository.findByNif(request.getNif())
                 .orElseThrow(DataNotFoundException::userNotFound);
 
-        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
+        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(userEntity.getEmail(), request.getPassword()));
 
         var accessToken = jwtService.generateAccessToken(userEntity);
         var refreshToken = jwtService.generateRefreshToken(userEntity);

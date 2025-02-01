@@ -10,8 +10,7 @@ import lombok.Data;
 @Builder
 public class LoginRequest {
     @NotBlank(message = ErrorMessages.FIELD_CANNOT_BE_BLANK)
-    @Email(message = ErrorMessages.INVALID_EMAIL)
-    private String email;
+    private String nif;
 
     @NotBlank(message = ErrorMessages.FIELD_CANNOT_BE_BLANK)
     private String password;
