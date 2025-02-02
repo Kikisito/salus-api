@@ -153,12 +153,4 @@ public class JwtService {
         byte[] keyBytes = Decoders.BASE64.decode(secretKey);
         return Keys.hmacShaKeyFor(keyBytes);
     }
-    public String generatePasswordResetToken(String email) {
-        return Jwts.builder()
-                .subject(email)
-                .issuedAt(new Date())
-                .expiration(new Date(System.currentTimeMillis() + passwordResetTokenExpiration))
-                .signWith(getSigningKey())
-                .compact();
-    }
 }

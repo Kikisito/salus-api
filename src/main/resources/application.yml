@@ -15,11 +15,12 @@ spring:
       idle-timeout: 600000
       max-lifetime: 1800000
   mail:
+    # CAMBIAR A ENV VARS
     from-header: "Project Salus <ua-pracs@kikisito.com>"
     host: "mail.kikisito.com"
     port: 587
     username: "ua-pracs@kikisito.com"
-    password: "b$ATbJS$o3bajmGs5Ns*tmbmyhRRYRD9U7NAX1v^q@tI&QPejtz3Gc3RaAs9g312&W0LR#jPrHev%Gy5K@Qgf97XhsV#@a7YJEffqV198&$&@d&q^AcOey&Zz9DAhTa2"
+    password: "h1JjbpxjtR4tpKPu#e0OvOwkZvtWLh$8S@q2f3Dc09YiJs1GulW9M2ZF*&vm#4bsVu1GwbJ60G@ErMNb$mmxYHlS3C9Y!yk1Add#Ne#xFPJ#$wNXR5vid^o*HBcCmqC!"
     properties:
       mail:
         debug: true
@@ -30,6 +31,7 @@ spring:
             enable: 'true'
 
 application:
+  # Cambiar a ENV VARS
   name: "Salus"
   host: http://localhost:8080
   security:

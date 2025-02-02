@@ -4,8 +4,10 @@ public final class ErrorMessages {
     public static final String INVALID_JSON = "Invalid JSON. Couldn't parse JSON";
     public static final String FIELD_CANNOT_BE_BLANK = "%s field cannot be empty or null";
     public static final String FIELD_IS_NOT_VALID = "%s field is not valid";
+    public static final String FIELD_LENGTH_INVALID = "%s field must be between {min} and {max} characters long";
     public static final String INVALID_PASSWORD_FORMAT = "%s field must contain at least one number, one capital letter, one lowercase letter and must be at least 8 characters long";
     public static final String INVALID_EMAIL = "%s must be a correctly formatted email address";
+    public static final String INVALID_NIF = "%s must be a valid NIF/NIE";
     public static final String USER_NOT_FOUND = "User not found";
     public static final String EMAIL_IS_REGISTERED = "Email is already registered.";
     public static final String NIF_IS_REGISTERED = "User ID is already registered.";

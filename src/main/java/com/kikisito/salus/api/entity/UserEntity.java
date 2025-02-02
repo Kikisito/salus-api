@@ -53,6 +53,7 @@ public class UserEntity implements UserDetails {
     private Date fechaNacimiento;
 
     @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "direccion_id", referencedColumnName = "id")
     private DireccionEntity direccion;
 
     @Convert(converter = StringListConverter.class)

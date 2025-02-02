@@ -71,6 +71,7 @@ public class AuthService {
 
     private final static Integer PASSWORD_RESET_EXPIRATION = 60 * 60; // SECONDS
 
+    @Transactional
     public void sendPasswordRecoveryMail(String email) {
         // Obtenemos la entidad asociada al email
         UserEntity userEntity = userRepository.findByEmail(email).orElseThrow(DataNotFoundException::userNotFound);
@@ -92,6 +93,7 @@ public class AuthService {
         emailingService.sendEmail(email, PASSWORD_RESET_EMAIL_SUBJECT, PASSWORD_RESET_EMAIL_TEXT.replace("{link}", recoverLink));
     }
 
+    @Transactional
     public void recoverPassword(String token, String newPassword) {
         // Obtenemos el PasswordResetEntity
         PasswordResetEntity passwordReset = passwordResetRepository.findByToken(token).orElseThrow(DataNotFoundException::tokenNotFound);
@@ -115,6 +117,7 @@ public class AuthService {
         passwordResetRepository.save(passwordReset);
     }
 
+    @Transactional
     public AuthenticationResponse register(RegisterRequest request) {
         // Comprobaciones previas (email/dni existentes)
         userRepository.findByEmail(request.getEmail()).ifPresent((userEntity) -> {
@@ -141,27 +144,30 @@ public class AuthService {
                 .rolesList(roleTypeList)
                 .build();
 
-        DireccionEntity direccionEntity = DireccionEntity.builder()
-                .lineaDireccion1(request.getDireccion().getLineaDireccion1())
-                .lineaDireccion2(request.getDireccion().getLineaDireccion2())
-                .codigoPostal(request.getDireccion().getCodigoPostal())
-                .pais(request.getDireccion().getPais())
-                .provincia(request.getDireccion().getProvincia())
-                .municipio(request.getDireccion().getMunicipio())
-                .localidad(request.getDireccion().getLocalidad())
-                .build();
+        UserEntity savedUser = saveCredentials(userEntity);
 
-        var savedUser = saveCredentials(userEntity);
-        var savedDireccion = saveDireccion(direccionEntity);
+        // La dirección es opcional, pero si se ha proporcionado la guardamos
+        if(request.getDireccion() != null) {
+            DireccionEntity direccionEntity = DireccionEntity.builder()
+                    .lineaDireccion1(request.getDireccion().getLineaDireccion1())
+                    .lineaDireccion2(request.getDireccion().getLineaDireccion2())
+                    .codigoPostal(request.getDireccion().getCodigoPostal())
+                    .pais(request.getDireccion().getPais())
+                    .provincia(request.getDireccion().getProvincia())
+                    .municipio(request.getDireccion().getMunicipio())
+                    .localidad(request.getDireccion().getLocalidad())
+                    .build();
+            DireccionEntity savedDireccion = saveDireccion(direccionEntity);
 
-        // Asignamos la dirección al usuario
-        savedUser.setDireccion(savedDireccion);
-        userRepository.save(savedUser);
+            // Asignamos la dirección al usuario
+            savedUser.setDireccion(savedDireccion);
+            userRepository.save(savedUser);
+        }
 
         // Generamos los tokens de acceso y enviamos el email de verificación
-        var accessToken = jwtService.generateAccessToken(userEntity);
-        var refreshToken = jwtService.generateRefreshToken(userEntity);
-        var publicId = getPublicId();
+        String accessToken = jwtService.generateAccessToken(userEntity);
+        String refreshToken = jwtService.generateRefreshToken(userEntity);
+        String publicId = getPublicId();
 
         String verificationLink = host + VERIFY_EMAIL_PATH + savedUser.getVerificationToken();
         emailingService.sendEmail(request.getEmail(),
@@ -169,14 +175,13 @@ public class AuthService {
                 VERIFY_EMAIL_TEXT.replace("{link}", verificationLink));
         saveUserSession(savedUser, accessToken, refreshToken, publicId);
 
-        var jwt = jwtService.generateJWT(userEntity, accessToken, refreshToken, publicId);
+        String jwt = jwtService.generateJWT(userEntity, accessToken, refreshToken, publicId);
         return AuthenticationResponse.builder()
                 .jwt(jwt)
                 .build();
     }
 
     @Transactional
-    @Modifying
     public void verifyEmailByToken(String token) {
         UserEntity userEntity = userRepository.findByVerificationToken(token).orElseThrow(InvalidTokenException::tokenAlreadyUsed);
 
@@ -190,6 +195,7 @@ public class AuthService {
         userRepository.save(userEntity);
     }
 
+    @Transactional
     public void resendVerificationEmail(UserEntity userEntity) {
         if (userEntity.getAccountStatusType() == AccountStatusType.VERIFIED) {
             throw ConflictException.emailIsVerified();
@@ -197,25 +203,26 @@ public class AuthService {
 
         // Generamos un nuevo token y lo enviamos
         userEntity.setVerificationToken(jwtService.generateEmailVerificationToken(userEntity.getEmail()));
-        var savedUser = saveCredentials(userEntity);
+        UserEntity savedUser = saveCredentials(userEntity);
 
         String verificationLink = host + VERIFY_EMAIL_PATH + savedUser.getVerificationToken();
         emailingService.sendEmail(savedUser.getEmail(), VERIFY_EMAIL_SUBJECT, VERIFY_EMAIL_TEXT.replace("{link}", verificationLink));
     }
 
+    @Transactional
     public AuthenticationResponse login(LoginRequest request) {
         UserEntity userEntity = userRepository.findByNif(request.getNif())
                 .orElseThrow(DataNotFoundException::userNotFound);
 
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(userEntity.getEmail(), request.getPassword()));
 
-        var accessToken = jwtService.generateAccessToken(userEntity);
-        var refreshToken = jwtService.generateRefreshToken(userEntity);
-        var publicId = getPublicId();
+        String accessToken = jwtService.generateAccessToken(userEntity);
+        String refreshToken = jwtService.generateRefreshToken(userEntity);
+        String publicId = getPublicId();
 
         saveUserSession(userEntity, accessToken, refreshToken, publicId);
 
-        var jwt = jwtService.generateJWT(userEntity, accessToken, refreshToken, publicId);
+        String jwt = jwtService.generateJWT(userEntity, accessToken, refreshToken, publicId);
 
         return AuthenticationResponse.builder()
                 .jwt(jwt)
