@@ -2,7 +2,7 @@ package com.kikisito.salus.api.handlers;
 
 import com.kikisito.salus.api.constants.ErrorMessages;
 import com.kikisito.salus.api.exception.*;
-import com.kikisito.salus.api.response.ErrorResponse;
+import com.kikisito.salus.api.dto.response.ErrorResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.FieldError;

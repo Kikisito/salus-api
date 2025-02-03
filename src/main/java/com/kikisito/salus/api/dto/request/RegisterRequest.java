@@ -1,8 +1,9 @@
-package com.kikisito.salus.api.dto;
+package com.kikisito.salus.api.dto.request;
 
 import com.kikisito.salus.api.constants.ErrorMessages;
 import com.kikisito.salus.api.constants.NifConstraint;
 import com.kikisito.salus.api.constants.PasswordConstraint;
+import com.kikisito.salus.api.dto.DireccionDTO;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import lombok.Builder;

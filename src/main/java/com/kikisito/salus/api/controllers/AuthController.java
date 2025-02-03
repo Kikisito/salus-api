@@ -1,8 +1,8 @@
 package com.kikisito.salus.api.controllers;
 
-import com.kikisito.salus.api.dto.AuthenticationResponse;
-import com.kikisito.salus.api.dto.LoginRequest;
-import com.kikisito.salus.api.dto.RegisterRequest;
+import com.kikisito.salus.api.dto.response.AuthenticationResponse;
+import com.kikisito.salus.api.dto.request.LoginRequest;
+import com.kikisito.salus.api.dto.request.RegisterRequest;
 import com.kikisito.salus.api.entity.UserEntity;
 import com.kikisito.salus.api.service.AuthService;
 import jakarta.validation.Valid;

@@ -1,8 +1,8 @@
 package com.kikisito.salus.api.service;
 
-import com.kikisito.salus.api.dto.AuthenticationResponse;
-import com.kikisito.salus.api.dto.LoginRequest;
-import com.kikisito.salus.api.dto.RegisterRequest;
+import com.kikisito.salus.api.dto.response.AuthenticationResponse;
+import com.kikisito.salus.api.dto.request.LoginRequest;
+import com.kikisito.salus.api.dto.request.RegisterRequest;
 import com.kikisito.salus.api.entity.*;
 import com.kikisito.salus.api.exception.*;
 import com.kikisito.salus.api.repository.DireccionRepository;
@@ -22,7 +22,6 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;

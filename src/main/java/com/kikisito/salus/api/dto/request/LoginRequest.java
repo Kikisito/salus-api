@@ -1,7 +1,6 @@
-package com.kikisito.salus.api.dto;
+package com.kikisito.salus.api.dto.request;
 
 import com.kikisito.salus.api.constants.ErrorMessages;
-import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Builder;
 import lombok.Data;

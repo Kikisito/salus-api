@@ -1,6 +1,6 @@
 package com.kikisito.salus.api.exception;
 
-import com.kikisito.salus.api.response.ErrorResponse;
+import com.kikisito.salus.api.dto.response.ErrorResponse;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 

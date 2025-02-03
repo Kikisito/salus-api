@@ -1,4 +1,4 @@
-package com.kikisito.salus.api.response;
+package com.kikisito.salus.api.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
