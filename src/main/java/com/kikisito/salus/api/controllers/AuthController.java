@@ -1,5 +1,7 @@
 package com.kikisito.salus.api.controllers;
 
+import com.kikisito.salus.api.dto.request.CheckEmailExistsRequest;
+import com.kikisito.salus.api.dto.request.CheckNifExistsRequest;
 import com.kikisito.salus.api.dto.response.AuthenticationResponse;
 import com.kikisito.salus.api.dto.request.LoginRequest;
 import com.kikisito.salus.api.dto.request.RegisterRequest;
@@ -62,5 +64,17 @@ public class AuthController {
     @PostMapping("/logout")
     public void fakeLogout() {
         throw new IllegalStateException("This method shouldn't be called. It's implemented by Spring Security filters.");
+    }
+
+    @PostMapping("/available/email")
+    public ResponseEntity<HttpStatus> existsEmail(@RequestBody @Valid CheckEmailExistsRequest request) {
+        authService.isEmailAvailable(request.getEmail());
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/available/nif")
+    public ResponseEntity<HttpStatus> existsNif(@RequestBody @Valid CheckNifExistsRequest request) {
+        authService.isNifAvailable(request.getNif());
+        return ResponseEntity.ok().build();
     }
 }

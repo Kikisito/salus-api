@@ -12,13 +12,10 @@ import com.kikisito.salus.api.repository.UserRepository;
 import com.kikisito.salus.api.type.AccountStatusType;
 import com.kikisito.salus.api.type.RoleType;
 import com.kikisito.salus.api.type.TokenType;
-import jakarta.transaction.Transactional;
 import java.security.SecureRandom;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Base64;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,6 +23,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -226,6 +224,28 @@ public class AuthService {
         return AuthenticationResponse.builder()
                 .jwt(jwt)
                 .build();
+    }
+
+    @Transactional(readOnly = true)
+    public boolean isEmailAvailable(String email) {
+        Optional<UserEntity> userEntity = userRepository.findByEmail(email);
+
+        if(userEntity.isPresent()) {
+            throw ConflictException.emailIsRegistered();
+        } else {
+            return true;
+        }
+    }
+
+    @Transactional(readOnly = true)
+    public boolean isNifAvailable(String nif) {
+        Optional<UserEntity> userEntity = userRepository.findByNif(nif);
+
+        if(userEntity.isPresent()) {
+            throw ConflictException.nifIsRegistered();
+        } else {
+            return true;
+        }
     }
 
     private UserEntity saveCredentials(UserEntity userEntity) {

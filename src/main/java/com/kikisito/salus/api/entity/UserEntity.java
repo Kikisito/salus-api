@@ -46,6 +46,7 @@ public class UserEntity implements UserDetails {
     @Column(nullable = false)
     private String password;
 
+    // No es único ya que es común que un miembro de una familia gestione las cuentas de otros miembros
     @Column
     private String telefono;
 
