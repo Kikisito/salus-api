@@ -23,11 +23,4 @@ public class PasswordResetEntity {
     @OneToOne(targetEntity = UserEntity.class)
     @JoinColumn(nullable = false, name = "user_id", unique = true)
     private UserEntity userEntity;
-
-    @Column(nullable = false)
-    private Date expiryDate;
-
-    @Column(nullable = false)
-    @Builder.Default
-    private boolean used = false;
 }

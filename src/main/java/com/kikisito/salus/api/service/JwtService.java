@@ -86,8 +86,8 @@ public class JwtService {
         return buildToken(new HashMap<>(), userDetails, refreshTokenExpiration);
     }
 
-    public String generatePasswordResetToken(UserDetails userDetails, Integer passwordTokenExpiration) {
-        return buildToken(new HashMap<>(), userDetails, passwordTokenExpiration * 1000);
+    public String generatePasswordResetToken(UserDetails userDetails) {
+        return buildToken(new HashMap<>(), userDetails, passwordResetTokenExpiration);
     }
 
     private String buildToken(Map<String, Object> extraClaims, UserDetails userDetails, long expiration) {

@@ -30,7 +30,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Value("${application.security.jwt.cookieMaxAge}")
     private int cookieMaxAge;
 
-    private static final String COOKIE_NAME = "auth-token";
+    private static final String COOKIE_NAME = "AUTH-TOKEN";
     private final JwtService jwtService;
     private final UserDetailsService userDetailsService;
 
@@ -115,7 +115,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         Cookie cookie = new Cookie(COOKIE_NAME, jwt);
         cookie.setMaxAge(this.cookieMaxAge); // 7 días
         cookie.setPath("/");
-        cookie.setHttpOnly(true);
+        cookie.setHttpOnly(false);
         cookie.setSecure(true);
         return cookie;
     }

@@ -1,10 +1,7 @@
 package com.kikisito.salus.api.controllers;
 
-import com.kikisito.salus.api.dto.request.CheckEmailExistsRequest;
-import com.kikisito.salus.api.dto.request.CheckNifExistsRequest;
+import com.kikisito.salus.api.dto.request.*;
 import com.kikisito.salus.api.dto.response.AuthenticationResponse;
-import com.kikisito.salus.api.dto.request.LoginRequest;
-import com.kikisito.salus.api.dto.request.RegisterRequest;
 import com.kikisito.salus.api.entity.UserEntity;
 import com.kikisito.salus.api.service.AuthService;
 import jakarta.validation.Valid;
@@ -48,22 +45,23 @@ public class AuthController {
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/recover")
-    public ResponseEntity<HttpStatus> recoverPassword(@RequestParam("token") String token, @RequestBody @Valid String password) {
-        authService.recoverPassword(token, password);
+    @PostMapping("/forgot-password/reset")
+    public ResponseEntity<HttpStatus> recoverPassword(@RequestBody @Valid PasswordResetRecoverRequest request) {
+        authService.recoverPassword(request.getToken(), request.getPassword());
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/recover/send")
-    public ResponseEntity<HttpStatus> sendPasswordRecoveryMail(@RequestBody @Valid String email) {
-        authService.sendPasswordRecoveryMail(email);
+    @PostMapping("/forgot-password/request")
+    public ResponseEntity<HttpStatus> sendPasswordRecoveryMail(@RequestBody @Valid PasswordResetRequest request) {
+        authService.sendPasswordRecoveryMail(request.getEmail(), request.getNif());
         return ResponseEntity.ok().build();
     }
 
-    // todo: implement logout
     @PostMapping("/logout")
-    public void fakeLogout() {
-        throw new IllegalStateException("This method shouldn't be called. It's implemented by Spring Security filters.");
+    public ResponseEntity<HttpStatus> logout(@CookieValue("AUTH-TOKEN") String token) {
+        authService.logout(token);
+        SecurityContextHolder.clearContext();
+        return ResponseEntity.ok().build();
     }
 
     @PostMapping("/available/email")

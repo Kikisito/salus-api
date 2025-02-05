@@ -12,6 +12,7 @@ import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -32,26 +33,36 @@ public class SecurityConfiguration {
     private final AuthenticationProvider authenticationProvider;
 
     private final String[] publicPaths = {
-        "/api/v1/auth/login",
-        "/api/v1/auth/register",
-        "/api/v1/auth/available/email",
-        "/api/v1/auth/available/nif",
-        "/api/v1/auth/recover/send",
-        "/api/v1/auth/verification/verify"
+            "/api/v1/auth/login",
+            "/api/v1/auth/register",
+            "/api/v1/auth/forgot-password/request",
+            "/api/v1/auth/forgot-password/reset",
+            "/api/v1/auth/available/email",
+            "/api/v1/auth/available/nif"
     };
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
+        /* Configuración de CSRF */
+        CookieCsrfTokenRepository tokenRepository = new CookieCsrfTokenRepository();
+        tokenRepository.setCookieCustomizer(cookie -> {
+            cookie.httpOnly(false); // lectura en JavaScript
+            cookie.secure(true); // solo en HTTPS
+            cookie.sameSite("Lax"); // cross-site controlado (el front se ejecuta siempre en otro dominio)
+        });
+
         CsrfTokenRequestAttributeHandler requestHandler = new CsrfTokenRequestAttributeHandler();
         requestHandler.setCsrfRequestAttributeName("_csrf");
+        /* Fin de configuración de CSRF */
 
         httpSecurity
-                .csrf(csrf -> csrf
-                        .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+                /*.csrf(csrf -> csrf
+                        .csrfTokenRepository(tokenRepository)
                         .csrfTokenRequestHandler(requestHandler)
                         // Ignoramos el token CSRF en las rutas de autenticación (no es necesario)
                         .ignoringRequestMatchers(this.publicPaths)
-                )
+                )*/
+                .csrf(AbstractHttpConfigurer::disable)
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(
                         auth -> auth

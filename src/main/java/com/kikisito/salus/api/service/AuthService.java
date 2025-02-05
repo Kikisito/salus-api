@@ -28,8 +28,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 public class AuthService {
-    public static final String VERIFY_EMAIL_PATH = "/api/v1/auth/verification/verify?token=";
-
     @Value("${application.host}")
     private String host;
 
@@ -64,30 +62,30 @@ public class AuthService {
     private final static String VERIFY_EMAIL_TEXT = "Te damos la bienvenida. Por favor, verifica tu correo electrónico a través del siguiente enlace: {link}";
 
     private final static String PASSWORD_RESET_EMAIL_SUBJECT = "Recuperación de contraseña";
-    private final static String PASSWORD_RESET_EMAIL_TEXT = "Para recuperar tu contraseña haz click en el siguiente enlace: {link}";
-
-    private final static Integer PASSWORD_RESET_EXPIRATION = 60 * 60; // SECONDS
+    private final static String PASSWORD_RESET_EMAIL_TEXT = "Para recuperar tu contraseña haz click en el siguiente enlace: {token}";
 
     @Transactional
-    public void sendPasswordRecoveryMail(String email) {
+    public void sendPasswordRecoveryMail(String email, String nif) {
         // Obtenemos la entidad asociada al email
-        UserEntity userEntity = userRepository.findByEmail(email).orElseThrow(DataNotFoundException::userNotFound);
+        Optional<UserEntity> userEntityOptional = userRepository.findByEmailAndNif(email, nif);
 
-        // Calculamos cuando expira el token de contraseña olvidada
-        Instant expiryInstant = Instant.now().plusSeconds(PASSWORD_RESET_EXPIRATION);
+        // Pese a que no exista el usuario, no informamos al usuario de que no existe y abandonamos el proceso (por seguridad)
+        if(userEntityOptional.isEmpty()) {
+            return;
+        }
+
+        // Obtenemos el usuario (aquí ya sabemos que existe)
+        UserEntity userEntity = userEntityOptional.get();
 
         // Si ya existe un PasswordResetEntity lo actualizamos, si no lo creamos
         PasswordResetEntity passwordResetEntity = passwordResetRepository.findByUserEntity(userEntity)
                 .orElse(PasswordResetEntity.builder().userEntity(userEntity).build());
 
-        passwordResetEntity.setToken(jwtService.generatePasswordResetToken(userEntity, PASSWORD_RESET_EXPIRATION));
-        passwordResetEntity.setExpiryDate(Date.from(expiryInstant));
-        passwordResetEntity.setUsed(false);
+        passwordResetEntity.setToken(jwtService.generatePasswordResetToken(userEntity));
 
         PasswordResetEntity finalPasswordResetEntity = passwordResetRepository.save(passwordResetEntity);
 
-        String recoverLink = host + "/api/v1/auth/recover?token=" + finalPasswordResetEntity.getToken();
-        emailingService.sendEmail(email, PASSWORD_RESET_EMAIL_SUBJECT, PASSWORD_RESET_EMAIL_TEXT.replace("{link}", recoverLink));
+        emailingService.sendEmail(email, PASSWORD_RESET_EMAIL_SUBJECT, PASSWORD_RESET_EMAIL_TEXT.replace("{token}", finalPasswordResetEntity.getToken()));
     }
 
     @Transactional
@@ -96,13 +94,8 @@ public class AuthService {
         PasswordResetEntity passwordReset = passwordResetRepository.findByToken(token).orElseThrow(DataNotFoundException::tokenNotFound);
 
         // Comprobamos que no ha caducado el token
-        if (passwordReset.getExpiryDate().before(new Date())) {
+        if (jwtService.isTokenExpired(token)) {
             throw InvalidTokenException.tokenExpired();
-        }
-
-        // Comprobamos que no se ha usado el token
-        if (passwordReset.isUsed()) {
-            throw InvalidTokenException.tokenAlreadyUsed();
         }
 
         // Cambiamos la contraseña y guardamos
@@ -110,8 +103,8 @@ public class AuthService {
         userEntity.setPassword(passwordEncoder.encode(newPassword));
         userRepository.save(userEntity);
 
-        passwordReset.setUsed(true);
-        passwordResetRepository.save(passwordReset);
+        // Borramos el token
+        passwordResetRepository.delete(passwordReset);
     }
 
     @Transactional
@@ -166,7 +159,7 @@ public class AuthService {
         String refreshToken = jwtService.generateRefreshToken(userEntity);
         String publicId = getPublicId();
 
-        String verificationLink = host + VERIFY_EMAIL_PATH + savedUser.getVerificationToken();
+        String verificationLink = host + "VERIFY_EMAIL_PATH" + savedUser.getVerificationToken();
         emailingService.sendEmail(request.getEmail(),
                 VERIFY_EMAIL_SUBJECT,
                 VERIFY_EMAIL_TEXT.replace("{link}", verificationLink));
@@ -202,7 +195,7 @@ public class AuthService {
         userEntity.setVerificationToken(jwtService.generateEmailVerificationToken(userEntity.getEmail()));
         UserEntity savedUser = saveCredentials(userEntity);
 
-        String verificationLink = host + VERIFY_EMAIL_PATH + savedUser.getVerificationToken();
+        String verificationLink = host + "VERIFY_EMAIL_PATH" + savedUser.getVerificationToken();
         emailingService.sendEmail(savedUser.getEmail(), VERIFY_EMAIL_SUBJECT, VERIFY_EMAIL_TEXT.replace("{link}", verificationLink));
     }
 
@@ -224,6 +217,11 @@ public class AuthService {
         return AuthenticationResponse.builder()
                 .jwt(jwt)
                 .build();
+    }
+
+    @Transactional
+    public void logout(String jwt) {
+        sessionRepository.findByAccessToken(jwtService.extractAccessToken(jwt)).ifPresent(sessionRepository::delete);
     }
 
     @Transactional(readOnly = true)
