@@ -3,19 +3,15 @@ package com.kikisito.salus.api.exception;
 import com.kikisito.salus.api.constants.ErrorMessages;
 
 public class InvalidTokenException extends ApiRuntimeException {
-
-    public static String TOKEN_EXPIRED = "INVALID_TOKEN_EXCEPTION.TOKEN_EXPIRED";
-    public static String TOKEN_ALREADY_USED = "INVALID_TOKEN_EXCEPTION.TOKEN_USED";
-
-    public InvalidTokenException(String message, String translationKey) {
-        super(message, translationKey);
+    public InvalidTokenException(String code, String message) {
+        super(code, message);
     }
 
     public static InvalidTokenException tokenExpired() {
-        return new InvalidTokenException(ErrorMessages.TOKEN_EXPIRED, TOKEN_EXPIRED);
+        return new InvalidTokenException("invalid_token.token_expired", ErrorMessages.TOKEN_EXPIRED);
     }
 
     public static InvalidTokenException tokenAlreadyUsed() {
-        return new InvalidTokenException(ErrorMessages.TOKEN_ALREADY_USED, TOKEN_ALREADY_USED);
+        return new InvalidTokenException("invalid_token.token_already_used", ErrorMessages.TOKEN_ALREADY_USED);
     }
 }

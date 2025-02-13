@@ -1,5 +1,6 @@
 package com.kikisito.salus.api.config;
 
+import com.kikisito.salus.api.handlers.AuthenticationExceptionHandler;
 import com.kikisito.salus.api.jwt.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -63,12 +64,14 @@ public class SecurityConfiguration {
                         .ignoringRequestMatchers(this.publicPaths)
                 )*/
                 .csrf(AbstractHttpConfigurer::disable)
+
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(
                         auth -> auth
                                 .requestMatchers(this.publicPaths).permitAll()
                                 .anyRequest().authenticated()
                 )
+                .exceptionHandling(eh -> eh.authenticationEntryPoint(new AuthenticationExceptionHandler()))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider)
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
