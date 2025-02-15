@@ -8,14 +8,15 @@ import java.lang.annotation.*;
 /**
  * This annotation is used to validate the NIF format.
  *
- * @see MinimumAgeValidator
+ * @see NifValidator
  */
 @Documented
-@Constraint(validatedBy = NifValidator.class)
+@Constraint(validatedBy = MinimumAgeValidator.class)
 @Target({ ElementType.METHOD, ElementType.FIELD })
 @Retention(RetentionPolicy.RUNTIME)
-public @interface NifConstraint {
-    String message() default "Invalid NIF format";
+public @interface MinimumAgeConstraint {
+    String message() default "Invalid date. You must be at least 18 years old";
     Class<?>[] groups() default {};
     Class<? extends Payload>[] payload() default {};
+    int minimumAge() default 18;
 }

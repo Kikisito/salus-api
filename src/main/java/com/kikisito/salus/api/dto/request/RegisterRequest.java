@@ -1,5 +1,6 @@
 package com.kikisito.salus.api.dto.request;
 
+import com.kikisito.salus.api.constants.MinimumAgeConstraint;
 import com.kikisito.salus.api.constants.ErrorMessages;
 import com.kikisito.salus.api.constants.NifConstraint;
 import com.kikisito.salus.api.constants.PasswordConstraint;
@@ -43,6 +44,7 @@ public class RegisterRequest {
 
     @NotNull(message = ErrorMessages.FIELD_CANNOT_BE_BLANK)
     @Past(message = ErrorMessages.INVALID_DATE_PAST)
+    @MinimumAgeConstraint(minimumAge = 18, message = ErrorMessages.INVALID_DATE_18_YEARS_OLD)
     private Date fechaNacimiento;
 
     @NotBlank(message = ErrorMessages.FIELD_CANNOT_BE_BLANK)
