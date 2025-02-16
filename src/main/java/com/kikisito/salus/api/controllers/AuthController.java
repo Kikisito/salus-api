@@ -58,7 +58,8 @@ public class AuthController {
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<HttpStatus> logout(@CookieValue("AUTH-TOKEN") String token) {
+    public ResponseEntity<HttpStatus> logout(@RequestHeader("Authorization") String rawToken) {
+        String token = rawToken.substring(7);
         authService.logout(token);
         SecurityContextHolder.clearContext();
         return ResponseEntity.ok().build();
