@@ -53,8 +53,8 @@ application:
     jwt:
       secret-key: "${APP_SECRET}"
       access-token:
-        expiration: 86400 # 1 dia
+        expiration: 86400000 # 1 dia
       refresh-token:
-        expiration: 604800 # 7 dias
+        expiration: 604800000 # 7 dias
       password-reset-token:
-        expiration: 3600000 # 1 hora
+        expiration: 1800000 # 30 minutos
