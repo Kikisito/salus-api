@@ -2,6 +2,7 @@ package com.kikisito.salus.api.entity;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.kikisito.salus.api.StringListConverter;
+import com.kikisito.salus.api.embeddable.DireccionEmbeddable;
 import com.kikisito.salus.api.type.AccountStatusType;
 import com.kikisito.salus.api.type.RoleType;
 import jakarta.persistence.*;
@@ -53,9 +54,8 @@ public class UserEntity implements UserDetails {
     @Column
     private Date fechaNacimiento;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "direccion_id", referencedColumnName = "id")
-    private DireccionEntity direccion;
+    @Embedded
+    private DireccionEmbeddable direccion;
 
     @Convert(converter = StringListConverter.class)
     @Enumerated(EnumType.STRING)

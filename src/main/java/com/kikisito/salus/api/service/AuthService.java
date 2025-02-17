@@ -3,9 +3,9 @@ package com.kikisito.salus.api.service;
 import com.kikisito.salus.api.dto.response.AuthenticationResponse;
 import com.kikisito.salus.api.dto.request.LoginRequest;
 import com.kikisito.salus.api.dto.request.RegisterRequest;
+import com.kikisito.salus.api.embeddable.DireccionEmbeddable;
 import com.kikisito.salus.api.entity.*;
 import com.kikisito.salus.api.exception.*;
-import com.kikisito.salus.api.repository.DireccionRepository;
 import com.kikisito.salus.api.repository.PasswordResetRepository;
 import com.kikisito.salus.api.repository.SessionRepository;
 import com.kikisito.salus.api.repository.UserRepository;
@@ -13,7 +13,6 @@ import com.kikisito.salus.api.type.AccountStatusType;
 import com.kikisito.salus.api.type.RoleType;
 import com.kikisito.salus.api.type.TokenType;
 import java.security.SecureRandom;
-import java.time.Instant;
 import java.util.*;
 
 import lombok.RequiredArgsConstructor;
@@ -39,9 +38,6 @@ public class AuthService {
 
     @Autowired
     private final SessionRepository sessionRepository;
-
-    @Autowired
-    private final DireccionRepository direccionRepository;
 
     @Autowired
     private final PasswordEncoder passwordEncoder;
@@ -121,6 +117,18 @@ public class AuthService {
         // Creamos el usuario y la dirección
         List<RoleType> roleTypeList = new ArrayList<>();
         roleTypeList.add(RoleType.USER);
+
+        // La dirección es opcional, pero si se ha proporcionado la guardamos
+        DireccionEmbeddable direccionEmbeddable = DireccionEmbeddable.builder()
+                .lineaDireccion1(request.getDireccion().getLineaDireccion1())
+                .lineaDireccion2(request.getDireccion().getLineaDireccion2())
+                .codigoPostal(request.getDireccion().getCodigoPostal())
+                .pais(request.getDireccion().getPais())
+                .provincia(request.getDireccion().getProvincia())
+                .municipio(request.getDireccion().getMunicipio())
+                .localidad(request.getDireccion().getLocalidad())
+                .build();
+
         UserEntity userEntity = UserEntity.builder()
                 .nif(request.getNif())
                 .nombre(request.getNombre())
@@ -129,30 +137,13 @@ public class AuthService {
                 .password(passwordEncoder.encode(request.getPassword()))
                 .telefono(request.getTelefono())
                 .fechaNacimiento(request.getFechaNacimiento())
+                .direccion(direccionEmbeddable)
                 .accountStatusType(AccountStatusType.NOT_VERIFIED)
                 .verificationToken(jwtService.generateEmailVerificationToken(request.getEmail()))
                 .rolesList(roleTypeList)
                 .build();
 
         UserEntity savedUser = saveCredentials(userEntity);
-
-        // La dirección es opcional, pero si se ha proporcionado la guardamos
-        if(request.getDireccion() != null) {
-            DireccionEntity direccionEntity = DireccionEntity.builder()
-                    .lineaDireccion1(request.getDireccion().getLineaDireccion1())
-                    .lineaDireccion2(request.getDireccion().getLineaDireccion2())
-                    .codigoPostal(request.getDireccion().getCodigoPostal())
-                    .pais(request.getDireccion().getPais())
-                    .provincia(request.getDireccion().getProvincia())
-                    .municipio(request.getDireccion().getMunicipio())
-                    .localidad(request.getDireccion().getLocalidad())
-                    .build();
-            DireccionEntity savedDireccion = saveDireccion(direccionEntity);
-
-            // Asignamos la dirección al usuario
-            savedUser.setDireccion(savedDireccion);
-            userRepository.save(savedUser);
-        }
 
         // Generamos los tokens de acceso y enviamos el email de verificación
         String accessToken = jwtService.generateAccessToken(userEntity);
@@ -248,10 +239,6 @@ public class AuthService {
 
     private UserEntity saveCredentials(UserEntity userEntity) {
         return userRepository.save(userEntity);
-    }
-
-    private DireccionEntity saveDireccion(DireccionEntity direccionEntity) {
-        return direccionRepository.save(direccionEntity);
     }
 
     private void saveUserSession(UserEntity userEntity, String accessToken, String refreshToken, String publicId) {

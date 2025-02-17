@@ -6,8 +6,6 @@ import lombok.Data;
 @Data
 @Builder
 public class DireccionDTO {
-    private Integer id;
-
     //@NotBlank(message = ErrorMessages.FIELD_CANNOT_BE_BLANK)
     private String lineaDireccion1;
 
