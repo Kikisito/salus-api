@@ -1,5 +1,6 @@
 package com.kikisito.salus.api.controllers;
 
+import com.kikisito.salus.api.dto.DireccionDTO;
 import com.kikisito.salus.api.dto.UsuarioDTO;
 import com.kikisito.salus.api.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -20,5 +21,11 @@ public class UserController {
     @PreAuthorize("hasAuthority('USER')")
     public ResponseEntity<UsuarioDTO> getCurrentProfile() {
         return ResponseEntity.ok(userService.getCurrentProfile());
+    }
+
+    @PostMapping("/@me/address")
+    @PreAuthorize("hasAuthority('USER')")
+    public ResponseEntity<UsuarioDTO> updateAddress(@RequestBody DireccionDTO direccionDTO) {
+        return ResponseEntity.ok(userService.updateAddress(direccionDTO));
     }
 }
