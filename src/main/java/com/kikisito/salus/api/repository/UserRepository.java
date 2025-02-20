@@ -15,4 +15,8 @@ public interface UserRepository extends JpaRepository<UserEntity, Integer> {
     Optional<UserEntity> findByVerificationToken(String token);
 
     Optional<UserEntity> findByNif(String nif);
+
+    boolean existsByEmail(String email);
+
+    boolean existsByNif(String nif);
 }
