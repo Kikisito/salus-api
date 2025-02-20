@@ -106,13 +106,13 @@ public class AuthService {
     @Transactional
     public AuthenticationResponse register(RegisterRequest request) {
         // Comprobaciones previas (email/dni existentes)
-        userRepository.findByEmail(request.getEmail()).ifPresent((userEntity) -> {
+        if(userRepository.existsByEmail(request.getEmail())) {
             throw ConflictException.emailIsRegistered();
-        });
+        }
 
-        userRepository.findByNif(request.getNif()).ifPresent((userEntity) -> {
+        if(userRepository.existsByNif(request.getNif())) {
             throw ConflictException.nifIsRegistered();
-        });
+        }
 
         // Creamos el usuario y la dirección
         List<RoleType> roleTypeList = new ArrayList<>();

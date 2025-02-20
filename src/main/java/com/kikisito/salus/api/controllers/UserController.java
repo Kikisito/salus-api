@@ -23,7 +23,13 @@ public class UserController {
         return ResponseEntity.ok(userService.getCurrentProfile());
     }
 
-    @PostMapping("/@me/address")
+    @PatchMapping("/@me")
+    @PreAuthorize("hasAuthority('USER')")
+    public ResponseEntity<UsuarioDTO> updateProfile(@RequestBody UsuarioDTO usuarioDTO) {
+        return ResponseEntity.ok(userService.updateProfile(usuarioDTO));
+    }
+
+    @PutMapping("/@me/address")
     @PreAuthorize("hasAuthority('USER')")
     public ResponseEntity<UsuarioDTO> updateAddress(@RequestBody DireccionDTO direccionDTO) {
         return ResponseEntity.ok(userService.updateAddress(direccionDTO));
