@@ -14,6 +14,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Objects;
+
 @Service
 @RequiredArgsConstructor
 public class UserService {
@@ -50,10 +52,14 @@ public class UserService {
         // Se busca el usuario por ID
         UserEntity userEntity = userRepository.findById(userIdTarget).orElseThrow(DataNotFoundException::userNotFound);
 
-        // Se comprueba si el email o el NIF ya están registrados por otro usuario
-        if(userRepository.existsByEmail(usuarioDTO.getEmail())) {
+        // Se comprueba si el email o el NIF ya están registrados por *OTRO* usuario
+        UserEntity existingUser = userRepository.findByEmail(usuarioDTO.getEmail()).orElse(null);
+        if (existingUser != null && !existingUser.getId().equals(userEntity.getId())) {
             throw ConflictException.emailIsRegistered();
-        } else if (userRepository.existsByNif(usuarioDTO.getNif())) {
+        }
+
+        existingUser = userRepository.findByNif(usuarioDTO.getNif()).orElse(null);
+        if (existingUser != null && !existingUser.getId().equals(userEntity.getId())) {
             throw ConflictException.nifIsRegistered();
         }
 
