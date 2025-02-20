@@ -1,5 +1,6 @@
 package com.kikisito.salus.api.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -19,6 +20,7 @@ public class UsuarioDTO {
     private String nif;
     private String email;
     private String telefono;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private Date fechaNacimiento;
     private DireccionDTO direccion;
 }
