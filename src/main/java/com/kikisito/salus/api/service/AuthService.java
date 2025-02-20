@@ -133,6 +133,7 @@ public class AuthService {
                 .nif(request.getNif())
                 .nombre(request.getNombre())
                 .apellidos(request.getApellidos())
+                .sexo(request.getSexo())
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .telefono(request.getTelefono())
