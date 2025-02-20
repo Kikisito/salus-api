@@ -3,8 +3,6 @@ package com.kikisito.salus.api.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.Date;
-
 @AllArgsConstructor
 @NoArgsConstructor
 @Setter

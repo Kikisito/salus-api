@@ -1,10 +1,7 @@
 package com.kikisito.salus.api.entity;
 
-import com.kikisito.salus.api.type.CitaStatusType;
 import jakarta.persistence.*;
 import lombok.*;
-
-import java.time.LocalDateTime;
 
 @AllArgsConstructor
 @NoArgsConstructor
