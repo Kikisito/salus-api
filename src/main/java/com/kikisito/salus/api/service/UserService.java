@@ -7,6 +7,7 @@ import com.kikisito.salus.api.entity.UserEntity;
 import com.kikisito.salus.api.exception.ConflictException;
 import com.kikisito.salus.api.exception.DataNotFoundException;
 import com.kikisito.salus.api.repository.UserRepository;
+import com.kikisito.salus.api.type.AccountStatusType;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,6 +62,11 @@ public class UserService {
         existingUser = userRepository.findByNif(usuarioDTO.getNif()).orElse(null);
         if (existingUser != null && !existingUser.getId().equals(userEntity.getId())) {
             throw ConflictException.nifIsRegistered();
+        }
+
+        // Si el email, que estaba verificado, se ha cambiado, se vuelve a marcar como cuenta no verificada
+        if (!userEntity.getEmail().equals(usuarioDTO.getEmail()) && userEntity.getAccountStatusType().equals(AccountStatusType.VERIFIED)) {
+            userEntity.setAccountStatusType(AccountStatusType.NOT_VERIFIED);
         }
 
         // Se mapea el DTO a la entidad y se guarda
