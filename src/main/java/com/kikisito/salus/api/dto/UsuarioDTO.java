@@ -6,7 +6,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Date;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -16,11 +17,13 @@ public class UsuarioDTO {
     private Integer id;
     private String nombre;
     private String apellidos;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime lastPasswordChange;
     private String sexo;
     private String nif;
     private String email;
     private String telefono;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-    private Date fechaNacimiento;
+    private LocalDate fechaNacimiento;
     private DireccionDTO direccion;
 }

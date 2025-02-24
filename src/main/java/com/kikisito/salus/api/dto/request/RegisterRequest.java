@@ -11,6 +11,7 @@ import lombok.Builder;
 import lombok.Data;
 import org.hibernate.validator.constraints.Length;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 @Data
@@ -45,7 +46,7 @@ public class RegisterRequest {
     @NotNull(message = ErrorMessages.FIELD_CANNOT_BE_BLANK)
     @Past(message = ErrorMessages.INVALID_DATE_PAST)
     @MinimumAgeConstraint(minimumAge = 18, message = ErrorMessages.INVALID_DATE_18_YEARS_OLD)
-    private Date fechaNacimiento;
+    private LocalDate fechaNacimiento;
 
     @NotBlank(message = ErrorMessages.FIELD_CANNOT_BE_BLANK)
     private String sexo;

@@ -13,6 +13,7 @@ import com.kikisito.salus.api.type.AccountStatusType;
 import com.kikisito.salus.api.type.RoleType;
 import com.kikisito.salus.api.type.TokenType;
 import java.security.SecureRandom;
+import java.time.LocalDateTime;
 import java.util.*;
 
 import lombok.RequiredArgsConstructor;
@@ -20,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -91,7 +93,7 @@ public class AuthService {
 
         // Comprobamos que no ha caducado el token
         if (jwtService.isTokenExpired(token)) {
-            throw InvalidTokenException.tokenExpired();
+            throw InvalidFieldException.tokenExpired();
         }
 
         // Cambiamos la contraseña y guardamos
@@ -146,26 +148,21 @@ public class AuthService {
 
         UserEntity savedUser = saveCredentials(userEntity);
 
-        // Generamos los tokens de acceso y enviamos el email de verificación
-        String accessToken = jwtService.generateAccessToken(userEntity);
-        String refreshToken = jwtService.generateRefreshToken(userEntity);
-        String publicId = getPublicId();
+        // Generamos los tokens de acceso
+        AuthenticationResponse authenticationResponse = this.createToken(userEntity);
 
+        // Enviamos el email de verificación
         String verificationLink = host + "VERIFY_EMAIL_PATH" + savedUser.getVerificationToken();
         emailingService.sendEmail(request.getEmail(),
                 VERIFY_EMAIL_SUBJECT,
                 VERIFY_EMAIL_TEXT.replace("{link}", verificationLink));
-        saveUserSession(savedUser, accessToken, refreshToken, publicId);
 
-        String jwt = jwtService.generateJWT(userEntity, accessToken, refreshToken, publicId);
-        return AuthenticationResponse.builder()
-                .jwt(jwt)
-                .build();
+        return authenticationResponse;
     }
 
     @Transactional
     public void verifyEmailByToken(String token) {
-        UserEntity userEntity = userRepository.findByVerificationToken(token).orElseThrow(InvalidTokenException::tokenAlreadyUsed);
+        UserEntity userEntity = userRepository.findByVerificationToken(token).orElseThrow(InvalidFieldException::tokenAlreadyUsed);
 
         if(userEntity.getAccountStatusType() == AccountStatusType.VERIFIED) {
             throw ConflictException.emailIsVerified();
@@ -198,22 +195,40 @@ public class AuthService {
 
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(userEntity.getEmail(), request.getPassword()));
 
-        String accessToken = jwtService.generateAccessToken(userEntity);
-        String refreshToken = jwtService.generateRefreshToken(userEntity);
-        String publicId = getPublicId();
-
-        saveUserSession(userEntity, accessToken, refreshToken, publicId);
-
-        String jwt = jwtService.generateJWT(userEntity, accessToken, refreshToken, publicId);
-
-        return AuthenticationResponse.builder()
-                .jwt(jwt)
-                .build();
+        return this.createToken(userEntity);
     }
 
     @Transactional
     public void logout(String jwt) {
         sessionRepository.findByAccessToken(jwtService.extractAccessToken(jwt)).ifPresent(sessionRepository::delete);
+    }
+
+    @Transactional
+    public AuthenticationResponse changePassword(String oldPassword, String newPassword) {
+        UserEntity userEntity = (UserEntity) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        return this.changePassword(userEntity, oldPassword, newPassword);
+    }
+
+    @Transactional
+    public AuthenticationResponse changePassword(UserEntity userEntity, String oldPassword, String newPassword) {
+        // Comprobamos que la contraseña antigua es correcta
+        if(!passwordEncoder.matches(oldPassword, userEntity.getPassword())) {
+            throw InvalidFieldException.invalidPassword();
+        }
+
+        // Borramos todas las sesiones del usuario
+        sessionRepository.deleteByUser(userEntity);
+
+        // Cambiamos la contraseña, el Date del cambio y guardamos
+        userEntity.setPassword(passwordEncoder.encode(newPassword));
+        userEntity.setLastPasswordChange(LocalDateTime.now());
+        userRepository.save(userEntity);
+
+        // Enviamos un email de confirmación
+        emailingService.sendEmail(userEntity.getEmail(), "Cambio de contraseña", "Tu contraseña ha sido cambiada. Si no has sido tú, por favor, contacta con nosotros.");
+
+        // Creamos un token de sesión para la sesión actual
+        return this.createToken(userEntity);
     }
 
     @Transactional(readOnly = true)
@@ -240,6 +255,20 @@ public class AuthService {
 
     private UserEntity saveCredentials(UserEntity userEntity) {
         return userRepository.save(userEntity);
+    }
+
+    private AuthenticationResponse createToken(UserEntity userEntity) {
+        String accessToken = jwtService.generateAccessToken(userEntity);
+        String refreshToken = jwtService.generateRefreshToken(userEntity);
+        String publicId = getPublicId();
+
+        saveUserSession(userEntity, accessToken, refreshToken, publicId);
+
+        String jwt = jwtService.generateJWT(userEntity, accessToken, refreshToken, publicId);
+
+        return AuthenticationResponse.builder()
+                .jwt(jwt)
+                .build();
     }
 
     private void saveUserSession(UserEntity userEntity, String accessToken, String refreshToken, String publicId) {

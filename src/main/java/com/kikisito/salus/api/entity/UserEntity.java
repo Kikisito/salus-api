@@ -7,9 +7,10 @@ import com.kikisito.salus.api.type.AccountStatusType;
 import com.kikisito.salus.api.type.RoleType;
 import jakarta.persistence.*;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
 import java.util.List;
 
 import lombok.*;
@@ -50,12 +51,15 @@ public class UserEntity implements UserDetails {
     @Column(nullable = false)
     private String password;
 
+    @Column
+    private LocalDateTime lastPasswordChange;
+
     // No es único ya que es común que un miembro de una familia gestione las cuentas de otros miembros
     @Column
     private String telefono;
 
     @Column
-    private Date fechaNacimiento;
+    private LocalDate fechaNacimiento;
 
     @Embedded
     private DireccionEmbeddable direccion;

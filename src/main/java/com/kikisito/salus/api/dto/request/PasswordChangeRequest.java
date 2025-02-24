@@ -8,11 +8,15 @@ import lombok.Data;
 
 @Data
 @Builder
-public class PasswordResetRecoverRequest {
+public class PasswordChangeRequest {
     @NotBlank(message = ErrorMessages.FIELD_CANNOT_BE_BLANK)
-    private String token;
+    private String currentPassword;
 
     @NotBlank(message = ErrorMessages.FIELD_CANNOT_BE_BLANK)
     @PasswordConstraint(message = ErrorMessages.INVALID_PASSWORD_FORMAT)
     private String password;
+
+    @NotBlank(message = ErrorMessages.FIELD_CANNOT_BE_BLANK)
+    @PasswordConstraint(message = ErrorMessages.INVALID_PASSWORD_FORMAT)
+    private String passwordConfirmation;
 }

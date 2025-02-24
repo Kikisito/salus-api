@@ -2,6 +2,8 @@ package com.kikisito.salus.api.repository;
 
 import com.kikisito.salus.api.entity.SessionEntity;
 import java.util.Optional;
+
+import com.kikisito.salus.api.entity.UserEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Repository;
@@ -16,4 +18,5 @@ public interface SessionRepository extends JpaRepository<SessionEntity, Integer>
     @Modifying
     void deleteByPublicId(String publicId);
 
+    void deleteByUser(UserEntity user);
 }

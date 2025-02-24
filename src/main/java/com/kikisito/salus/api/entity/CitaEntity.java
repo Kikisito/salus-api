@@ -25,12 +25,14 @@ public class CitaEntity extends DatedEntity {
     private LocalDateTime fecha;
 
     @Column(nullable = false)
+    @Builder.Default
     private CitaType tipo = CitaType.PRESENCIAL;
 
     @Column(nullable = false)
     private String motivo;
 
     @Column(nullable = false)
+    @Builder.Default
     private CitaStatusType estado = CitaStatusType.PENDIENTE;
 
     @ManyToOne(fetch = FetchType.LAZY)

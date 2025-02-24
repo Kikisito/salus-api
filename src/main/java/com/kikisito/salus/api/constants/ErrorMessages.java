@@ -6,6 +6,7 @@ public final class ErrorMessages {
     public static final String FIELD_IS_NOT_VALID = "%s field is not valid";
     public static final String FIELD_LENGTH_INVALID = "%s field must be between {min} and {max} characters long";
     public static final String INVALID_PASSWORD_FORMAT = "%s field must contain at least one number, one capital letter, one lowercase letter and must be at least 8 characters long";
+    public static final String INVALID_PASSWORD = "Invalid password";
     public static final String INVALID_EMAIL = "%s must be a correctly formatted email address";
     public static final String INVALID_NIF = "%s must be a valid NIF/NIE";
     public static final String USER_NOT_FOUND = "User could not be found";

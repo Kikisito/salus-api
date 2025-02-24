@@ -79,8 +79,8 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ExceptionHandler(InvalidTokenException.class)
-    public ExceptionResponse handleInvalidTokenException(final InvalidTokenException ex) {
+    @ExceptionHandler(InvalidFieldException.class)
+    public ExceptionResponse handleInvalidTokenException(final InvalidFieldException ex) {
         logger.error("Invalid token", ex);
         return new ExceptionResponse(
                 "Invalid token",
