@@ -49,4 +49,11 @@ public class UserController {
                 authService.changePassword(passwordChangeRequest.getCurrentPassword(), passwordChangeRequest.getPassword())
         );
     }
+
+    @DeleteMapping("/@me/sessions")
+    @PreAuthorize("hasAuthority('USER')")
+    public ResponseEntity<Void> logout() {
+        authService.closeAllSessions();
+        return ResponseEntity.noContent().build();
+    }
 }

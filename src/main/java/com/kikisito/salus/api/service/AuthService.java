@@ -231,6 +231,17 @@ public class AuthService {
         return this.createToken(userEntity);
     }
 
+    @Transactional
+    public void closeAllSessions() {
+        UserEntity userEntity = (UserEntity) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        closeAllSessions(userEntity);
+    }
+
+    @Transactional
+    public void closeAllSessions(UserEntity userEntity) {
+        sessionRepository.deleteByUser(userEntity);
+    }
+
     @Transactional(readOnly = true)
     public boolean isEmailAvailable(String email) {
         Optional<UserEntity> userEntity = userRepository.findByEmail(email);
