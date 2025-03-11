@@ -15,7 +15,6 @@ import java.util.List;
 @Table(name = "medicos")
 @PrimaryKeyJoinColumn(name = "user_id")
 public class MedicoEntity extends UserEntity {
-
     @Column(nullable = false, unique = true)
     private String numeroColegiado;
 
@@ -26,6 +25,5 @@ public class MedicoEntity extends UserEntity {
     private List<EspecialidadEntity> especialidades;
 
     @OneToMany(mappedBy = "medico")
-    private List<CitaEntity> citasMedico;
-
+    private List<CitaSlotEntity> slotsCitas;
 }

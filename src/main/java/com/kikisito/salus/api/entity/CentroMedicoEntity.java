@@ -13,7 +13,6 @@ import java.util.List;
 @Entity
 @Table(name = "centros_medicos")
 public class CentroMedicoEntity {
-
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Integer id;
@@ -50,5 +49,4 @@ public class CentroMedicoEntity {
 
     @OneToMany(mappedBy = "centroMedico")
     private List<ConsultaEntity> consultas;
-
 }

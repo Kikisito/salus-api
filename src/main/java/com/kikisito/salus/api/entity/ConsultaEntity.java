@@ -3,6 +3,8 @@ package com.kikisito.salus.api.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.List;
+
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
@@ -11,16 +13,17 @@ import lombok.*;
 @Entity
 @Table(name = "consultas")
 public class ConsultaEntity {
-
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Integer id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "centro_medico_id")
+    @JoinColumn(name = "centro_medico_id", nullable = false)
     private CentroMedicoEntity centroMedico;
 
     @Column(nullable = false)
     private String nombre;
 
+    @OneToMany(mappedBy = "consulta")
+    private List<CitaSlotEntity> citas;
 }

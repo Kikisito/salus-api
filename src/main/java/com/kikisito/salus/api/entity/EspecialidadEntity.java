@@ -13,7 +13,6 @@ import java.util.List;
 @Builder
 @Table(name = "especialidades")
 public class EspecialidadEntity {
-
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Integer id;
@@ -28,6 +27,5 @@ public class EspecialidadEntity {
     private List<MedicoEntity> medicos;
 
     @OneToMany(mappedBy = "especialidad")
-    private List<CitaEntity> citas;
-
+    private List<CitaSlotEntity> slotsCitas;
 }

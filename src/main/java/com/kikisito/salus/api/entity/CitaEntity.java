@@ -6,8 +6,6 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
-import java.time.LocalDateTime;
-
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
@@ -16,39 +14,26 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "citas")
 public class CitaEntity extends DatedEntity {
-
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Integer id;
 
-    @Column(nullable = false)
-    private LocalDateTime fecha;
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "slot_id", nullable = false)
+    private CitaSlotEntity slot;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "paciente_id")
+    private UserEntity paciente;
 
     @Column(nullable = false)
     @Builder.Default
     private CitaType tipo = CitaType.PRESENCIAL;
 
     @Column(nullable = false)
-    private String motivo;
-
-    @Column(nullable = false)
     @Builder.Default
     private CitaStatusType estado = CitaStatusType.PENDIENTE;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "paciente_id")
-    private UserEntity paciente;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "medico_id")
-    private UserEntity medico;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "especialidad_id")
-    private EspecialidadEntity especialidad;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "consulta_id")
-    private ConsultaEntity consulta;
-
+    @Column(nullable = false)
+    private String motivo;
 }
