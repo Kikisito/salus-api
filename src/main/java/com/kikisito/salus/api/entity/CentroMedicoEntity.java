@@ -47,6 +47,6 @@ public class CentroMedicoEntity {
     @Column(nullable = false)
     private String localidad;
 
-    @OneToMany(mappedBy = "centroMedico")
+    @OneToMany(mappedBy = "centroMedico", cascade = CascadeType.REMOVE)
     private List<ConsultaEntity> consultas;
 }

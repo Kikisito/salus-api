@@ -20,4 +20,6 @@ public final class ErrorMessages {
     public static final String TOKEN_ALREADY_USED = "This token has already been used";
     public static final String INVALID_DATE_PAST = "La fecha de nacimiento debe ser anterior a la fecha actual";
     public static final String INVALID_DATE_18_YEARS_OLD = "El usuario debe tener al menos 18 años";
+    public static final String CENTRO_MEDICO_NOT_FOUND = "Centro médico no encontrado";
+    public static final String CONSULTA_NOT_FOUND = "Consulta no encontrada";
 }

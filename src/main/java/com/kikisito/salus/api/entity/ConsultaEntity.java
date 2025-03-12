@@ -24,6 +24,8 @@ public class ConsultaEntity {
     @Column(nullable = false)
     private String nombre;
 
+    // Cascade para borrar citas
+    // antes de borrarlas se debería ver si se notifican usuarios o se hace otra acción
     @OneToMany(mappedBy = "consulta")
     private List<CitaSlotEntity> citas;
 }

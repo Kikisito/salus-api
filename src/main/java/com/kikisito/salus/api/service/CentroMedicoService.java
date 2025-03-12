@@ -3,6 +3,7 @@ package com.kikisito.salus.api.service;
 import com.kikisito.salus.api.dto.CentroMedicoDTO;
 import com.kikisito.salus.api.dto.request.NewCentroMedicoRequest;
 import com.kikisito.salus.api.entity.CentroMedicoEntity;
+import com.kikisito.salus.api.exception.DataNotFoundException;
 import com.kikisito.salus.api.repository.CentroMedicoRepository;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -30,7 +31,7 @@ public class CentroMedicoService {
 
     @Transactional(readOnly = true)
     public CentroMedicoDTO getCentroMedicoById(Integer id) {
-        CentroMedicoEntity centroMedico = centroMedicoRepository.findById(id).orElseThrow();
+        CentroMedicoEntity centroMedico = centroMedicoRepository.findById(id).orElseThrow(DataNotFoundException::centroMedicoNotFound);
         return modelMapper.map(centroMedico, CentroMedicoDTO.class);
     }
 
@@ -43,7 +44,7 @@ public class CentroMedicoService {
 
     @Transactional
     public CentroMedicoDTO updateCentroMedico(Integer id, NewCentroMedicoRequest centroMedicoDTO) {
-        CentroMedicoEntity centroMedico = centroMedicoRepository.findById(id).orElseThrow();
+        CentroMedicoEntity centroMedico = centroMedicoRepository.findById(id).orElseThrow(DataNotFoundException::centroMedicoNotFound);
         modelMapper.map(centroMedicoDTO, centroMedico);
         centroMedico = centroMedicoRepository.save(centroMedico);
         return modelMapper.map(centroMedico, CentroMedicoDTO.class);
