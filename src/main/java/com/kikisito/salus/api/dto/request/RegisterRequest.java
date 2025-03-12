@@ -50,6 +50,7 @@ public class RegisterRequest {
     @NotBlank(message = ErrorMessages.FIELD_CANNOT_BE_BLANK)
     private String sexo;
 
+    @NotNull(message = ErrorMessages.FIELD_CANNOT_BE_BLANK)
     @Valid
     private DireccionDTO direccion;
 }

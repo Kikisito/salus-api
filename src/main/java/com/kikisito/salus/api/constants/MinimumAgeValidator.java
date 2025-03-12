@@ -3,10 +3,9 @@ package com.kikisito.salus.api.constants;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 
-import java.util.Calendar;
-import java.util.Date;
+import java.time.LocalDate;
 
-public class MinimumAgeValidator implements ConstraintValidator<MinimumAgeConstraint, Date> {
+public class MinimumAgeValidator implements ConstraintValidator<MinimumAgeConstraint, LocalDate> {
     private int minimumAge;
 
     @Override
@@ -16,15 +15,12 @@ public class MinimumAgeValidator implements ConstraintValidator<MinimumAgeConstr
     }
 
     @Override
-    public boolean isValid(Date date, ConstraintValidatorContext constraintValidatorContext) {
+    public boolean isValid(LocalDate date, ConstraintValidatorContext constraintValidatorContext) {
         if (date == null) {
             return false;
         }
 
-        Calendar calendar = Calendar.getInstance();
-        calendar.add(Calendar.YEAR, -minimumAge);
-        Date minValidDate = calendar.getTime();
-
-        return date.before(minValidDate);
+        LocalDate minValidDate = LocalDate.now().minusYears(minimumAge);
+        return date.isBefore(minValidDate);
     }
 }
