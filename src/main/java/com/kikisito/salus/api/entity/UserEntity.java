@@ -14,7 +14,6 @@ import java.util.Collection;
 import java.util.List;
 
 import lombok.*;
-import lombok.experimental.SuperBuilder;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -24,11 +23,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 @Setter
 @Getter
 @Entity
-@SuperBuilder
-@Inheritance(strategy = InheritanceType.JOINED)
+@Builder
 @Table(name = "users")
 public class UserEntity implements UserDetails {
-
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Integer id;
@@ -80,6 +77,12 @@ public class UserEntity implements UserDetails {
     @JsonManagedReference
     private List<SessionEntity> sessions;
 
+    @OneToMany(mappedBy = "paciente", fetch = FetchType.LAZY)
+    private List<CitaEntity> citas;
+
+    @OneToOne(mappedBy = "user")
+    private PerfilMedicoEntity perfilMedico;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         List<SimpleGrantedAuthority> authoritiesList = new ArrayList<>();
@@ -88,9 +91,6 @@ public class UserEntity implements UserDetails {
         }
         return authoritiesList;
     }
-
-    @OneToMany(mappedBy = "paciente", fetch = FetchType.LAZY)
-    private List<CitaEntity> citasPaciente;
 
     @Override
     public String getUsername() {
@@ -121,5 +121,4 @@ public class UserEntity implements UserDetails {
     public String getPassword() {
         return password;
     }
-
 }

@@ -18,4 +18,12 @@ public class ConflictException extends ApiRuntimeException {
     public static ConflictException emailIsVerified() {
         return new ConflictException("conflict.email_is_verified", ErrorMessages.EMAIL_IS_VERIFIED);
     }
+
+    public static ConflictException userAlreadyMedico() {
+        return new ConflictException("conflict.user_already_medico", ErrorMessages.USER_ALREADY_MEDICO);
+    }
+
+    public static ConflictException numeroColegiadoAlreadyExists() {
+        return new ConflictException("conflict.numero_colegiado_already_exists", ErrorMessages.NUMERO_COLEGIADO_ALREADY_EXISTS);
+    }
 }

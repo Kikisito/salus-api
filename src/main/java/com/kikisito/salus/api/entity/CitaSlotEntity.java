@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 @Setter
 @Builder
 @Entity
-@Table(name = "agenda_medico", uniqueConstraints = {
+@Table(name = "citas_slots", uniqueConstraints = {
         @UniqueConstraint(columnNames = {"medico_id", "diaSemana", "horaInicio", "horaFin"})
 })
 public class CitaSlotEntity {
@@ -21,7 +21,7 @@ public class CitaSlotEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "medico_id", nullable = false)
-    private MedicoEntity medico;
+    private PerfilMedicoEntity perfilMedico;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "especialidad_id", nullable = false)

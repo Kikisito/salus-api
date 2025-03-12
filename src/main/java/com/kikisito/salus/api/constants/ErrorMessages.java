@@ -22,4 +22,6 @@ public final class ErrorMessages {
     public static final String INVALID_DATE_18_YEARS_OLD = "El usuario debe tener al menos 18 años";
     public static final String CENTRO_MEDICO_NOT_FOUND = "Centro médico no encontrado";
     public static final String CONSULTA_NOT_FOUND = "Consulta no encontrada";
+    public static final String USER_ALREADY_MEDICO = "User is already registered as a doctor";
+    public static final String NUMERO_COLEGIADO_ALREADY_EXISTS = "This medical registration number is already registered";
 }

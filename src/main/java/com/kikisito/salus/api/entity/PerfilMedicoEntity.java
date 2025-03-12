@@ -12,9 +12,16 @@ import java.util.List;
 @Getter
 @Entity
 @SuperBuilder
-@Table(name = "medicos")
-@PrimaryKeyJoinColumn(name = "user_id")
-public class MedicoEntity extends UserEntity {
+@Table(name = "perfiles_medicos")
+public class PerfilMedicoEntity {
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    private Integer id;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false, unique = true)
+    private UserEntity user;
+
     @Column(nullable = false, unique = true)
     private String numeroColegiado;
 
@@ -24,6 +31,6 @@ public class MedicoEntity extends UserEntity {
             inverseJoinColumns = @JoinColumn(name = "especialidad_id"))
     private List<EspecialidadEntity> especialidades;
 
-    @OneToMany(mappedBy = "medico")
+    @OneToMany(mappedBy = "perfilMedico")
     private List<CitaSlotEntity> slotsCitas;
 }
