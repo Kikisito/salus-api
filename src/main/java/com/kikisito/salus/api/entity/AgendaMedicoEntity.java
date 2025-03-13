@@ -28,7 +28,7 @@ public class AgendaMedicoEntity {
     private DiaSemana diaSemana;
 
     @Column(nullable = false)
-    private String horaInicio;
+    private LocalTime horaInicio;
 
     @Column(nullable = false)
     private LocalTime horaFin;
