@@ -28,11 +28,16 @@ public class PerfilMedicoEntity {
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "medicos_especialidades",
             joinColumns = @JoinColumn(name = "medico_id"),
+            foreignKey = @ForeignKey(name = "fk_medicos_especialidad__medico_id"),
             inverseJoinColumns = @JoinColumn(name = "especialidad_id"),
+            inverseForeignKey = @ForeignKey(name = "fk_medicos_especialidad__especialidad_id"),
             uniqueConstraints = @UniqueConstraint(columnNames = {"medico_id", "especialidad_id"})
     )
     private List<EspecialidadEntity> especialidades;
 
     @OneToMany(mappedBy = "perfilMedico")
     private List<CitaSlotEntity> slotsCitas;
+
+    @OneToMany(mappedBy = "medico")
+    private List<AgendaMedicoEntity> agenda;
 }

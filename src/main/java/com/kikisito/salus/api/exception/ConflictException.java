@@ -30,4 +30,8 @@ public class ConflictException extends ApiRuntimeException {
     public static ConflictException medicoAlreadyHasEspecialidad() {
         return new ConflictException("conflict.medico_already_has_especialidad", ErrorMessages.MEDICO_ALREADY_HAS_ESPECIALIDAD);
     }
+
+    public static ConflictException horarioColapsa() {
+        return new ConflictException("conflict.horario_colapsa", ErrorMessages.HORARIO_COLAPSA);
+    }
 }

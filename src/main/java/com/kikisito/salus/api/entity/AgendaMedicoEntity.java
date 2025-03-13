@@ -22,7 +22,7 @@ public class AgendaMedicoEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "medico_id", nullable = false)
-    private UserEntity medico;
+    private PerfilMedicoEntity medico;
 
     @Column(nullable = false)
     private DiaSemana diaSemana;

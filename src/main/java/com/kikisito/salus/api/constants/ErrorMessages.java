@@ -27,4 +27,6 @@ public final class ErrorMessages {
     public static final String MEDICO_NOT_FOUND = "Médico no encontrado";
     public static final String ESPECIALIDAD_NOT_FOUND = "Especialidad no encontrada";
     public static final String MEDICO_ALREADY_HAS_ESPECIALIDAD = "El médico ya tiene asignada la especialidad";
+    public static final String END_TIME_MUST_BE_AFTER_START_TIME = "End time must be after start time";
+    public static final String HORARIO_COLAPSA = "El horario colapsa con otro horario existente";
 }
