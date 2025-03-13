@@ -28,7 +28,9 @@ public class PerfilMedicoEntity {
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "medicos_especialidades",
             joinColumns = @JoinColumn(name = "medico_id"),
-            inverseJoinColumns = @JoinColumn(name = "especialidad_id"))
+            inverseJoinColumns = @JoinColumn(name = "especialidad_id"),
+            uniqueConstraints = @UniqueConstraint(columnNames = {"medico_id", "especialidad_id"})
+    )
     private List<EspecialidadEntity> especialidades;
 
     @OneToMany(mappedBy = "perfilMedico")

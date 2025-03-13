@@ -24,4 +24,7 @@ public final class ErrorMessages {
     public static final String CONSULTA_NOT_FOUND = "Consulta no encontrada";
     public static final String USER_ALREADY_MEDICO = "User is already registered as a doctor";
     public static final String NUMERO_COLEGIADO_ALREADY_EXISTS = "This medical registration number is already registered";
+    public static final String MEDICO_NOT_FOUND = "Médico no encontrado";
+    public static final String ESPECIALIDAD_NOT_FOUND = "Especialidad no encontrada";
+    public static final String MEDICO_ALREADY_HAS_ESPECIALIDAD = "El médico ya tiene asignada la especialidad";
 }

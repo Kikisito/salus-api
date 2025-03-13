@@ -26,4 +26,8 @@ public class ConflictException extends ApiRuntimeException {
     public static ConflictException numeroColegiadoAlreadyExists() {
         return new ConflictException("conflict.numero_colegiado_already_exists", ErrorMessages.NUMERO_COLEGIADO_ALREADY_EXISTS);
     }
+
+    public static ConflictException medicoAlreadyHasEspecialidad() {
+        return new ConflictException("conflict.medico_already_has_especialidad", ErrorMessages.MEDICO_ALREADY_HAS_ESPECIALIDAD);
+    }
 }

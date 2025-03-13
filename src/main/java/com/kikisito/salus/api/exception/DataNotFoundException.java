@@ -22,4 +22,12 @@ public class DataNotFoundException extends ApiRuntimeException {
     public static DataNotFoundException consultaNotFound() {
         return new DataNotFoundException("data_not_found.consulta", ErrorMessages.CONSULTA_NOT_FOUND);
     }
+
+    public static DataNotFoundException medicoNotFound() {
+        return new DataNotFoundException("data_not_found.medico", ErrorMessages.MEDICO_NOT_FOUND);
+    }
+
+    public static DataNotFoundException especialidadNotFound() {
+        return new DataNotFoundException("data_not_found.especialidad", ErrorMessages.ESPECIALIDAD_NOT_FOUND);
+    }
 }
