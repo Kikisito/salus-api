@@ -2,7 +2,8 @@ package com.kikisito.salus.api.controllers;
 
 import com.kikisito.salus.api.dto.AgendaMedicoDTO;
 import com.kikisito.salus.api.dto.request.AgendaMedicoRequest;
-import com.kikisito.salus.api.service.AgendaService;
+import com.kikisito.salus.api.service.AgendaMedicoService;
+import com.kikisito.salus.api.type.DiaSemana;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,30 +20,30 @@ import java.util.List;
 @CrossOrigin
 public class AgendaMedicoController {
     @Autowired
-    private final AgendaService agendaService;
+    private final AgendaMedicoService agendaMedicoService;
 
-    @GetMapping("/{medicoId}")
+    @GetMapping("/{medicoId}/{diaSemana}")
     @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity<List<AgendaMedicoDTO>> getAgendasMedico(@PathVariable Integer medicoId) {
-        return ResponseEntity.ok(agendaService.getAgendasMedico(medicoId));
+    public ResponseEntity<List<AgendaMedicoDTO>> getAgendasMedico(@PathVariable Integer medicoId, @PathVariable DiaSemana diaSemana) {
+        return ResponseEntity.ok(agendaMedicoService.getAgendasMedicoByDiaSemana(medicoId, diaSemana));
     }
 
     @PostMapping("/add")
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<AgendaMedicoDTO> addAgendaEntry(@RequestBody @Valid AgendaMedicoRequest agendaMedicoRequest) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(agendaService.addAgendaMedico(agendaMedicoRequest));
+        return ResponseEntity.status(HttpStatus.CREATED).body(agendaMedicoService.addAgendaMedico(agendaMedicoRequest));
     }
 
     @PutMapping("/update/{agendaId}")
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<AgendaMedicoDTO> updateAgendaEntry(@PathVariable("agendaId") Integer agendaId, @RequestBody @Valid AgendaMedicoRequest agendaMedicoRequest) {
-        return ResponseEntity.ok(agendaService.updateAgendaMedico(agendaId, agendaMedicoRequest));
+        return ResponseEntity.ok(agendaMedicoService.updateAgendaMedico(agendaId, agendaMedicoRequest));
     }
 
     @DeleteMapping("/delete/{agendaId}")
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<Void> deleteAgendaEntry(@PathVariable Integer agendaId) {
-        agendaService.deleteAgendaMedico(agendaId);
+        agendaMedicoService.deleteAgendaMedico(agendaId);
         return ResponseEntity.noContent().build();
     }
 }

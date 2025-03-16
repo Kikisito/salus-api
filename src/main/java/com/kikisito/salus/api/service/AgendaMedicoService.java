@@ -20,7 +20,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class AgendaService {
+public class AgendaMedicoService {
     @Autowired
     private final AgendaMedicoRepository agendaMedicoRepository;
 
@@ -52,18 +52,13 @@ public class AgendaService {
         // Obtenemos todas las agendas existentes para el médico y el día de la semana
         List<AgendaMedicoEntity> agendasExistentes = agendaMedicoRepository.findByMedicoAndDiaSemana(medico, agendaMedicoRequest.getDiaSemana());
 
-        // Obtenemos los horarios de la nueva agenda
+        // Obtenemos los horarios de la nueva
+        DiaSemana diaSemana = agendaMedicoRequest.getDiaSemana();
         LocalTime start1 = agendaMedicoRequest.getHoraInicio();
         LocalTime end1 = agendaMedicoRequest.getHoraFin();
 
         // Verificamos si hay colisión de horarios
-        boolean horarioColapsa = agendasExistentes.stream().anyMatch(
-                agenda -> {
-                    LocalTime start2 = agenda.getHoraInicio();
-                    LocalTime end2 = agenda.getHoraFin();
-                    return timesOverlap(start1, end1, start2, end2);
-                }
-        );
+        boolean horarioColapsa = this.agendaOverlap(diaSemana, start1, end1, agendasExistentes);
 
         if (horarioColapsa) {
             throw ConflictException.horarioColapsa();
@@ -86,22 +81,13 @@ public class AgendaService {
         // Obtenemos todas las agendas existentes para el médico y el día de la semana
         List<AgendaMedicoEntity> agendasExistentes = agendaMedicoRepository.findByMedicoAndDiaSemana(agenda.getMedico(), agenda.getDiaSemana());
 
-        // Obtenemos los horarios de la nueva agenda
+        // Obtenemos los horarios de la nueva
+        DiaSemana diaSemana = agendaMedicoRequest.getDiaSemana();
         LocalTime start1 = agendaMedicoRequest.getHoraInicio();
         LocalTime end1 = agendaMedicoRequest.getHoraFin();
 
         // Verificamos si hay colisión de horarios
-        boolean horarioColapsa = agendasExistentes.stream().anyMatch(
-                agendaExistente -> {
-                    // Descartamos la agenda que estamos actualizando
-                    if (agendaExistente.getId().equals(agendaId)) {
-                        return false;
-                    }
-                    LocalTime start2 = agendaExistente.getHoraInicio();
-                    LocalTime end2 = agendaExistente.getHoraFin();
-                    return timesOverlap(start1, end1, start2, end2);
-                }
-        );
+        boolean horarioColapsa = this.agendaOverlap(diaSemana, start1, end1, agendasExistentes);
 
         if (horarioColapsa) {
             throw ConflictException.horarioColapsa();
@@ -119,8 +105,24 @@ public class AgendaService {
 
     @Transactional
     public void deleteAgendaMedico(Integer agendaId) {
-        AgendaMedicoEntity agenda = agendaMedicoRepository.findById(agendaId).orElseThrow(DataNotFoundException::agendaNotFound);
-        agendaMedicoRepository.delete(agenda);
+        if (!agendaMedicoRepository.existsById(agendaId)) {
+            throw DataNotFoundException.agendaNotFound();
+        }
+        agendaMedicoRepository.deleteById(agendaId);
+    }
+
+    private boolean agendaOverlap(DiaSemana diaSemana, LocalTime start1, LocalTime end1, List<AgendaMedicoEntity> agendas) {
+        return agendas.stream().anyMatch(
+                agenda -> {
+                    if (agenda.getDiaSemana() != diaSemana) {
+                        return false;
+                    }
+                    LocalTime start2 = agenda.getHoraInicio();
+                    LocalTime end2 = agenda.getHoraFin();
+                    return timesOverlap(start1, end1, start2, end2);
+                }
+        );
+
     }
 
     private boolean timesOverlap(LocalTime start1, LocalTime end1, LocalTime start2, LocalTime end2) {
