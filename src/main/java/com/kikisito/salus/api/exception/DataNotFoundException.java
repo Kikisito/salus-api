@@ -30,4 +30,8 @@ public class DataNotFoundException extends ApiRuntimeException {
     public static DataNotFoundException especialidadNotFound() {
         return new DataNotFoundException("data_not_found.especialidad", ErrorMessages.ESPECIALIDAD_NOT_FOUND);
     }
+
+    public static DataNotFoundException agendaNotFound() {
+        return new DataNotFoundException("data_not_found.agenda", ErrorMessages.AGENDA_NOT_FOUND);
+    }
 }

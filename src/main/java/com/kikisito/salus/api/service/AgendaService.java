@@ -6,10 +6,9 @@ import com.kikisito.salus.api.entity.AgendaMedicoEntity;
 import com.kikisito.salus.api.entity.PerfilMedicoEntity;
 import com.kikisito.salus.api.exception.ConflictException;
 import com.kikisito.salus.api.exception.DataNotFoundException;
-import com.kikisito.salus.api.repository.AusenciaMedicoRepository;
-import com.kikisito.salus.api.repository.CitaRepository;
 import com.kikisito.salus.api.repository.AgendaMedicoRepository;
 import com.kikisito.salus.api.repository.PerfilMedicoRepository;
+import com.kikisito.salus.api.type.DiaSemana;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,13 +22,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class AgendaService {
     @Autowired
-    private final CitaRepository citaRepository;
-
-    @Autowired
     private final AgendaMedicoRepository agendaMedicoRepository;
-
-    @Autowired
-    private final AusenciaMedicoRepository ausenciaMedicoRepository;
 
     @Autowired
     private final PerfilMedicoRepository perfilMedicoRepository;
@@ -37,13 +30,27 @@ public class AgendaService {
     @Autowired
     private final ModelMapper modelMapper;
 
+    @Transactional(readOnly = true)
+    public List<AgendaMedicoDTO> getAgendasMedico(Integer medicoId) {
+        PerfilMedicoEntity medico = perfilMedicoRepository.findById(medicoId).orElseThrow(DataNotFoundException::medicoNotFound);
+        List<AgendaMedicoEntity> agendas = agendaMedicoRepository.findByMedico(medico);
+        return agendas.stream().map(agenda -> modelMapper.map(agenda, AgendaMedicoDTO.class)).toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<AgendaMedicoDTO> getAgendasMedicoByDiaSemana(Integer medicoId, DiaSemana diaSemana) {
+        PerfilMedicoEntity medico = perfilMedicoRepository.findById(medicoId).orElseThrow(DataNotFoundException::medicoNotFound);
+        List<AgendaMedicoEntity> agendas = agendaMedicoRepository.findByMedicoAndDiaSemana(medico, diaSemana);
+        return agendas.stream().map(agenda -> modelMapper.map(agenda, AgendaMedicoDTO.class)).toList();
+    }
+
     @Transactional
     public AgendaMedicoDTO addAgendaMedico(AgendaMedicoRequest agendaMedicoRequest) {
         // Buscamos si existe el perfil del médico y lo recuperamos
         PerfilMedicoEntity medico = perfilMedicoRepository.findById(agendaMedicoRequest.getMedico()).orElseThrow(DataNotFoundException::medicoNotFound);
 
         // Obtenemos todas las agendas existentes para el médico y el día de la semana
-        List<AgendaMedicoEntity> agendasExistentes = agendaMedicoRepository.findByMedico_IdAndDiaSemana(agendaMedicoRequest.getMedico(), agendaMedicoRequest.getDiaSemana());
+        List<AgendaMedicoEntity> agendasExistentes = agendaMedicoRepository.findByMedicoAndDiaSemana(medico, agendaMedicoRequest.getDiaSemana());
 
         // Obtenemos los horarios de la nueva agenda
         LocalTime start1 = agendaMedicoRequest.getHoraInicio();
@@ -58,7 +65,7 @@ public class AgendaService {
                 }
         );
 
-        if(horarioColapsa) {
+        if (horarioColapsa) {
             throw ConflictException.horarioColapsa();
         }
 
@@ -69,6 +76,51 @@ public class AgendaService {
 
         // Mapeamos la entidad a DTO y retornamos
         return modelMapper.map(agendaMedicoEntity, AgendaMedicoDTO.class);
+    }
+
+    @Transactional
+    public AgendaMedicoDTO updateAgendaMedico(Integer agendaId, AgendaMedicoRequest agendaMedicoRequest) {
+        // Buscamos la agenda a actualizar
+        AgendaMedicoEntity agenda = agendaMedicoRepository.findById(agendaId).orElseThrow(DataNotFoundException::agendaNotFound);
+
+        // Obtenemos todas las agendas existentes para el médico y el día de la semana
+        List<AgendaMedicoEntity> agendasExistentes = agendaMedicoRepository.findByMedicoAndDiaSemana(agenda.getMedico(), agenda.getDiaSemana());
+
+        // Obtenemos los horarios de la nueva agenda
+        LocalTime start1 = agendaMedicoRequest.getHoraInicio();
+        LocalTime end1 = agendaMedicoRequest.getHoraFin();
+
+        // Verificamos si hay colisión de horarios
+        boolean horarioColapsa = agendasExistentes.stream().anyMatch(
+                agendaExistente -> {
+                    // Descartamos la agenda que estamos actualizando
+                    if (agendaExistente.getId().equals(agendaId)) {
+                        return false;
+                    }
+                    LocalTime start2 = agendaExistente.getHoraInicio();
+                    LocalTime end2 = agendaExistente.getHoraFin();
+                    return timesOverlap(start1, end1, start2, end2);
+                }
+        );
+
+        if (horarioColapsa) {
+            throw ConflictException.horarioColapsa();
+        }
+
+        // Mapeamos la petición a la entidad y guardamos
+        agenda.setDiaSemana(agendaMedicoRequest.getDiaSemana());
+        agenda.setHoraInicio(agendaMedicoRequest.getHoraInicio());
+        agenda.setHoraFin(agendaMedicoRequest.getHoraFin());
+        agenda = agendaMedicoRepository.save(agenda);
+
+        // Mapeamos la entidad a DTO y retornamos
+        return modelMapper.map(agenda, AgendaMedicoDTO.class);
+    }
+
+    @Transactional
+    public void deleteAgendaMedico(Integer agendaId) {
+        AgendaMedicoEntity agenda = agendaMedicoRepository.findById(agendaId).orElseThrow(DataNotFoundException::agendaNotFound);
+        agendaMedicoRepository.delete(agenda);
     }
 
     private boolean timesOverlap(LocalTime start1, LocalTime end1, LocalTime start2, LocalTime end2) {

@@ -29,4 +29,5 @@ public final class ErrorMessages {
     public static final String MEDICO_ALREADY_HAS_ESPECIALIDAD = "El médico ya tiene asignada la especialidad";
     public static final String END_TIME_MUST_BE_AFTER_START_TIME = "End time must be after start time";
     public static final String HORARIO_COLAPSA = "El horario colapsa con otro horario existente";
+    public static final String AGENDA_NOT_FOUND = "Agenda no encontrada";
 }
