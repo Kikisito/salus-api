@@ -32,4 +32,5 @@ public final class ErrorMessages {
     public static final String AGENDA_NOT_FOUND = "Agenda no encontrada";
     public static final String CITA_SLOT_NOT_FOUND = "Cita slot no encontrada";
     public static final String CITA_NOT_FOUND = "Cita no encontrada";
+    public static final String APPOINTMENT_SLOT_IS_ALREADY_TAKEN = "Appointment slot is already taken";
 }

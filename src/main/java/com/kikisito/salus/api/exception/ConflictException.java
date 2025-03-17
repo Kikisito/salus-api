@@ -34,4 +34,8 @@ public class ConflictException extends ApiRuntimeException {
     public static ConflictException horarioColapsa() {
         return new ConflictException("conflict.horario_colapsa", ErrorMessages.HORARIO_COLAPSA);
     }
+
+    public static ConflictException appointmentSlotIsAlreadyTaken() {
+        return new ConflictException("conflict.appointment_slot_is_already_taken", ErrorMessages.APPOINTMENT_SLOT_IS_ALREADY_TAKEN);
+    }
 }
