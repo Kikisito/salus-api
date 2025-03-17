@@ -40,13 +40,13 @@ public class AgendaMedicoController {
         return ResponseEntity.status(HttpStatus.CREATED).body(agendaMedicoService.addAgendaMedicoEntry(agendaMedicoRequest));
     }
 
-    @PutMapping("/update/{agendaId}")
+    @PutMapping("/{agendaId}")
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<AgendaMedicoDTO> updateAgendaEntry(@PathVariable("agendaId") Integer agendaId, @RequestBody @Valid AgendaMedicoRequest agendaMedicoRequest) {
         return ResponseEntity.ok(agendaMedicoService.updateAgendaMedicoEntry(agendaId, agendaMedicoRequest));
     }
 
-    @DeleteMapping("/delete/{agendaId}")
+    @DeleteMapping("/{agendaId}")
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<Void> deleteAgendaEntry(@PathVariable Integer agendaId) {
         agendaMedicoService.deleteAgendaMedicoEntry(agendaId);

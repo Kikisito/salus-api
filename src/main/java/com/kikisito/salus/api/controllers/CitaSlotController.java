@@ -32,7 +32,7 @@ public class CitaSlotController {
         return ResponseEntity.ok(citaSlotService.createCitaSlot(citaSlotRequest));
     }
 
-    @DeleteMapping("/{citaSlot}/delete")
+    @DeleteMapping("/{citaSlot}")
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<Void> deleteCitaSlot(@PathVariable("citaSlot") Integer citaSlotId) {
         citaSlotService.deleteCitaSlot(citaSlotId);
