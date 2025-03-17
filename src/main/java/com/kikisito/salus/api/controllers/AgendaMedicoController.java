@@ -15,7 +15,7 @@ import java.time.DayOfWeek;
 import java.util.List;
 
 @RestController
-@RequestMapping("api/v1/agenda")
+@RequestMapping("api/v1/schedules")
 @RequiredArgsConstructor
 @CrossOrigin
 public class AgendaMedicoController {

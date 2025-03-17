@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("api/v1/cita-slot")
+@RequestMapping("api/v1/appointment-slots")
 @RequiredArgsConstructor
 @CrossOrigin
 public class CitaSlotController {

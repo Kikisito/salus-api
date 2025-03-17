@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("api/v1/perfil-medico")
+@RequestMapping("api/v1/doctor-profiles")
 @RequiredArgsConstructor
 @CrossOrigin
 public class PerfilMedicoController {
@@ -29,19 +29,19 @@ public class PerfilMedicoController {
         return ResponseEntity.status(HttpStatus.CREATED).body(perfilMedicoService.addMedicoFromUser(addPerfilMedicoToUserRequest));
     }
 
-    @GetMapping("/{perfilId}/especialidades")
+    @GetMapping("/{perfilId}/specialties")
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<List<EspecialidadDTO>> getEspecialidadesMedico(@PathVariable("perfilId") Integer id) {
         return ResponseEntity.ok(perfilMedicoService.getEspecialidades(id));
     }
 
-    @PostMapping("/{medicoId}/especialidades/add")
+    @PostMapping("/{medicoId}/specialties/add")
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<PerfilMedicoDTO> addEspecialidadMedico(@PathVariable("medicoId") Integer medicoId, @RequestBody @Valid AddEspecialidadMedicoRequest addEspecialidadMedicoRequest) {
         return ResponseEntity.status(HttpStatus.CREATED).body(perfilMedicoService.addEspecialidadMedico(medicoId, addEspecialidadMedicoRequest));
     }
 
-    @DeleteMapping("/{medicoId}/especialidades/{especialidadId}")
+    @DeleteMapping("/{medicoId}/specialties/{especialidadId}")
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<PerfilMedicoDTO> deleteEspecialidadMedico(@PathVariable("medicoId") Integer medicoId, @PathVariable("especialidadId") Integer especialidadId) {
         return ResponseEntity.ok(perfilMedicoService.deleteEspecialidadMedico(medicoId, especialidadId));

@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("api/v1/especialidad")
+@RequestMapping("api/v1/specialties")
 @RequiredArgsConstructor
 @CrossOrigin
 public class EspecialidadController {
