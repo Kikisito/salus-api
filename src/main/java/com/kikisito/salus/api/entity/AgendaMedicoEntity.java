@@ -1,9 +1,9 @@
 package com.kikisito.salus.api.entity;
 
-import com.kikisito.salus.api.type.DiaSemana;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.DayOfWeek;
 import java.time.LocalTime;
 
 @AllArgsConstructor
@@ -25,7 +25,7 @@ public class AgendaMedicoEntity {
     private PerfilMedicoEntity medico;
 
     @Column(nullable = false)
-    private DiaSemana diaSemana;
+    private DayOfWeek diaSemana;
 
     @Column(nullable = false)
     private LocalTime horaInicio;

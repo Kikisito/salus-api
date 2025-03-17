@@ -34,4 +34,12 @@ public class DataNotFoundException extends ApiRuntimeException {
     public static DataNotFoundException agendaNotFound() {
         return new DataNotFoundException("data_not_found.agenda", ErrorMessages.AGENDA_NOT_FOUND);
     }
+
+    public static DataNotFoundException citaSlotNotFound() {
+        return new DataNotFoundException("data_not_found.cita_slot", ErrorMessages.CITA_SLOT_NOT_FOUND);
+    }
+
+    public static DataNotFoundException citaNotFound() {
+        return new DataNotFoundException("data_not_found.cita", ErrorMessages.CITA_NOT_FOUND);
+    }
 }

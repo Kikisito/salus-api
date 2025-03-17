@@ -1,10 +1,15 @@
 package com.kikisito.salus.api.repository;
 
-import com.kikisito.salus.api.entity.CitaEntity;
+import com.kikisito.salus.api.dto.CitaSlotDTO;
+import com.kikisito.salus.api.entity.CitaSlotEntity;
+import com.kikisito.salus.api.entity.PerfilMedicoEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.Optional;
+import java.time.LocalDate;
+import java.util.List;
 
 @Repository
-public interface CitaRepository extends JpaRepository<CitaEntity, Integer> {}
+public interface CitaSlotRepository extends JpaRepository<CitaSlotEntity, Integer> {
+    List<CitaSlotDTO> findByPerfilMedicoAndFecha(PerfilMedicoEntity perfilMedico, LocalDate fecha);
+}

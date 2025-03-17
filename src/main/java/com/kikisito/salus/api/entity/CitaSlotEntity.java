@@ -3,7 +3,8 @@ package com.kikisito.salus.api.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
+import java.time.LocalTime;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -32,7 +33,10 @@ public class CitaSlotEntity {
     private ConsultaEntity consulta;
 
     @Column(nullable = false)
-    private LocalDateTime fecha;
+    private LocalDate fecha;
+
+    @Column(nullable = false)
+    private LocalTime hora;
 
     @OneToOne(mappedBy = "slot")
     private CitaEntity cita;

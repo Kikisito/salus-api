@@ -1,5 +1,6 @@
 package com.kikisito.salus.api.dto;
 
+import com.kikisito.salus.api.type.CitaStatusType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -11,11 +12,11 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Data
 @Builder
-public class CitaSlotDTO {
+public class CitaDTO {
     private Integer id;
-    private PerfilMedicoDTO perfilMedico;
-    private EspecialidadDTO especialidad;
-    private ConsultaDTO consulta;
-    private LocalDateTime fecha;
-    private CitaEntity cita;
+    private CitaSlotDTO slot;
+    private UsuarioDTO paciente;
+    private CitaStatusType tipo;
+    private CitaStatusType estado;
+    private String motivo;
 }

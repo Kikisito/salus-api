@@ -30,4 +30,6 @@ public final class ErrorMessages {
     public static final String END_TIME_MUST_BE_AFTER_START_TIME = "End time must be after start time";
     public static final String HORARIO_COLAPSA = "El horario colapsa con otro horario existente";
     public static final String AGENDA_NOT_FOUND = "Agenda no encontrada";
+    public static final String CITA_SLOT_NOT_FOUND = "Cita slot no encontrada";
+    public static final String CITA_NOT_FOUND = "Cita no encontrada";
 }

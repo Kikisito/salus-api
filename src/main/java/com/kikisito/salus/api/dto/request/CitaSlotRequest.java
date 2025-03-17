@@ -1,4 +1,4 @@
-package com.kikisito.salus.api.dto;
+package com.kikisito.salus.api.dto.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -12,12 +12,10 @@ import java.time.LocalTime;
 @NoArgsConstructor
 @Data
 @Builder
-public class CitaSlotDTO {
-    private Integer id;
-    private PerfilMedicoDTO perfilMedico;
-    private EspecialidadDTO especialidad;
-    private ConsultaDTO consulta;
+public class CitaSlotRequest {
+    private Integer perfilMedico;
+    private Integer especialidad;
+    private Integer consulta;
     private LocalDate fecha;
     private LocalTime hora;
-    private CitaDTO cita;
 }

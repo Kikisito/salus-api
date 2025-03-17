@@ -1,12 +1,12 @@
 package com.kikisito.salus.api.dto.request;
 
 import com.kikisito.salus.api.constants.ErrorMessages;
-import com.kikisito.salus.api.type.DiaSemana;
 import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Data;
 
+import java.time.DayOfWeek;
 import java.time.LocalTime;
 
 @Data
@@ -16,7 +16,7 @@ public class AgendaMedicoRequest {
     private Integer medico;
 
     @NotNull(message = ErrorMessages.FIELD_CANNOT_BE_BLANK)
-    private DiaSemana diaSemana;
+    private DayOfWeek diaSemana;
 
     @NotNull(message = ErrorMessages.FIELD_CANNOT_BE_BLANK)
     private LocalTime horaInicio;
