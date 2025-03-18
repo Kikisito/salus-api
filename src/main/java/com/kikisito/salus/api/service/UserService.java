@@ -2,6 +2,7 @@ package com.kikisito.salus.api.service;
 
 import com.kikisito.salus.api.dto.DireccionDTO;
 import com.kikisito.salus.api.dto.UsuarioDTO;
+import com.kikisito.salus.api.dto.response.UsersListResponse;
 import com.kikisito.salus.api.embeddable.DireccionEmbeddable;
 import com.kikisito.salus.api.entity.UserEntity;
 import com.kikisito.salus.api.exception.ConflictException;
@@ -11,9 +12,13 @@ import com.kikisito.salus.api.type.AccountStatusType;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -23,6 +28,19 @@ public class UserService {
 
     @Autowired
     private ModelMapper modelMapper;
+
+    @Transactional(readOnly = true)
+    public UsersListResponse getAllUsers(Integer page, Integer count) {
+        Page<UserEntity> userEntities = userRepository.findAll(PageRequest.of(page, count));
+        List<UsuarioDTO> usersDTO = userEntities.stream()
+                .map(userEntity -> modelMapper.map(userEntity, UsuarioDTO.class))
+                .toList();
+
+        return UsersListResponse.builder()
+                .count(userRepository.count())
+                .users(usersDTO)
+                .build();
+    }
 
     @Transactional(readOnly = true)
     public UsuarioDTO getCurrentProfile() {
