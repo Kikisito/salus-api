@@ -14,7 +14,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -28,27 +27,55 @@ public class UserController {
     @Autowired
     private final AuthService authService;
 
-    @GetMapping(value = { "/all", "/all/{page}", "/all/{page}/{count}"})
+    private static final int MAX_ROWS_PER_PAGE = 100;
+    private static final int DEFAULT_PAGE_SIZE = 10;
+
+    @GetMapping(value = { "/all", "/all/{page}", "/all/{page}/{limit}"})
     @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity<UsersListResponse> getAllUsers(@PathVariable Optional<Integer> page, @PathVariable Optional<Integer> count) {
+    public ResponseEntity<UsersListResponse> getAllUsers(@PathVariable Optional<Integer> page, @PathVariable Optional<Integer> limit) {
         // Validación antes de realizar la consulta
         if(page.isPresent() && page.get() < 0) {
             return ResponseEntity.badRequest().build();
         }
 
-        // Limitamos el número de usuarios a mostrar en [1,100] para evitar problemas de rendimiento
-        if(count.isPresent() && (count.get() < 1 || count.get() > 100)) {
+        // Limitamos el número de usuarios a mostrar en [1,MAX_ROWS_PER_PAGE] para evitar problemas de rendimiento
+        if(limit.isPresent() && (limit.get() < 1 || limit.get() > MAX_ROWS_PER_PAGE)) {
             return ResponseEntity.badRequest().build();
         }
 
         // Obtenemos la lista de usuarios
         UsersListResponse users;
-        if(page.isPresent() && count.isPresent()) {
-            users = userService.getAllUsers(page.get(), count.get());
+        if(page.isPresent() && limit.isPresent()) {
+            users = userService.getAllUsers(page.get(), limit.get());
         } else if(page.isPresent()) {
-            users = userService.getAllUsers(page.get(), 10);
+            users = userService.getAllUsers(page.get(), DEFAULT_PAGE_SIZE);
         } else {
-            users = userService.getAllUsers(0, 10);
+            users = userService.getAllUsers(0, DEFAULT_PAGE_SIZE);
+        }
+        return ResponseEntity.ok(users);
+    }
+
+    @GetMapping("/search/{search}/{page}/{limit}")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public ResponseEntity<UsersListResponse> searchUsers(@PathVariable String search, @PathVariable Optional<Integer> page, @PathVariable Optional<Integer> limit) {
+        // Validación antes de realizar la consulta
+        if(page.isPresent() && page.get() < 0) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        // Limitamos el número de usuarios a mostrar en [1,MAX_ROWS_PER_PAGE] para evitar problemas de rendimiento
+        if(limit.isPresent() && (limit.get() < 1 || limit.get() > MAX_ROWS_PER_PAGE)) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        // Obtenemos la lista de usuarios
+        UsersListResponse users;
+        if(page.isPresent() && limit.isPresent()) {
+            users = userService.searchUsers(search, page.get(), limit.get());
+        } else if(page.isPresent()) {
+            users = userService.searchUsers(search, page.get(), DEFAULT_PAGE_SIZE);
+        } else {
+            users = userService.searchUsers(search, 0, DEFAULT_PAGE_SIZE);
         }
         return ResponseEntity.ok(users);
     }

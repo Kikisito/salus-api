@@ -30,14 +30,27 @@ public class UserService {
     private ModelMapper modelMapper;
 
     @Transactional(readOnly = true)
-    public UsersListResponse getAllUsers(Integer page, Integer count) {
-        Page<UserEntity> userEntities = userRepository.findAll(PageRequest.of(page, count));
+    public UsersListResponse getAllUsers(Integer page, Integer limit) {
+        Page<UserEntity> userEntities = userRepository.findAll(PageRequest.of(page, limit));
         List<UsuarioDTO> usersDTO = userEntities.stream()
                 .map(userEntity -> modelMapper.map(userEntity, UsuarioDTO.class))
                 .toList();
 
         return UsersListResponse.builder()
                 .count(userRepository.count())
+                .users(usersDTO)
+                .build();
+    }
+
+    @Transactional(readOnly = true)
+    public UsersListResponse searchUsers(String search, Integer page, Integer limit) {
+        Page<UserEntity> userEntities = userRepository.searchUsers(search, PageRequest.of(page, limit));
+        List<UsuarioDTO> usersDTO = userEntities.stream()
+                .map(userEntity -> modelMapper.map(userEntity, UsuarioDTO.class))
+                .toList();
+
+        return UsersListResponse.builder()
+                .count(userRepository.searchUsersCount(search))
                 .users(usersDTO)
                 .build();
     }
