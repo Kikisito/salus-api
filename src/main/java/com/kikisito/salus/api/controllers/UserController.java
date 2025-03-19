@@ -3,8 +3,10 @@ package com.kikisito.salus.api.controllers;
 import com.kikisito.salus.api.dto.DireccionDTO;
 import com.kikisito.salus.api.dto.UsuarioDTO;
 import com.kikisito.salus.api.dto.request.PasswordChangeRequest;
+import com.kikisito.salus.api.dto.request.RestrictUserRequest;
 import com.kikisito.salus.api.dto.response.AuthenticationResponse;
 import com.kikisito.salus.api.dto.response.UsersListResponse;
+import com.kikisito.salus.api.entity.UserEntity;
 import com.kikisito.salus.api.service.AuthService;
 import com.kikisito.salus.api.service.UserService;
 import jakarta.validation.Valid;
@@ -12,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
@@ -80,22 +83,48 @@ public class UserController {
         return ResponseEntity.ok(users);
     }
 
+    @GetMapping("/{id}")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public ResponseEntity<UsuarioDTO> getUserById(@PathVariable int id) {
+        return ResponseEntity.ok(userService.getUserProfile(id));
+    }
+
+    @PutMapping("/{id}")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public ResponseEntity<UsuarioDTO> updateUser(@PathVariable("id") Integer userId, @RequestBody @Valid UsuarioDTO usuarioDTO) {
+        return ResponseEntity.ok(userService.updateProfile(userId, usuarioDTO));
+    }
+
+    @PutMapping("/{id}/address")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public ResponseEntity<UsuarioDTO> updateAddress(@PathVariable("id") Integer userId, @RequestBody @Valid DireccionDTO direccionDTO) {
+        return ResponseEntity.ok(userService.updateAddress(userId, direccionDTO));
+    }
+
+    @PutMapping("/{id}/restrict")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public ResponseEntity<UsuarioDTO> restrictUser(@PathVariable("id") Integer userId, @RequestBody @Valid RestrictUserRequest request) {
+        return ResponseEntity.ok(userService.restrictUser(userId, request));
+    }
+
+    // Sección para el usuario actual
+
     @GetMapping("/@me")
     @PreAuthorize("hasAuthority('USER')")
-    public ResponseEntity<UsuarioDTO> getCurrentProfile() {
-        return ResponseEntity.ok(userService.getCurrentProfile());
+    public ResponseEntity<UsuarioDTO> getCurrentProfile(@AuthenticationPrincipal UserEntity userEntity) {
+        return ResponseEntity.ok(userService.getUserProfile(userEntity));
     }
 
     @PatchMapping("/@me")
     @PreAuthorize("hasAuthority('USER')")
-    public ResponseEntity<UsuarioDTO> updateProfile(@RequestBody @Valid UsuarioDTO usuarioDTO) {
-        return ResponseEntity.ok(userService.updateProfile(usuarioDTO));
+    public ResponseEntity<UsuarioDTO> updateCurrentProfile(@AuthenticationPrincipal UserEntity userEntity, @RequestBody @Valid UsuarioDTO usuarioDTO) {
+        return ResponseEntity.ok(userService.updateProfile(userEntity ,usuarioDTO));
     }
 
     @PutMapping("/@me/address")
     @PreAuthorize("hasAuthority('USER')")
-    public ResponseEntity<UsuarioDTO> updateAddress(@RequestBody @Valid DireccionDTO direccionDTO) {
-        return ResponseEntity.ok(userService.updateAddress(direccionDTO));
+    public ResponseEntity<UsuarioDTO> updateAddress(@AuthenticationPrincipal UserEntity userEntity, @RequestBody @Valid DireccionDTO direccionDTO) {
+        return ResponseEntity.ok(userService.updateAddress(userEntity, direccionDTO));
     }
 
     @PutMapping("/@me/password")

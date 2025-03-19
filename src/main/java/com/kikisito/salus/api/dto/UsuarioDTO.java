@@ -29,4 +29,5 @@ public class UsuarioDTO {
     private LocalDate fechaNacimiento;
     private DireccionDTO direccion;
     private List<RoleType> rolesList;
+    private Boolean restricted;
 }

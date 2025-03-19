@@ -2,6 +2,7 @@ package com.kikisito.salus.api.service;
 
 import com.kikisito.salus.api.dto.DireccionDTO;
 import com.kikisito.salus.api.dto.UsuarioDTO;
+import com.kikisito.salus.api.dto.request.RestrictUserRequest;
 import com.kikisito.salus.api.dto.response.UsersListResponse;
 import com.kikisito.salus.api.embeddable.DireccionEmbeddable;
 import com.kikisito.salus.api.entity.UserEntity;
@@ -14,7 +15,6 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -56,10 +56,13 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public UsuarioDTO getCurrentProfile() {
-        // Se obtiene el usuario autenticado
-        UserEntity userEntity = (UserEntity) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    public UsuarioDTO getUserProfile(Integer id) {
+        UserEntity userEntity = userRepository.findById(id).orElseThrow(DataNotFoundException::userNotFound);
+        return this.getUserProfile(userEntity);
+    }
 
+    @Transactional(readOnly = true)
+    public UsuarioDTO getUserProfile(UserEntity userEntity) {
         // Se mapea la dirección a un DTO, si existe
         DireccionDTO direccionDTO = (userEntity.getDireccion() != null)
                 ? modelMapper.map(userEntity.getDireccion(), DireccionDTO.class)
@@ -72,16 +75,14 @@ public class UserService {
     }
 
     @Transactional
-    public UsuarioDTO updateProfile(UsuarioDTO usuarioDTO) {
-        UserEntity userEntity = (UserEntity) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        return updateProfile(userEntity.getId(), usuarioDTO);
-    }
-
-    @Transactional
     public UsuarioDTO updateProfile(int userIdTarget, UsuarioDTO usuarioDTO) {
         // Se busca el usuario por ID
         UserEntity userEntity = userRepository.findById(userIdTarget).orElseThrow(DataNotFoundException::userNotFound);
+        return this.updateProfile(userEntity, usuarioDTO);
+    }
 
+    @Transactional
+    public UsuarioDTO updateProfile(UserEntity userEntity, UsuarioDTO usuarioDTO) {
         // Se comprueba si el email o el NIF ya están registrados por *OTRO* usuario
         UserEntity existingUser = userRepository.findByEmail(usuarioDTO.getEmail()).orElse(null);
         if (existingUser != null && !existingUser.getId().equals(userEntity.getId())) {
@@ -113,16 +114,14 @@ public class UserService {
     }
 
     @Transactional
-    public UsuarioDTO updateAddress(DireccionDTO direccionDTO) {
-        UserEntity userEntity = (UserEntity) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        return updateAddress(userEntity.getId(), direccionDTO);
-    }
-
-    @Transactional
     public UsuarioDTO updateAddress(int userId, DireccionDTO direccionDTO) {
         // Se busca el usuario por ID
         UserEntity userEntity = userRepository.findById(userId).orElseThrow(DataNotFoundException::userNotFound);
+        return updateAddress(userEntity, direccionDTO);
+    }
 
+    @Transactional
+    public UsuarioDTO updateAddress(UserEntity userEntity, DireccionDTO direccionDTO) {
         // Se mapea la dirección a un objeto "embeddable", se actualiza el usuario y se guarda
         DireccionEmbeddable direccionEmbeddable = modelMapper.map(direccionDTO, DireccionEmbeddable.class);
         userEntity.setDireccion(direccionEmbeddable);
@@ -132,5 +131,17 @@ public class UserService {
         UsuarioDTO usuarioDTOUpdated = modelMapper.map(userEntity, UsuarioDTO.class);
         usuarioDTOUpdated.setDireccion(direccionDTO);
         return usuarioDTOUpdated;
+    }
+
+    @Transactional
+    public UsuarioDTO restrictUser(int userId, RestrictUserRequest request) {
+        // Se busca el usuario por ID
+        UserEntity userEntity = userRepository.findById(userId).orElseThrow(DataNotFoundException::userNotFound);
+
+        // Se restringe o se des-restringe el usuario
+        userEntity.setRestricted(request.isRestrict());
+        userEntity = userRepository.save(userEntity);
+
+        return modelMapper.map(userEntity, UsuarioDTO.class);
     }
 }

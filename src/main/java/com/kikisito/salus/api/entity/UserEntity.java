@@ -83,6 +83,10 @@ public class UserEntity implements UserDetails {
     @OneToOne(mappedBy = "user")
     private PerfilMedicoEntity perfilMedico;
 
+    // Impide que el usuario pueda crear nuevas citas
+    @Column
+    private Boolean restricted = false;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         List<SimpleGrantedAuthority> authoritiesList = new ArrayList<>();
