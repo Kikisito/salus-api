@@ -53,6 +53,30 @@ public class PerfilMedicoController {
         return ResponseEntity.ok(doctors);
     }
 
+    @GetMapping(value = { "/search/{search}", "/search/{search}/{page}", "/search/{search}/{page}/{limit}"})
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public ResponseEntity<DoctorsListResponse> searchDoctors(@PathVariable String search, @PathVariable Optional<Integer> page, @PathVariable Optional<Integer> limit) {
+        // Validación antes de realizar la consulta
+        if(page.isPresent() && page.get() < 0) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        // Limitamos el número de usuarios a mostrar en [1,MAX_ROWS_PER_PAGE] para evitar problemas de rendimiento
+        if(limit.isPresent() && (limit.get() < 1 || limit.get() > MAX_ROWS_PER_PAGE)) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        // Obtenemos la lista de usuarios
+        DoctorsListResponse doctors;
+        if(page.isPresent() && limit.isPresent()) {
+            doctors = perfilMedicoService.searchPerfilesMedicos(search, page.get(), limit.get());
+        } else if(page.isPresent()) {
+            doctors = perfilMedicoService.searchPerfilesMedicos(search, page.get(), DEFAULT_PAGE_SIZE);
+        } else {
+            doctors = perfilMedicoService.searchPerfilesMedicos(search, 0, DEFAULT_PAGE_SIZE);
+        }
+        return ResponseEntity.ok(doctors);
+    }
 
     @GetMapping("/{id}")
     @PreAuthorize("hasAuthority('ADMIN')")

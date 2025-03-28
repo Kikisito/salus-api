@@ -54,6 +54,20 @@ public class PerfilMedicoService {
     }
 
     @Transactional(readOnly = true)
+    public DoctorsListResponse searchPerfilesMedicos(String search, Integer page, Integer limit) {
+        Page<PerfilMedicoEntity> perfilMedicoEntities = perfilMedicoRepository.search(search, PageRequest.of(page, limit));
+
+        List<PerfilMedicoDTO> doctorsDTO = perfilMedicoEntities.stream()
+                .map(perfilMedicoEntity -> modelMapper.map(perfilMedicoEntity, PerfilMedicoDTO.class))
+                .toList();
+
+        return DoctorsListResponse.builder()
+                .count(perfilMedicoRepository.searchCount(search))
+                .doctors(doctorsDTO)
+                .build();
+    }
+
+    @Transactional(readOnly = true)
     public PerfilMedicoDTO getPerfilMedico(Integer id) {
         PerfilMedicoEntity perfilMedicoEntity = perfilMedicoRepository.findById(id).orElseThrow(DataNotFoundException::medicoNotFound);
         return modelMapper.map(perfilMedicoEntity, PerfilMedicoDTO.class);
