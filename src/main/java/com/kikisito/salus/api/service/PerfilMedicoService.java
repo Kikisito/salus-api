@@ -5,6 +5,7 @@ import com.kikisito.salus.api.dto.PerfilMedicoDTO;
 import com.kikisito.salus.api.dto.UsuarioDTO;
 import com.kikisito.salus.api.dto.request.AddEspecialidadMedicoRequest;
 import com.kikisito.salus.api.dto.request.AddPerfilMedicoToUserRequest;
+import com.kikisito.salus.api.dto.response.DoctorsListResponse;
 import com.kikisito.salus.api.entity.EspecialidadEntity;
 import com.kikisito.salus.api.entity.PerfilMedicoEntity;
 import com.kikisito.salus.api.entity.UserEntity;
@@ -16,6 +17,8 @@ import com.kikisito.salus.api.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,6 +38,26 @@ public class PerfilMedicoService {
 
     @Autowired
     private ModelMapper modelMapper;
+
+    @Transactional(readOnly = true)
+    public DoctorsListResponse getPerfilesMedicos(Integer page, Integer limit) {
+        Page<PerfilMedicoEntity> perfilMedicoEntities = perfilMedicoRepository.findAll(PageRequest.of(page, limit));
+
+        List<PerfilMedicoDTO> doctorsDTO = perfilMedicoEntities.stream()
+                .map(perfilMedicoEntity -> modelMapper.map(perfilMedicoEntity, PerfilMedicoDTO.class))
+                .toList();
+
+        return DoctorsListResponse.builder()
+                .count(perfilMedicoRepository.count())
+                .doctors(doctorsDTO)
+                .build();
+    }
+
+    @Transactional(readOnly = true)
+    public PerfilMedicoDTO getPerfilMedico(Integer id) {
+        PerfilMedicoEntity perfilMedicoEntity = perfilMedicoRepository.findById(id).orElseThrow(DataNotFoundException::medicoNotFound);
+        return modelMapper.map(perfilMedicoEntity, PerfilMedicoDTO.class);
+    }
 
     @Transactional
     public PerfilMedicoDTO addMedicoFromUser(AddPerfilMedicoToUserRequest addPerfilMedicoToUserRequest) {
