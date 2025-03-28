@@ -85,6 +85,7 @@ public class UserEntity implements UserDetails {
 
     // Impide que el usuario pueda crear nuevas citas
     @Column
+    @Builder.Default
     private Boolean restricted = false;
 
     @Override
