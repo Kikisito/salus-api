@@ -10,9 +10,3 @@ services:
     environment:
       POSTGRES_USER: salus
       POSTGRES_PASSWORD: salus
-
-  adminer:
-    image: adminer
-    restart: always
-    ports:
-      - "8081:8080"
