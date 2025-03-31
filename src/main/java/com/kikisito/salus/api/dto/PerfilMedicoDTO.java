@@ -12,6 +12,7 @@ import java.util.List;
 @Data
 @Builder
 public class PerfilMedicoDTO {
+    private Integer id;
     private UsuarioDTO user;
     private String numeroColegiado;
     private List<EspecialidadDTO> especialidades;
