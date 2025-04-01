@@ -2,6 +2,7 @@ package com.kikisito.salus.api.controllers;
 
 import com.kikisito.salus.api.dto.CentroMedicoDTO;
 import com.kikisito.salus.api.dto.request.NewCentroMedicoRequest;
+import com.kikisito.salus.api.dto.response.MedicalCentersListResponse;
 import com.kikisito.salus.api.service.CentroMedicoService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -11,7 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("api/v1/medical-centers")
@@ -21,10 +22,10 @@ public class CentroMedicoController {
     @Autowired
     private final CentroMedicoService centroMedicoService;
 
-    @GetMapping("/all")
+    @GetMapping(value = { "/all", "/all/{page}", "/all/{page}/{limit}"})
     @PreAuthorize("hasAuthority('USER')")
-    public ResponseEntity<List<CentroMedicoDTO>> getCurrentProfile() {
-        return ResponseEntity.ok(centroMedicoService.getCentrosMedicos());
+    public ResponseEntity<MedicalCentersListResponse> getCurrentProfile(@PathVariable Optional<Integer> page, @PathVariable Optional<Integer> limit) {
+        return ResponseEntity.ok(centroMedicoService.getCentrosMedicos(page, limit));
     }
 
     @PostMapping("/add")
