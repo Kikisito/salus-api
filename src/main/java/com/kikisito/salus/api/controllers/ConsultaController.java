@@ -2,6 +2,7 @@ package com.kikisito.salus.api.controllers;
 
 import com.kikisito.salus.api.dto.ConsultaDTO;
 import com.kikisito.salus.api.dto.request.ConsultaRequest;
+import com.kikisito.salus.api.dto.response.RoomsListResponse;
 import com.kikisito.salus.api.service.ConsultaService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -11,7 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("api/v1/rooms")
@@ -21,10 +22,10 @@ public class ConsultaController {
     @Autowired
     private final ConsultaService consultaService;
 
-    @GetMapping("/all")
+    @GetMapping(value = { "/all", "/all/{page}", "/all/{page}/{limit}"})
     @PreAuthorize("hasAuthority('USER')")
-    public ResponseEntity<List<ConsultaDTO>> getConsultas() {
-        return ResponseEntity.ok(consultaService.getConsultas());
+    public ResponseEntity<RoomsListResponse> getConsultas(@PathVariable Optional<Integer> page, @PathVariable Optional<Integer> limit) {
+        return ResponseEntity.ok(consultaService.getConsultas(page, limit));
     }
 
     @PostMapping("/add")
