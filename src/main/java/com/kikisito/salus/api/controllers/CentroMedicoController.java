@@ -28,6 +28,12 @@ public class CentroMedicoController {
         return ResponseEntity.ok(centroMedicoService.getCentrosMedicos(page, limit));
     }
 
+    @GetMapping(value = { "/search/{search}", "/search/{search}/{page}", "/search/{search}/{page}/{limit}"})
+    @PreAuthorize("hasAuthority('USER')")
+    public ResponseEntity<MedicalCentersListResponse> searchCentroMedico(@PathVariable String search, @PathVariable Optional<Integer> page, @PathVariable Optional<Integer> limit) {
+        return ResponseEntity.ok(centroMedicoService.searchCentrosMedicos(search, page, limit));
+    }
+
     @PostMapping("/add")
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<CentroMedicoDTO> addCentroMedico(@RequestBody @Valid NewCentroMedicoRequest centroMedicoDTO) {

@@ -53,6 +53,27 @@ public class CentroMedicoService {
     }
 
     @Transactional(readOnly = true)
+    public MedicalCentersListResponse searchCentrosMedicos(String search, Optional<Integer> optionalPage, Optional<Integer> optionalLimit) {
+        // Usamos los métodos Math.max y Math.min para asegurarnos de que
+        // los valores de page y limit estén dentro de los límites permitidos
+        Integer page = Math.max(optionalPage.orElse(DEFAULT_PAGE), DEFAULT_PAGE);
+        Integer limit = Math.min(optionalLimit.orElse(DEFAULT_PAGE_SIZE), MAX_ROWS_PER_PAGE);
+
+        // Obtenemos los centros médicos de la base de datos
+        Page<CentroMedicoEntity> centrosMedicos = centroMedicoRepository.findByNombreContainingIgnoreCase(search, PageRequest.of(page, limit));
+
+        // Convertimos los centros médicos a DTOs
+        List<CentroMedicoDTO> centroMedicoDTOs = centrosMedicos.getContent().stream()
+                .map(c -> modelMapper.map(c, CentroMedicoDTO.class))
+                .collect(Collectors.toList());
+
+        return MedicalCentersListResponse.builder()
+                .count(centrosMedicos.getTotalElements())
+                .medicalCenters(centroMedicoDTOs)
+                .build();
+    }
+
+    @Transactional(readOnly = true)
     public CentroMedicoDTO getCentroMedicoById(Integer id) {
         CentroMedicoEntity centroMedico = centroMedicoRepository.findById(id).orElseThrow(DataNotFoundException::centroMedicoNotFound);
         return modelMapper.map(centroMedico, CentroMedicoDTO.class);
