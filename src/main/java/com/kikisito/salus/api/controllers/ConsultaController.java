@@ -28,6 +28,12 @@ public class ConsultaController {
         return ResponseEntity.ok(consultaService.getConsultas(page, limit));
     }
 
+    @GetMapping(value = { "/search/{search}", "/search/{search}/{page}", "/search/{search}/{page}/{limit}"})
+    @PreAuthorize("hasAuthority('USER')")
+    public ResponseEntity<RoomsListResponse> searchConsulta(@PathVariable String search, @PathVariable Optional<Integer> page, @PathVariable Optional<Integer> limit) {
+        return ResponseEntity.ok(consultaService.searchConsultas(search, page, limit));
+    }
+
     @PostMapping("/add")
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<ConsultaDTO> addConsulta(@RequestBody @Valid ConsultaRequest consultaRequest) {

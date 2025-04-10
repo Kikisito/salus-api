@@ -56,6 +56,24 @@ public class ConsultaService {
     }
 
     @Transactional(readOnly = true)
+    public RoomsListResponse searchConsultas(String search, Optional<Integer> optionalPage, Optional<Integer> optionalLimit) {
+        Integer page = Math.max(optionalPage.orElse(DEFAULT_PAGE), DEFAULT_PAGE);
+        Integer limit = Math.min(optionalLimit.orElse(DEFAULT_PAGE_SIZE), MAX_ROWS_PER_PAGE);
+
+        Page<ConsultaEntity> consultas = consultaRepository.findByNombreContainingIgnoreCaseOrCentroMedico_NombreContainingIgnoreCase(search, search, PageRequest.of(page, limit));
+
+        // Convertimos los centros médicos a DTOs
+        List<ConsultaDTO> consultaDTOs = consultas.getContent().stream()
+                .map(c -> modelMapper.map(c, ConsultaDTO.class))
+                .toList();
+
+        return RoomsListResponse.builder()
+                .count(consultas.getTotalElements())
+                .rooms(consultaDTOs)
+                .build();
+    }
+
+    @Transactional(readOnly = true)
     public ConsultaDTO getConsulta(Integer id) {
         ConsultaEntity consulta = consultaRepository.findById(id).orElseThrow(DataNotFoundException::consultaNotFound);
         return modelMapper.map(consulta, ConsultaDTO.class);
