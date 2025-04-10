@@ -3,8 +3,8 @@ package com.kikisito.salus.api.service;
 import com.kikisito.salus.api.dto.EspecialidadDTO;
 import com.kikisito.salus.api.dto.PerfilMedicoDTO;
 import com.kikisito.salus.api.dto.UsuarioDTO;
-import com.kikisito.salus.api.dto.request.AddEspecialidadMedicoRequest;
-import com.kikisito.salus.api.dto.request.AddPerfilMedicoToUserRequest;
+import com.kikisito.salus.api.dto.request.AddDoctorSpecialtyRequest;
+import com.kikisito.salus.api.dto.request.DoctorLicenseRequest;
 import com.kikisito.salus.api.dto.response.DoctorsListResponse;
 import com.kikisito.salus.api.entity.EspecialidadEntity;
 import com.kikisito.salus.api.entity.PerfilMedicoEntity;
@@ -14,6 +14,7 @@ import com.kikisito.salus.api.exception.DataNotFoundException;
 import com.kikisito.salus.api.repository.EspecialidadRepository;
 import com.kikisito.salus.api.repository.PerfilMedicoRepository;
 import com.kikisito.salus.api.repository.UserRepository;
+import com.kikisito.salus.api.type.RoleType;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -74,9 +75,9 @@ public class PerfilMedicoService {
     }
 
     @Transactional
-    public PerfilMedicoDTO addMedicoFromUser(AddPerfilMedicoToUserRequest addPerfilMedicoToUserRequest) {
-        UserEntity userEntity = userRepository.findById(addPerfilMedicoToUserRequest.getUserId()).orElseThrow(DataNotFoundException::userNotFound);
-        String numeroColegiado = addPerfilMedicoToUserRequest.getNumeroColegiado();
+    public PerfilMedicoDTO addMedicoFromUser(DoctorLicenseRequest doctorLicenseRequest) {
+        UserEntity userEntity = userRepository.findById(doctorLicenseRequest.getUserId()).orElseThrow(DataNotFoundException::userNotFound);
+        String numeroColegiado = doctorLicenseRequest.getLicense();
 
         // Comprobamos que el usuario no sea un médico ya y que el número de colegiado no exista
         if(perfilMedicoRepository.existsMedicoEntitiesByUser(userEntity)) {
@@ -92,10 +93,33 @@ public class PerfilMedicoService {
                 .build();
         perfilMedicoEntity = perfilMedicoRepository.save(perfilMedicoEntity);
 
+        // Le asignamos el rol PROFESSIONAL al usuario si no lo tiene
+        if(!userEntity.getRolesList().contains(RoleType.PROFESIONAL)) {
+            userEntity.getRolesList().add(RoleType.PROFESIONAL);
+            userEntity = userRepository.save(userEntity);
+        }
+
         // Devolvemos el perfil médico tras mapearlo a DTO con el usuario DTO
         PerfilMedicoDTO perfilMedicoDTO = modelMapper.map(perfilMedicoEntity, PerfilMedicoDTO.class);
         perfilMedicoDTO.setUser(modelMapper.map(userEntity, UsuarioDTO.class));
         return perfilMedicoDTO;
+    }
+
+    @Transactional
+    public PerfilMedicoDTO changeLicense(Integer id, DoctorLicenseRequest doctorLicenseRequest) {
+        PerfilMedicoEntity perfilMedicoEntity = perfilMedicoRepository.findById(id).orElseThrow(DataNotFoundException::medicoNotFound);
+        String numeroColegiado = doctorLicenseRequest.getLicense();
+
+        // Comprobamos que el número de colegiado no exista
+        if(perfilMedicoRepository.existsMedicoEntitiesByNumeroColegiado(numeroColegiado)) {
+            throw ConflictException.numeroColegiadoAlreadyExists();
+        }
+
+        // Cambiamos el número de colegiado y guardamos
+        perfilMedicoEntity.setNumeroColegiado(numeroColegiado);
+        perfilMedicoEntity = perfilMedicoRepository.save(perfilMedicoEntity);
+
+        return modelMapper.map(perfilMedicoEntity, PerfilMedicoDTO.class);
     }
 
     @Transactional(readOnly = true)
@@ -108,9 +132,9 @@ public class PerfilMedicoService {
     }
 
     @Transactional
-    public PerfilMedicoDTO addEspecialidadMedico(Integer medicoId, AddEspecialidadMedicoRequest addEspecialidadMedicoRequest) {
+    public PerfilMedicoDTO addEspecialidadMedico(Integer medicoId, AddDoctorSpecialtyRequest addDoctorSpecialtyRequest) {
         PerfilMedicoEntity perfilMedicoEntity = perfilMedicoRepository.findById(medicoId).orElseThrow(DataNotFoundException::medicoNotFound);
-        EspecialidadEntity especialidadEntity = especialidadRepository.findById(addEspecialidadMedicoRequest.getEspecialidadId()).orElseThrow(DataNotFoundException::especialidadNotFound);
+        EspecialidadEntity especialidadEntity = especialidadRepository.findById(addDoctorSpecialtyRequest.getSpecialtyId()).orElseThrow(DataNotFoundException::especialidadNotFound);
 
         // Comprobamos que el médico no tenga ya la especialidad
         if(perfilMedicoEntity.getEspecialidades().contains(especialidadEntity)) {

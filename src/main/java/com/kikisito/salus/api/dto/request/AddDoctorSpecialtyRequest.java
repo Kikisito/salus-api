@@ -7,7 +7,7 @@ import lombok.Data;
 
 @Data
 @Builder
-public class AddEspecialidadMedicoRequest {
+public class AddDoctorSpecialtyRequest {
     @NotNull(message = ErrorMessages.FIELD_CANNOT_BE_BLANK)
-    private Integer especialidadId;
+    private Integer specialtyId;
 }

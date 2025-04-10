@@ -2,8 +2,8 @@ package com.kikisito.salus.api.controllers;
 
 import com.kikisito.salus.api.dto.EspecialidadDTO;
 import com.kikisito.salus.api.dto.PerfilMedicoDTO;
-import com.kikisito.salus.api.dto.request.AddEspecialidadMedicoRequest;
-import com.kikisito.salus.api.dto.request.AddPerfilMedicoToUserRequest;
+import com.kikisito.salus.api.dto.request.AddDoctorSpecialtyRequest;
+import com.kikisito.salus.api.dto.request.DoctorLicenseRequest;
 import com.kikisito.salus.api.dto.response.DoctorsListResponse;
 import com.kikisito.salus.api.service.PerfilMedicoService;
 import jakarta.validation.Valid;
@@ -84,6 +84,12 @@ public class PerfilMedicoController {
         return ResponseEntity.ok(perfilMedicoService.getPerfilMedico(id));
     }
 
+    @PutMapping("/{id}/license")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public ResponseEntity<PerfilMedicoDTO> updatePerfilMedico(@PathVariable("id") Integer id, @RequestBody @Valid DoctorLicenseRequest doctorLicenseRequest) {
+        return ResponseEntity.ok(perfilMedicoService.changeLicense(id, doctorLicenseRequest));
+    }
+
     @GetMapping("/{perfilId}/specialties")
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<List<EspecialidadDTO>> getEspecialidadesMedico(@PathVariable("perfilId") Integer id) {
@@ -92,8 +98,8 @@ public class PerfilMedicoController {
 
     @PostMapping("/{medicoId}/specialties/add")
     @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity<PerfilMedicoDTO> addEspecialidadMedico(@PathVariable("medicoId") Integer medicoId, @RequestBody @Valid AddEspecialidadMedicoRequest addEspecialidadMedicoRequest) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(perfilMedicoService.addEspecialidadMedico(medicoId, addEspecialidadMedicoRequest));
+    public ResponseEntity<PerfilMedicoDTO> addEspecialidadMedico(@PathVariable("medicoId") Integer medicoId, @RequestBody @Valid AddDoctorSpecialtyRequest addDoctorSpecialtyRequest) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(perfilMedicoService.addEspecialidadMedico(medicoId, addDoctorSpecialtyRequest));
     }
 
     @DeleteMapping("/{medicoId}/specialties/{especialidadId}")
@@ -104,7 +110,7 @@ public class PerfilMedicoController {
 
     @PostMapping("/add")
     @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity<PerfilMedicoDTO> addPerfilMedico(@RequestBody @Valid AddPerfilMedicoToUserRequest addPerfilMedicoToUserRequest) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(perfilMedicoService.addMedicoFromUser(addPerfilMedicoToUserRequest));
+    public ResponseEntity<PerfilMedicoDTO> addPerfilMedico(@RequestBody @Valid DoctorLicenseRequest doctorLicenseRequest) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(perfilMedicoService.addMedicoFromUser(doctorLicenseRequest));
     }
 }

@@ -8,10 +8,10 @@ import lombok.Data;
 
 @Data
 @Builder
-public class AddPerfilMedicoToUserRequest {
+public class DoctorLicenseRequest {
     @NotNull(message = ErrorMessages.FIELD_CANNOT_BE_BLANK)
     private Integer userId;
 
     @NotBlank(message = ErrorMessages.FIELD_CANNOT_BE_BLANK)
-    private String numeroColegiado;
+    private String license; // Número de colegiado
 }
