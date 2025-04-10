@@ -2,6 +2,7 @@ package com.kikisito.salus.api.controllers;
 
 import com.kikisito.salus.api.dto.EspecialidadDTO;
 import com.kikisito.salus.api.dto.request.AddEspecialidadRequest;
+import com.kikisito.salus.api.dto.response.SpecialtiesListResponse;
 import com.kikisito.salus.api.service.EspecialidadService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -12,6 +13,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("api/v1/specialties")
@@ -20,6 +22,18 @@ import java.util.List;
 public class EspecialidadController {
     @Autowired
     private final EspecialidadService perfilMedicoService;
+
+    @GetMapping(value = { "/all", "/all/{page}", "/all/{page}/{limit}"})
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public ResponseEntity<SpecialtiesListResponse> getAllEspecialidades(@PathVariable Optional<Integer> page, @PathVariable Optional<Integer> limit) {
+        return ResponseEntity.ok(perfilMedicoService.getAllEspecialidades(page, limit));
+    }
+
+    @GetMapping(value = { "/search/{search}", "/search/{search}/{page}", "/search/{search}/{page}/{limit}"})
+    @PreAuthorize("hasAuthority('USER')")
+    public ResponseEntity<SpecialtiesListResponse> searchEspecialidad(@PathVariable String search, @PathVariable Optional<Integer> page, @PathVariable Optional<Integer> limit) {
+        return ResponseEntity.ok(perfilMedicoService.searchEspecialidades(search, page, limit));
+    }
 
     @PostMapping("/add")
     @PreAuthorize("hasAuthority('ADMIN')")
@@ -44,11 +58,5 @@ public class EspecialidadController {
     public ResponseEntity<Void> deleteEspecialidad(@PathVariable("especialidadId") Integer id) {
         perfilMedicoService.deleteEspecialidad(id);
         return ResponseEntity.noContent().build();
-    }
-
-    @GetMapping("/all")
-    @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity<List<EspecialidadDTO>> getAllEspecialidades() {
-        return ResponseEntity.ok(perfilMedicoService.getAllEspecialidades());
     }
 }
