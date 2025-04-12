@@ -24,6 +24,10 @@ public class AgendaMedicoEntity {
     @JoinColumn(name = "medico_id", nullable = false)
     private PerfilMedicoEntity medico;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "consulta_id", nullable = false)
+    private ConsultaEntity consulta;
+
     @Column(nullable = false)
     private DayOfWeek diaSemana;
 

@@ -28,4 +28,7 @@ public class ConsultaEntity {
     // antes de borrarlas se debería ver si se notifican usuarios o se hace otra acción
     @OneToMany(mappedBy = "consulta")
     private List<CitaSlotEntity> citas;
+
+    @OneToMany(mappedBy = "consulta")
+    private List<AgendaMedicoEntity> agendas;
 }
