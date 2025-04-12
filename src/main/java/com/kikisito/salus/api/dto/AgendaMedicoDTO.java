@@ -14,6 +14,8 @@ import java.time.LocalTime;
 @Builder
 public class AgendaMedicoDTO {
     private PerfilMedicoDTO medico;
+    private EspecialidadDTO especialidad;
+    private ConsultaDTO consulta;
     private DayOfWeek diaSemana;
     private LocalTime horaInicio;
     private LocalTime horaFin;
