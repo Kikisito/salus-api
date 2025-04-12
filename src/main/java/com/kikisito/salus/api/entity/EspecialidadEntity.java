@@ -28,4 +28,7 @@ public class EspecialidadEntity {
 
     @OneToMany(mappedBy = "especialidad")
     private List<CitaSlotEntity> slotsCitas;
+
+    @OneToMany(mappedBy = "especialidad")
+    private List<AgendaMedicoEntity> agendas;
 }
