@@ -13,6 +13,7 @@ import java.time.LocalTime;
 @Data
 @Builder
 public class AgendaMedicoDTO {
+    private Integer id;
     private PerfilMedicoDTO medico;
     private EspecialidadDTO especialidad;
     private ConsultaDTO consulta;

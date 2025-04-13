@@ -101,6 +101,20 @@ public class AgendaMedicoService {
         // Buscamos la agenda a actualizar
         AgendaMedicoEntity agenda = agendaMedicoRepository.findById(agendaId).orElseThrow(DataNotFoundException::agendaNotFound);
 
+        // Buscamos si existe el perfil del médico y lo recuperamos
+        PerfilMedicoEntity medico = perfilMedicoRepository.findById(agenda.getMedico().getId()).orElseThrow(DataNotFoundException::medicoNotFound);
+
+        // Buscamos la especialidad y la consulta
+        EspecialidadEntity especialidad = especialidadRepository.findById(agendaMedicoRequest.getEspecialidad()).orElseThrow(DataNotFoundException::especialidadNotFound);
+
+        // Comprobamos si el médico tiene la especialidad de la petición
+        if(!medico.getEspecialidades().contains(especialidad)) {
+            throw ConflictException.doctorDoesNotHaveSpecialty();
+        }
+
+        // Buscamos la consulta
+        ConsultaEntity consulta = consultaRepository.findById(agendaMedicoRequest.getConsulta()).orElseThrow(DataNotFoundException::consultaNotFound);
+
         // Obtenemos todas las agendas existentes para el médico y el día de la semana
         List<AgendaMedicoEntity> agendasExistentes = agendaMedicoRepository.findByMedicoAndDiaSemana(agenda.getMedico(), agenda.getDiaSemana());
 
@@ -110,16 +124,19 @@ public class AgendaMedicoService {
         LocalTime end1 = agendaMedicoRequest.getHoraFin();
 
         // Verificamos si hay colisión de horarios
-        boolean horarioColapsa = this.agendaOverlap(diaSemana, start1, end1, agendasExistentes);
+        boolean horarioColapsa = this.agendaOverlap(agendaId, diaSemana, start1, end1, agendasExistentes);
 
         if (horarioColapsa) {
             throw ConflictException.horarioColapsa();
         }
 
         // Mapeamos la petición a la entidad y guardamos
+        agenda.setEspecialidad(especialidad);
+        agenda.setConsulta(consulta);
         agenda.setDiaSemana(agendaMedicoRequest.getDiaSemana());
         agenda.setHoraInicio(agendaMedicoRequest.getHoraInicio());
         agenda.setHoraFin(agendaMedicoRequest.getHoraFin());
+        agenda.setDuracionCita(agendaMedicoRequest.getDuracionCita());
         agenda = agendaMedicoRepository.save(agenda);
 
         // Mapeamos la entidad a DTO y retornamos
@@ -135,11 +152,21 @@ public class AgendaMedicoService {
     }
 
     private boolean agendaOverlap(DayOfWeek diaSemana, LocalTime start1, LocalTime end1, List<AgendaMedicoEntity> agendas) {
+        return this.agendaOverlap(null, diaSemana, start1, end1, agendas);
+    }
+
+    private boolean agendaOverlap(Integer skipEntry, DayOfWeek diaSemana, LocalTime start1, LocalTime end1, List<AgendaMedicoEntity> agendas) {
         return agendas.stream().anyMatch(
                 agenda -> {
                     if (agenda.getDiaSemana() != diaSemana) {
                         return false;
                     }
+
+                    // Si la agenda es la misma que la que se está actualizando, no se verifica
+                    if (agenda.getId().equals(skipEntry)) {
+                        return false;
+                    }
+
                     LocalTime start2 = agenda.getHoraInicio();
                     LocalTime end2 = agenda.getHoraFin();
                     return timesOverlap(start1, end1, start2, end2);
