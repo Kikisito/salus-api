@@ -16,6 +16,12 @@ public class AgendaMedicoRequest {
     private Integer medico;
 
     @NotNull(message = ErrorMessages.FIELD_CANNOT_BE_BLANK)
+    private Integer especialidad;
+
+    @NotNull(message = ErrorMessages.FIELD_CANNOT_BE_BLANK)
+    private Integer consulta;
+
+    @NotNull(message = ErrorMessages.FIELD_CANNOT_BE_BLANK)
     private DayOfWeek diaSemana;
 
     @NotNull(message = ErrorMessages.FIELD_CANNOT_BE_BLANK)

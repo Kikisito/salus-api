@@ -33,4 +33,5 @@ public final class ErrorMessages {
     public static final String CITA_SLOT_NOT_FOUND = "Cita slot no encontrada";
     public static final String CITA_NOT_FOUND = "Cita no encontrada";
     public static final String APPOINTMENT_SLOT_IS_ALREADY_TAKEN = "Appointment slot is already taken";
+    public static final String DOCTOR_DOES_NOT_HAVE_SPECIALTY = "Doctor does not have the requested specialty";
 }

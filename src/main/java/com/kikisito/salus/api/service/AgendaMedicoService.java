@@ -3,10 +3,14 @@ package com.kikisito.salus.api.service;
 import com.kikisito.salus.api.dto.AgendaMedicoDTO;
 import com.kikisito.salus.api.dto.request.AgendaMedicoRequest;
 import com.kikisito.salus.api.entity.AgendaMedicoEntity;
+import com.kikisito.salus.api.entity.ConsultaEntity;
+import com.kikisito.salus.api.entity.EspecialidadEntity;
 import com.kikisito.salus.api.entity.PerfilMedicoEntity;
 import com.kikisito.salus.api.exception.ConflictException;
 import com.kikisito.salus.api.exception.DataNotFoundException;
 import com.kikisito.salus.api.repository.AgendaMedicoRepository;
+import com.kikisito.salus.api.repository.ConsultaRepository;
+import com.kikisito.salus.api.repository.EspecialidadRepository;
 import com.kikisito.salus.api.repository.PerfilMedicoRepository;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -26,6 +30,12 @@ public class AgendaMedicoService {
 
     @Autowired
     private final PerfilMedicoRepository perfilMedicoRepository;
+
+    @Autowired
+    private final EspecialidadRepository especialidadRepository;
+
+    @Autowired
+    private final ConsultaRepository consultaRepository;
 
     @Autowired
     private final ModelMapper modelMapper;
@@ -49,6 +59,17 @@ public class AgendaMedicoService {
         // Buscamos si existe el perfil del médico y lo recuperamos
         PerfilMedicoEntity medico = perfilMedicoRepository.findById(agendaMedicoRequest.getMedico()).orElseThrow(DataNotFoundException::medicoNotFound);
 
+        // Buscamos la especialidad y la consulta
+        EspecialidadEntity especialidad = especialidadRepository.findById(agendaMedicoRequest.getEspecialidad()).orElseThrow(DataNotFoundException::especialidadNotFound);
+
+        // Comprobamos si el médico tiene la especialidad de la petición
+        if(!medico.getEspecialidades().contains(especialidad)) {
+            throw ConflictException.doctorDoesNotHaveSpecialty();
+        }
+
+        // Buscamos la consulta
+        ConsultaEntity consulta = consultaRepository.findById(agendaMedicoRequest.getConsulta()).orElseThrow(DataNotFoundException::consultaNotFound);
+
         // Obtenemos todas las agendas existentes para el médico y el día de la semana
         List<AgendaMedicoEntity> agendasExistentes = agendaMedicoRepository.findByMedicoAndDiaSemana(medico, agendaMedicoRequest.getDiaSemana());
 
@@ -67,6 +88,8 @@ public class AgendaMedicoService {
         // Mapeamos la petición a la entidad y guardamos
         AgendaMedicoEntity agendaMedicoEntity = modelMapper.map(agendaMedicoRequest, AgendaMedicoEntity.class);
         agendaMedicoEntity.setMedico(medico);
+        agendaMedicoEntity.setEspecialidad(especialidad);
+        agendaMedicoEntity.setConsulta(consulta);
         agendaMedicoEntity = agendaMedicoRepository.save(agendaMedicoEntity);
 
         // Mapeamos la entidad a DTO y retornamos
