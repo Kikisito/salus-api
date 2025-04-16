@@ -14,6 +14,7 @@ import java.time.LocalDateTime;
 @Table(name = "ausencias_medicos", uniqueConstraints = {
         @UniqueConstraint(columnNames = {"medico_id", "fechaInicio", "fechaFin"})
 })
+// TRADUCIR A INGLÉS E IMPLEMENTAR
 public class AusenciaMedicoEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)

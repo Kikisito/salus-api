@@ -1,7 +1,7 @@
 package com.kikisito.salus.api.service;
 
 import com.kikisito.salus.api.dto.DireccionDTO;
-import com.kikisito.salus.api.dto.UsuarioDTO;
+import com.kikisito.salus.api.dto.UserDTO;
 import com.kikisito.salus.api.dto.request.RestrictUserRequest;
 import com.kikisito.salus.api.dto.response.UsersListResponse;
 import com.kikisito.salus.api.embeddable.DireccionEmbeddable;
@@ -32,8 +32,8 @@ public class UserService {
     @Transactional(readOnly = true)
     public UsersListResponse getAllUsers(Integer page, Integer limit) {
         Page<UserEntity> userEntities = userRepository.findAll(PageRequest.of(page, limit));
-        List<UsuarioDTO> usersDTO = userEntities.stream()
-                .map(userEntity -> modelMapper.map(userEntity, UsuarioDTO.class))
+        List<UserDTO> usersDTO = userEntities.stream()
+                .map(userEntity -> modelMapper.map(userEntity, UserDTO.class))
                 .toList();
 
         return UsersListResponse.builder()
@@ -45,8 +45,8 @@ public class UserService {
     @Transactional(readOnly = true)
     public UsersListResponse searchUsers(String search, Integer page, Integer limit) {
         Page<UserEntity> userEntities = userRepository.searchUsers(search, PageRequest.of(page, limit));
-        List<UsuarioDTO> usersDTO = userEntities.stream()
-                .map(userEntity -> modelMapper.map(userEntity, UsuarioDTO.class))
+        List<UserDTO> usersDTO = userEntities.stream()
+                .map(userEntity -> modelMapper.map(userEntity, UserDTO.class))
                 .toList();
 
         return UsersListResponse.builder()
@@ -56,85 +56,85 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public UsuarioDTO getUserProfile(Integer id) {
+    public UserDTO getUserProfile(Integer id) {
         UserEntity userEntity = userRepository.findById(id).orElseThrow(DataNotFoundException::userNotFound);
         return this.getUserProfile(userEntity);
     }
 
     @Transactional(readOnly = true)
-    public UsuarioDTO getUserProfile(UserEntity userEntity) {
+    public UserDTO getUserProfile(UserEntity userEntity) {
         // Se mapea la dirección a un DTO, si existe
         DireccionDTO direccionDTO = (userEntity.getDireccion() != null)
                 ? modelMapper.map(userEntity.getDireccion(), DireccionDTO.class)
                 : null;
 
         // Se mapea el usuario a un DTO y se le asigna la dirección para devolverlo como respuesta
-        UsuarioDTO usuarioDTO = modelMapper.map(userEntity, UsuarioDTO.class);
-        usuarioDTO.setDireccion(direccionDTO);
-        return usuarioDTO;
+        UserDTO userDTO = modelMapper.map(userEntity, UserDTO.class);
+        userDTO.setDireccion(direccionDTO);
+        return userDTO;
     }
 
     @Transactional
-    public UsuarioDTO updateProfile(int userIdTarget, UsuarioDTO usuarioDTO) {
+    public UserDTO updateProfile(int userIdTarget, UserDTO userDTO) {
         // Se busca el usuario por ID
         UserEntity userEntity = userRepository.findById(userIdTarget).orElseThrow(DataNotFoundException::userNotFound);
-        return this.updateProfile(userEntity, usuarioDTO);
+        return this.updateProfile(userEntity, userDTO);
     }
 
     @Transactional
-    public UsuarioDTO updateProfile(UserEntity userEntity, UsuarioDTO usuarioDTO) {
+    public UserDTO updateProfile(UserEntity userEntity, UserDTO userDTO) {
         // Se comprueba si el email o el NIF ya están registrados por *OTRO* usuario
-        UserEntity existingUser = userRepository.findByEmail(usuarioDTO.getEmail()).orElse(null);
+        UserEntity existingUser = userRepository.findByEmail(userDTO.getEmail()).orElse(null);
         if (existingUser != null && !existingUser.getId().equals(userEntity.getId())) {
             throw ConflictException.emailIsRegistered();
         }
 
-        existingUser = userRepository.findByNif(usuarioDTO.getNif()).orElse(null);
+        existingUser = userRepository.findByNif(userDTO.getNif()).orElse(null);
         if (existingUser != null && !existingUser.getId().equals(userEntity.getId())) {
             throw ConflictException.nifIsRegistered();
         }
 
         // Si el email, que estaba verificado, se ha cambiado, se vuelve a marcar como cuenta no verificada
-        if (!userEntity.getEmail().equals(usuarioDTO.getEmail()) && userEntity.getAccountStatusType().equals(AccountStatusType.VERIFIED)) {
+        if (!userEntity.getEmail().equals(userDTO.getEmail()) && userEntity.getAccountStatusType().equals(AccountStatusType.VERIFIED)) {
             userEntity.setAccountStatusType(AccountStatusType.NOT_VERIFIED);
         }
 
         // Se mapea el DTO a la entidad y se guarda
-        userEntity.setNombre(usuarioDTO.getNombre());
-        userEntity.setApellidos(usuarioDTO.getApellidos());
-        userEntity.setNif(usuarioDTO.getNif());
-        userEntity.setSexo(usuarioDTO.getSexo());
-        userEntity.setEmail(usuarioDTO.getEmail());
-        userEntity.setTelefono(usuarioDTO.getTelefono());
-        userEntity.setFechaNacimiento(usuarioDTO.getFechaNacimiento());
+        userEntity.setNombre(userDTO.getNombre());
+        userEntity.setApellidos(userDTO.getApellidos());
+        userEntity.setNif(userDTO.getNif());
+        userEntity.setSexo(userDTO.getSexo());
+        userEntity.setEmail(userDTO.getEmail());
+        userEntity.setTelefono(userDTO.getTelefono());
+        userEntity.setFechaNacimiento(userDTO.getFechaNacimiento());
         userEntity = userRepository.save(userEntity);
 
         // Se mapea el usuario actualizado a un DTO y se devuelve
-        return modelMapper.map(userEntity, UsuarioDTO.class);
+        return modelMapper.map(userEntity, UserDTO.class);
     }
 
     @Transactional
-    public UsuarioDTO updateAddress(int userId, DireccionDTO direccionDTO) {
+    public UserDTO updateAddress(int userId, DireccionDTO direccionDTO) {
         // Se busca el usuario por ID
         UserEntity userEntity = userRepository.findById(userId).orElseThrow(DataNotFoundException::userNotFound);
         return updateAddress(userEntity, direccionDTO);
     }
 
     @Transactional
-    public UsuarioDTO updateAddress(UserEntity userEntity, DireccionDTO direccionDTO) {
+    public UserDTO updateAddress(UserEntity userEntity, DireccionDTO direccionDTO) {
         // Se mapea la dirección a un objeto "embeddable", se actualiza el usuario y se guarda
         DireccionEmbeddable direccionEmbeddable = modelMapper.map(direccionDTO, DireccionEmbeddable.class);
         userEntity.setDireccion(direccionEmbeddable);
         userEntity = userRepository.save(userEntity);
 
         // Se mapea el usuario actualizado a un DTO y se le asigna la dirección para devolverlo como respuesta
-        UsuarioDTO usuarioDTOUpdated = modelMapper.map(userEntity, UsuarioDTO.class);
-        usuarioDTOUpdated.setDireccion(direccionDTO);
-        return usuarioDTOUpdated;
+        UserDTO userDTOUpdated = modelMapper.map(userEntity, UserDTO.class);
+        userDTOUpdated.setDireccion(direccionDTO);
+        return userDTOUpdated;
     }
 
     @Transactional
-    public UsuarioDTO restrictUser(int userId, RestrictUserRequest request) {
+    public UserDTO restrictUser(int userId, RestrictUserRequest request) {
         // Se busca el usuario por ID
         UserEntity userEntity = userRepository.findById(userId).orElseThrow(DataNotFoundException::userNotFound);
 
@@ -142,6 +142,6 @@ public class UserService {
         userEntity.setRestricted(request.isRestrict());
         userEntity = userRepository.save(userEntity);
 
-        return modelMapper.map(userEntity, UsuarioDTO.class);
+        return modelMapper.map(userEntity, UserDTO.class);
     }
 }

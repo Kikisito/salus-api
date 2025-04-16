@@ -77,11 +77,11 @@ public class UserEntity implements UserDetails {
     @JsonManagedReference
     private List<SessionEntity> sessions;
 
-    @OneToMany(mappedBy = "paciente", fetch = FetchType.LAZY)
-    private List<CitaEntity> citas;
+    @OneToMany(mappedBy = "patient", fetch = FetchType.LAZY)
+    private List<AppointmentEntity> appointments;
 
     @OneToOne(mappedBy = "user")
-    private PerfilMedicoEntity perfilMedico;
+    private MedicalProfileEntity medicalProfile;
 
     // Impide que el usuario pueda crear nuevas citas
     @Column

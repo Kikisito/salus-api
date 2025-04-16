@@ -15,31 +15,31 @@ public class DataNotFoundException extends ApiRuntimeException {
         return new DataNotFoundException("data_not_found.token", ErrorMessages.TOKEN_NOT_FOUND);
     }
 
-    public static DataNotFoundException centroMedicoNotFound() {
-        return new DataNotFoundException("data_not_found.centro_medico", ErrorMessages.CENTRO_MEDICO_NOT_FOUND);
+    public static DataNotFoundException medicalCenterNotFound() {
+        return new DataNotFoundException("data_not_found.centro_medico", ErrorMessages.MEDICAL_CENTER_NOT_FOUND);
     }
 
-    public static DataNotFoundException consultaNotFound() {
-        return new DataNotFoundException("data_not_found.consulta", ErrorMessages.CONSULTA_NOT_FOUND);
+    public static DataNotFoundException roomNotFound() {
+        return new DataNotFoundException("data_not_found.consulta", ErrorMessages.ROOM_NOT_FOUND);
     }
 
-    public static DataNotFoundException medicoNotFound() {
-        return new DataNotFoundException("data_not_found.medico", ErrorMessages.MEDICO_NOT_FOUND);
+    public static DataNotFoundException doctorNotFound() {
+        return new DataNotFoundException("data_not_found.medico", ErrorMessages.DOCTOR_NOT_FOUND);
     }
 
-    public static DataNotFoundException especialidadNotFound() {
-        return new DataNotFoundException("data_not_found.especialidad", ErrorMessages.ESPECIALIDAD_NOT_FOUND);
+    public static DataNotFoundException specialtyNotFound() {
+        return new DataNotFoundException("data_not_found.especialidad", ErrorMessages.SPECIALTY_NOT_FOUND);
     }
 
-    public static DataNotFoundException agendaNotFound() {
-        return new DataNotFoundException("data_not_found.agenda", ErrorMessages.AGENDA_NOT_FOUND);
+    public static DataNotFoundException scheduleNotFound() {
+        return new DataNotFoundException("data_not_found.agenda", ErrorMessages.SCHEDULE_NOT_FOUND);
     }
 
-    public static DataNotFoundException citaSlotNotFound() {
-        return new DataNotFoundException("data_not_found.cita_slot", ErrorMessages.CITA_SLOT_NOT_FOUND);
+    public static DataNotFoundException appointmentSlotNotFound() {
+        return new DataNotFoundException("data_not_found.cita_slot", ErrorMessages.APPOINTMENT_SLOT_NOT_FOUND);
     }
 
-    public static DataNotFoundException citaNotFound() {
-        return new DataNotFoundException("data_not_found.cita", ErrorMessages.CITA_NOT_FOUND);
+    public static DataNotFoundException appointmentNotFound() {
+        return new DataNotFoundException("data_not_found.cita", ErrorMessages.APPOINTMENT_NOT_FOUND);
     }
 }

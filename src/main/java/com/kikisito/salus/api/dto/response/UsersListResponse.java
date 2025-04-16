@@ -1,6 +1,6 @@
 package com.kikisito.salus.api.dto.response;
 
-import com.kikisito.salus.api.dto.UsuarioDTO;
+import com.kikisito.salus.api.dto.UserDTO;
 import lombok.Builder;
 import lombok.Data;
 
@@ -10,5 +10,5 @@ import java.util.List;
 @Builder
 public class UsersListResponse {
     private final long count;
-    private final List<UsuarioDTO> users;
+    private final List<UserDTO> users;
 }

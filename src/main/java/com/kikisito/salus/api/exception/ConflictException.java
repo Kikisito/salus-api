@@ -19,24 +19,24 @@ public class ConflictException extends ApiRuntimeException {
         return new ConflictException("conflict.email_is_verified", ErrorMessages.EMAIL_IS_VERIFIED);
     }
 
-    public static ConflictException userAlreadyMedico() {
-        return new ConflictException("conflict.user_already_medico", ErrorMessages.USER_ALREADY_MEDICO);
+    public static ConflictException userAlreadyDoctor() {
+        return new ConflictException("conflict.user_already_medico", ErrorMessages.USER_ALREADY_DOCTOR);
     }
 
-    public static ConflictException numeroColegiadoAlreadyExists() {
-        return new ConflictException("conflict.numero_colegiado_already_exists", ErrorMessages.NUMERO_COLEGIADO_ALREADY_EXISTS);
+    public static ConflictException licenseAlreadyExists() {
+        return new ConflictException("conflict.numero_colegiado_already_exists", ErrorMessages.LICENSE_ALREADY_EXISTS);
     }
 
-    public static ConflictException medicoAlreadyHasEspecialidad() {
-        return new ConflictException("conflict.medico_already_has_especialidad", ErrorMessages.MEDICO_ALREADY_HAS_ESPECIALIDAD);
+    public static ConflictException doctorHasAlreadySpecialty() {
+        return new ConflictException("conflict.medico_already_has_especialidad", ErrorMessages.DOCTOR_ALREADY_HAS_SPECIALTY);
     }
 
     public static ConflictException doctorDoesNotHaveSpecialty() {
         return new ConflictException("conflict.doctor_does_not_have_specialty", ErrorMessages.DOCTOR_DOES_NOT_HAVE_SPECIALTY);
     }
 
-    public static ConflictException horarioColapsa() {
-        return new ConflictException("conflict.horario_colapsa", ErrorMessages.HORARIO_COLAPSA);
+    public static ConflictException scheduleConflict() {
+        return new ConflictException("conflict.horario_colapsa", ErrorMessages.SCHEDULE_CONFLICT);
     }
 
     public static ConflictException appointmentSlotIsAlreadyTaken() {

@@ -1,6 +1,6 @@
 package com.kikisito.salus.api.dto.response;
 
-import com.kikisito.salus.api.dto.CentroMedicoDTO;
+import com.kikisito.salus.api.dto.MedicalCenterDTO;
 import lombok.Builder;
 import lombok.Data;
 
@@ -10,5 +10,5 @@ import java.util.List;
 @Builder
 public class MedicalCentersListResponse {
     private final long count;
-    private final List<CentroMedicoDTO> medicalCenters;
+    private final List<MedicalCenterDTO> medicalCenters;
 }
