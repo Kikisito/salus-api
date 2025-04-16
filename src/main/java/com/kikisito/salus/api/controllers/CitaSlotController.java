@@ -22,20 +22,21 @@ public class CitaSlotController {
 
     @GetMapping("/{medicoId}")
     @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity<List<CitaSlotDTO>> getAgendasMedico(@PathVariable Integer medicoId, @RequestBody GetCitaSlotRequest getCitaSlotRequest) {
+    public ResponseEntity<List<CitaSlotDTO>> getDoctorAppointmentSlots(@PathVariable Integer medicoId, @RequestBody GetCitaSlotRequest getCitaSlotRequest) {
         return ResponseEntity.ok(citaSlotService.getCitasSlotByMedicoAndFecha(medicoId, getCitaSlotRequest.getFecha()));
     }
 
     @PostMapping("/add")
     @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity<CitaSlotDTO> createCitaSlot(@RequestBody CitaSlotRequest citaSlotRequest) {
-        return ResponseEntity.ok(citaSlotService.createCitaSlot(citaSlotRequest));
+    public ResponseEntity<CitaSlotDTO> createAppointmentSlot(@RequestBody CitaSlotRequest appointmentSlotRequest) {
+        return ResponseEntity.ok(citaSlotService.createCitaSlot(appointmentSlotRequest));
     }
 
+    
     @DeleteMapping("/{citaSlot}")
     @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity<Void> deleteCitaSlot(@PathVariable("citaSlot") Integer citaSlotId) {
-        citaSlotService.deleteCitaSlot(citaSlotId);
+    public ResponseEntity<Void> deleteAppointmentSlot(@PathVariable("citaSlot") Integer appointmentSlotId) {
+        citaSlotService.deleteCitaSlot(appointmentSlotId);
         return ResponseEntity.ok().build();
     }
 }
