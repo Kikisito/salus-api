@@ -11,6 +11,6 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @Data
 @Builder
-public class GetAppointmentSlotRequest {
+public class GetAppointmentSlotsRequest {
     private LocalDate date;
 }

@@ -11,5 +11,5 @@ import java.util.List;
 
 @Repository
 public interface AppointmentSlotRepository extends JpaRepository<AppointmentSlotEntity, Integer> {
-    List<AppointmentSlotDTO> findByDoctorAndDate(MedicalProfileEntity doctor, LocalDate date);
+    List<AppointmentSlotEntity> findByDoctorAndDate(MedicalProfileEntity doctor, LocalDate date);
 }

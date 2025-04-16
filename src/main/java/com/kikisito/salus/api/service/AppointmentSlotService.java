@@ -65,8 +65,12 @@ public class AppointmentSlotService {
 
     @Transactional(readOnly = true)
     public List<AppointmentSlotDTO> getAppointmentSlotsByDoctorAndDate(Integer doctorId, LocalDate date) {
-        MedicalProfileEntity medico = medicalProfileRepository.findById(doctorId).orElseThrow(DataNotFoundException::doctorNotFound);
-        return appointmentSlotRepository.findByDoctorAndDate(medico, date);
+        MedicalProfileEntity doctor = medicalProfileRepository.findById(doctorId).orElseThrow(DataNotFoundException::doctorNotFound);
+        List<AppointmentSlotEntity> appointmentSlots = appointmentSlotRepository.findByDoctorAndDate(doctor, date);
+
+        return appointmentSlots.stream()
+                .map(appointmentSlot -> modelMapper.map(appointmentSlot, AppointmentSlotDTO.class))
+                .toList();
     }
 
     @Transactional

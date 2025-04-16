@@ -2,14 +2,15 @@ package com.kikisito.salus.api.controllers;
 
 import com.kikisito.salus.api.dto.AppointmentSlotDTO;
 import com.kikisito.salus.api.dto.request.AppointmentSlotRequest;
-import com.kikisito.salus.api.dto.request.GetAppointmentSlotRequest;
 import com.kikisito.salus.api.service.AppointmentSlotService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -20,10 +21,10 @@ public class AppointmentSlotsController {
     @Autowired
     private final AppointmentSlotService appointmentSlotService;
 
-    @GetMapping("/{medicoId}")
+    @GetMapping("/{medicoId}/{date}")
     @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity<List<AppointmentSlotDTO>> getDoctorAppointmentSlots(@PathVariable Integer medicoId, @RequestBody GetAppointmentSlotRequest getAppointmentSlotRequest) {
-        return ResponseEntity.ok(appointmentSlotService.getAppointmentSlotsByDoctorAndDate(medicoId, getAppointmentSlotRequest.getDate()));
+    public ResponseEntity<List<AppointmentSlotDTO>> getDoctorAppointmentSlots(@PathVariable Integer medicoId, @PathVariable @DateTimeFormat(pattern = "dd-MM-yyyy") LocalDate date) {
+        return ResponseEntity.ok(appointmentSlotService.getAppointmentSlotsByDoctorAndDate(medicoId, date));
     }
 
     @PostMapping("/add")
@@ -33,9 +34,9 @@ public class AppointmentSlotsController {
     }
 
     
-    @DeleteMapping("/{citaSlot}")
+    @DeleteMapping("/{appointmentSlot}")
     @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity<Void> deleteAppointmentSlot(@PathVariable("citaSlot") Integer appointmentSlotId) {
+    public ResponseEntity<Void> deleteAppointmentSlot(@PathVariable("appointmentSlot") Integer appointmentSlotId) {
         appointmentSlotService.deleteAppointmentSlot(appointmentSlotId);
         return ResponseEntity.ok().build();
     }

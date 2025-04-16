@@ -20,5 +20,5 @@ public class AppointmentSlotDTO {
     private LocalDate date;
     private LocalTime startTime;
     private LocalTime endTime;
-    private AppointmentDTO appointment;
+    private Integer appointmentId;
 }
