@@ -31,6 +31,12 @@ public class AppointmentsController {
     @PostMapping("/@me/new")
     @PreAuthorize("hasAuthority('USER')")
     public ResponseEntity<AppointmentDTO> createAppointment(@AuthenticationPrincipal UserEntity user, @RequestBody AppointmentRequest appointmentRequest) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(appointmentService.getAppointment(user, appointmentRequest));
+        return ResponseEntity.status(HttpStatus.CREATED).body(appointmentService.createAppointment(user, appointmentRequest));
+    }
+
+    @GetMapping("/{id}")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public ResponseEntity<AppointmentDTO> getAppointmentById(@PathVariable Integer id) {
+        return ResponseEntity.ok(appointmentService.getAppointmentById(id));
     }
 }

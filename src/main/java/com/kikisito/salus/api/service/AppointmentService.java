@@ -46,6 +46,13 @@ public class AppointmentService {
     }
 
     @Transactional(readOnly = true)
+    public AppointmentDTO getAppointmentById(Integer appointmentId) {
+        AppointmentEntity appointment = appointmentRepository.findById(appointmentId).orElseThrow(DataNotFoundException::appointmentNotFound);
+        return modelMapper.map(appointment, AppointmentDTO.class);
+    }
+
+
+    @Transactional(readOnly = true)
     public List<AppointmentDTO> getAllUserAppointments(Integer userId) {
         UserEntity user = userRepository.findById(userId).orElseThrow(DataNotFoundException::userNotFound);
         List<AppointmentEntity> citas = appointmentRepository.findByPatient(user);
@@ -56,7 +63,7 @@ public class AppointmentService {
     }
 
     @Transactional
-    public AppointmentDTO getAppointment(UserEntity patient, AppointmentRequest appointmentRequest) {
+    public AppointmentDTO createAppointment(UserEntity patient, AppointmentRequest appointmentRequest) {
         // Comprobamos y obtenemos el slot de la cita que ha solicitado el usuario
         AppointmentSlotEntity appointmentSlot = appointmentSlotRepository.findById(appointmentRequest.getAppointmentSlot()).orElseThrow(DataNotFoundException::appointmentSlotNotFound);
 
