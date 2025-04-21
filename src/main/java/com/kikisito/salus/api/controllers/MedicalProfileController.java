@@ -113,4 +113,11 @@ public class MedicalProfileController {
     public ResponseEntity<MedicalProfileDTO> addMedicalProfile(@RequestBody @Valid DoctorLicenseRequest doctorLicenseRequest) {
         return ResponseEntity.status(HttpStatus.CREATED).body(medicalProfileService.createMedicalProfileFromUserEntity(doctorLicenseRequest));
     }
+
+    @DeleteMapping("/{doctorId}")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public ResponseEntity<Void> deleteMedicalProfile(@PathVariable("doctorId") Integer id) {
+        medicalProfileService.deleteMedicalProfile(id);
+        return ResponseEntity.noContent().build();
+    }
 }

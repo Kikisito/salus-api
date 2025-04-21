@@ -13,4 +13,5 @@ import java.util.List;
 public interface AppointmentRepository extends JpaRepository<AppointmentEntity, Integer> {
     List<AppointmentEntity> findBySlot_DoctorAndSlot_Date(MedicalProfileEntity slotDoctor, LocalDate slotDate);
     List<AppointmentEntity> findByPatient(UserEntity patient);
+    boolean existsBySlot_Doctor(MedicalProfileEntity doctor);
 }

@@ -11,6 +11,7 @@ import com.kikisito.salus.api.entity.MedicalProfileEntity;
 import com.kikisito.salus.api.entity.UserEntity;
 import com.kikisito.salus.api.exception.ConflictException;
 import com.kikisito.salus.api.exception.DataNotFoundException;
+import com.kikisito.salus.api.repository.AppointmentRepository;
 import com.kikisito.salus.api.repository.SpecialtyRepository;
 import com.kikisito.salus.api.repository.MedicalProfileRepository;
 import com.kikisito.salus.api.repository.UserRepository;
@@ -36,6 +37,9 @@ public class MedicalProfileService {
 
     @Autowired
     private final SpecialtyRepository specialtyRepository;
+
+    @Autowired
+    private final AppointmentRepository appointmentRepository;
 
     @Autowired
     private ModelMapper modelMapper;
@@ -157,5 +161,18 @@ public class MedicalProfileService {
         medicalProfileRepository.save(medicalProfileEntity);
 
         return modelMapper.map(medicalProfileEntity, MedicalProfileDTO.class);
+    }
+
+    @Transactional
+    public boolean deleteMedicalProfile(Integer id) {
+        MedicalProfileEntity medicalProfile = medicalProfileRepository.findById(id).orElseThrow(DataNotFoundException::doctorNotFound);
+
+        // Solo se permite eliminar un perfil médico si no tiene datos asociados como médico. Por lo general, comprobando citas debería ser suficiente
+        if(appointmentRepository.existsBySlot_Doctor(medicalProfile)) {
+            throw ConflictException.doctorHasMedicalDataLinked();
+        }
+
+        medicalProfileRepository.delete(medicalProfile);
+        return true;
     }
 }

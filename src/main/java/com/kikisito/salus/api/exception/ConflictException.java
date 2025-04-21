@@ -42,4 +42,8 @@ public class ConflictException extends ApiRuntimeException {
     public static ConflictException appointmentSlotIsAlreadyTaken() {
         return new ConflictException("conflict.appointment_slot_is_already_taken", ErrorMessages.APPOINTMENT_SLOT_IS_ALREADY_TAKEN);
     }
+
+    public static ConflictException doctorHasMedicalDataLinked() {
+        return new ConflictException("conflict.doctor_has_appointments", ErrorMessages.DOCTOR_HAS_MEDICAL_DATA_LINKED);
+    }
 }
