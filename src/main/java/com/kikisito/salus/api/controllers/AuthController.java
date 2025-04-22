@@ -68,12 +68,12 @@ public class AuthController {
     @PostMapping("/available/email")
     public ResponseEntity<HttpStatus> existsEmail(@RequestBody @Valid CheckEmailExistsRequest request) {
         authService.isEmailAvailable(request.getEmail());
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/available/nif")
     public ResponseEntity<HttpStatus> existsNif(@RequestBody @Valid CheckNifExistsRequest request) {
         authService.isNifAvailable(request.getNif());
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 }
