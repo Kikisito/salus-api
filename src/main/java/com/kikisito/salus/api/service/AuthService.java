@@ -76,14 +76,19 @@ public class AuthService {
         UserEntity userEntity = userEntityOptional.get();
 
         // Si ya existe un PasswordResetEntity lo actualizamos, si no lo creamos
+        PasswordResetEntity passwordResetEntity = this.createPasswordResetToken(userEntity);
+
+        emailingService.sendEmail(email, PASSWORD_RESET_EMAIL_SUBJECT, PASSWORD_RESET_EMAIL_TEXT.replace("{token}", passwordResetEntity.getToken()));
+    }
+
+    @Transactional
+    public PasswordResetEntity createPasswordResetToken(UserEntity userEntity) {
         PasswordResetEntity passwordResetEntity = passwordResetRepository.findByUserEntity(userEntity)
                 .orElse(PasswordResetEntity.builder().userEntity(userEntity).build());
 
         passwordResetEntity.setToken(jwtService.generatePasswordResetToken(userEntity));
 
-        PasswordResetEntity finalPasswordResetEntity = passwordResetRepository.save(passwordResetEntity);
-
-        emailingService.sendEmail(email, PASSWORD_RESET_EMAIL_SUBJECT, PASSWORD_RESET_EMAIL_TEXT.replace("{token}", finalPasswordResetEntity.getToken()));
+        return passwordResetRepository.save(passwordResetEntity);
     }
 
     @Transactional
@@ -96,12 +101,19 @@ public class AuthService {
             throw InvalidFieldException.tokenExpired();
         }
 
-        // Cambiamos la contraseña y guardamos
+        // Cambiamos la contraseña
         UserEntity userEntity = passwordReset.getUserEntity();
         userEntity.setPassword(passwordEncoder.encode(newPassword));
+
+        // Aprovechamos para verificar el email del usuario, ya que este token solo se envía al email asociado
+        if(userEntity.getAccountStatusType() == AccountStatusType.NOT_VERIFIED) {
+            userEntity.setAccountStatusType(AccountStatusType.VERIFIED);
+        }
+
+        // Guardamos el usuario
         userRepository.save(userEntity);
 
-        // Borramos el token
+        // Borramos el token de recuperación de contraseña
         passwordResetRepository.delete(passwordReset);
     }
 
