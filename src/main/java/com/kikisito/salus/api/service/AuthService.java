@@ -63,7 +63,7 @@ public class AuthService {
     private final static String PASSWORD_RESET_EMAIL_TEXT = "Para recuperar tu contraseña haz click en el siguiente enlace: {token}";
 
     @Transactional
-    public void sendPasswordRecoveryMail(String email, String nif) {
+    public void startPasswordRecoveryProcess(String email, String nif) {
         // Obtenemos la entidad asociada al email
         Optional<UserEntity> userEntityOptional = userRepository.findByEmailAndNif(email, nif);
 
@@ -78,7 +78,8 @@ public class AuthService {
         // Si ya existe un PasswordResetEntity lo actualizamos, si no lo creamos
         PasswordResetEntity passwordResetEntity = this.createPasswordResetToken(userEntity);
 
-        emailingService.sendEmail(email, PASSWORD_RESET_EMAIL_SUBJECT, PASSWORD_RESET_EMAIL_TEXT.replace("{token}", passwordResetEntity.getToken()));
+        // Mandamos el email
+        this.sendPasswordResetEmail(userEntity, passwordResetEntity.getToken());
     }
 
     @Transactional
@@ -164,10 +165,7 @@ public class AuthService {
         AuthenticationResponse authenticationResponse = this.createToken(userEntity);
 
         // Enviamos el email de verificación
-        String verificationLink = host + "VERIFY_EMAIL_PATH" + savedUser.getVerificationToken();
-        emailingService.sendEmail(request.getEmail(),
-                VERIFY_EMAIL_SUBJECT,
-                VERIFY_EMAIL_TEXT.replace("{link}", verificationLink));
+        this.sendVerificationEmail(savedUser);
 
         return authenticationResponse;
     }
@@ -309,5 +307,16 @@ public class AuthService {
         byte[] randomBytes = new byte[24];
         secureRandom.nextBytes(randomBytes);
         return base64Encoder.encodeToString(randomBytes);
+    }
+
+    public void sendPasswordResetEmail(UserEntity userEntity, String token) {
+        // todo: Cambiar el enlace
+        emailingService.sendEmail(userEntity.getEmail(), PASSWORD_RESET_EMAIL_SUBJECT, PASSWORD_RESET_EMAIL_TEXT.replace("{token}", token));
+    }
+
+    public void sendVerificationEmail(UserEntity userEntity) {
+        // todo: Cambiar el enlace
+        String verificationLink = host + "VERIFY_EMAIL_PATH" + userEntity.getVerificationToken();
+        emailingService.sendEmail(userEntity.getEmail(), VERIFY_EMAIL_SUBJECT, VERIFY_EMAIL_TEXT.replace("{link}", verificationLink));
     }
 }

@@ -53,7 +53,7 @@ public class AuthController {
 
     @PostMapping("/forgot-password/request")
     public ResponseEntity<HttpStatus> sendPasswordRecoveryMail(@RequestBody @Valid PasswordResetRequest request) {
-        authService.sendPasswordRecoveryMail(request.getEmail(), request.getNif());
+        authService.startPasswordRecoveryProcess(request.getEmail(), request.getNif());
         return ResponseEntity.ok().build();
     }
 

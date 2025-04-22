@@ -2,7 +2,9 @@ package com.kikisito.salus.api.controllers;
 
 import com.kikisito.salus.api.dto.DireccionDTO;
 import com.kikisito.salus.api.dto.UserDTO;
+import com.kikisito.salus.api.dto.request.CreateUserRequest;
 import com.kikisito.salus.api.dto.request.PasswordChangeRequest;
+import com.kikisito.salus.api.dto.request.RegisterRequest;
 import com.kikisito.salus.api.dto.request.RestrictUserRequest;
 import com.kikisito.salus.api.dto.response.AuthenticationResponse;
 import com.kikisito.salus.api.dto.response.UsersListResponse;
@@ -140,5 +142,11 @@ public class UserController {
     public ResponseEntity<Void> logout() {
         authService.closeAllSessions();
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/add")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public ResponseEntity<UserDTO> addUser(@RequestBody @Valid CreateUserRequest createUserRequest) {
+        return ResponseEntity.ok(userService.createUser(createUserRequest));
     }
 }

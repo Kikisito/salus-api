@@ -2,6 +2,8 @@ package com.kikisito.salus.api.service;
 
 import com.kikisito.salus.api.dto.DireccionDTO;
 import com.kikisito.salus.api.dto.UserDTO;
+import com.kikisito.salus.api.dto.request.CreateUserRequest;
+import com.kikisito.salus.api.dto.request.RegisterRequest;
 import com.kikisito.salus.api.dto.request.RestrictUserRequest;
 import com.kikisito.salus.api.dto.response.UsersListResponse;
 import com.kikisito.salus.api.embeddable.DireccionEmbeddable;
@@ -10,24 +12,50 @@ import com.kikisito.salus.api.exception.ConflictException;
 import com.kikisito.salus.api.exception.DataNotFoundException;
 import com.kikisito.salus.api.repository.UserRepository;
 import com.kikisito.salus.api.type.AccountStatusType;
+import com.kikisito.salus.api.type.RoleType;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.security.SecureRandom;
+import java.util.Base64;
+import java.util.Collections;
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class UserService {
+    @Value("${application.host}")
+    private String host;
+
     @Autowired
     private final UserRepository userRepository;
 
     @Autowired
+    private final AuthService authService;
+
+    @Autowired
+    private final EmailingService emailingService;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    @Autowired
     private ModelMapper modelMapper;
+
+    private final static String WELCOME_EMAIL_NO_PASSWORD_TEXT_SUBJECT = "Te damos la bienvenida";
+    private final static String WELCOME_EMAIL_NO_PASSWORD_TEXT_BODY = "Hola %s,\n\n" +
+            "¡Te damos la bienvenida! Tu cuenta ha sido creada con éxito. \n" +
+            "Para establecer una contraseña en tu cuenta y poder acceder, por favor, utiliza el siguiente enlace:\n" +
+            "%s\n\n" +
+            "Si tienes alguna pregunta, no dudes en ponerte en contacto con nosotros.\n\n" +
+            "Saludos.";
 
     @Transactional(readOnly = true)
     public UsersListResponse getAllUsers(Integer page, Integer limit) {
@@ -143,5 +171,65 @@ public class UserService {
         userEntity = userRepository.save(userEntity);
 
         return modelMapper.map(userEntity, UserDTO.class);
+    }
+
+
+    @Transactional
+    public UserDTO createUser(CreateUserRequest request) {
+        // Comprobaciones previas (email/dni existentes)
+        if(userRepository.existsByEmail(request.getEmail())) {
+            throw ConflictException.emailIsRegistered();
+        }
+
+        if(userRepository.existsByNif(request.getNif())) {
+            throw ConflictException.nifIsRegistered();
+        }
+
+        // Creamos el usuario y la dirección
+        List<RoleType> roleTypeList = Collections.singletonList(RoleType.USER);
+
+        // La dirección es opcional, pero si se ha proporcionado la guardamos
+        DireccionEmbeddable direccionEmbeddable = DireccionEmbeddable.builder()
+                .lineaDireccion1(request.getDireccion().getLineaDireccion1())
+                .lineaDireccion2(request.getDireccion().getLineaDireccion2())
+                .codigoPostal(request.getDireccion().getCodigoPostal())
+                .pais(request.getDireccion().getPais())
+                .provincia(request.getDireccion().getProvincia())
+                .municipio(request.getDireccion().getMunicipio())
+                .localidad(request.getDireccion().getLocalidad())
+                .build();
+
+        UserEntity userEntity = UserEntity.builder()
+                .nif(request.getNif())
+                .nombre(request.getNombre())
+                .apellidos(request.getApellidos())
+                .sexo(request.getSexo())
+                .email(request.getEmail())
+                .password(passwordEncoder.encode(this.generateRandomPassword(128))) // Al crear la cuenta un tercero, la contraseña será aleatoria y el usuario deberá resetearla
+                .telefono(request.getTelefono())
+                .fechaNacimiento(request.getFechaNacimiento())
+                .direccion(direccionEmbeddable)
+                .accountStatusType(AccountStatusType.NOT_VERIFIED)
+                .rolesList(roleTypeList)
+                .build();
+
+        UserEntity savedUser = userRepository.save(userEntity);
+
+        // Creamos un token para resetear la contraseña del usuario
+        String passwordResetToken = authService.createPasswordResetToken(savedUser).getToken();
+
+        // Enviamos el email de reseteo de contraseña
+        // todo: Cambiar el enlace
+        emailingService.sendEmail(savedUser.getEmail(), WELCOME_EMAIL_NO_PASSWORD_TEXT_SUBJECT,
+                String.format(WELCOME_EMAIL_NO_PASSWORD_TEXT_BODY, savedUser.getNombre(), host + "/forgot-password/reset/" + passwordResetToken));
+
+        return modelMapper.map(savedUser, UserDTO.class);
+    }
+
+    private String generateRandomPassword(int length) {
+        SecureRandom secureRandom = new SecureRandom();
+        byte[] randomBytes = new byte[length];
+        secureRandom.nextBytes(randomBytes);
+        return Base64.getUrlEncoder().withoutPadding().encodeToString(randomBytes);
     }
 }
