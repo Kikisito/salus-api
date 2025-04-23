@@ -36,4 +36,7 @@ public class AppointmentEntity extends DatedEntity {
 
     @Column(nullable = false)
     private String reason;
+
+    @Column
+    private String doctorObservations;
 }

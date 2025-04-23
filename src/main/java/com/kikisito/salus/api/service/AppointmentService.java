@@ -1,6 +1,7 @@
 package com.kikisito.salus.api.service;
 
 import com.kikisito.salus.api.dto.AppointmentDTO;
+import com.kikisito.salus.api.dto.ReducedAppointmentDTO;
 import com.kikisito.salus.api.dto.request.AppointmentRequest;
 import com.kikisito.salus.api.entity.AppointmentEntity;
 import com.kikisito.salus.api.entity.AppointmentSlotEntity;
@@ -62,6 +63,17 @@ public class AppointmentService {
                 .toList();
     }
 
+
+    @Transactional(readOnly = true)
+    public List<ReducedAppointmentDTO> getAllUserReducedAppointments(Integer userId) {
+        UserEntity user = userRepository.findById(userId).orElseThrow(DataNotFoundException::userNotFound);
+        List<AppointmentEntity> citas = appointmentRepository.findByPatient(user);
+
+        return citas.stream()
+                .map(cita -> modelMapper.map(cita, ReducedAppointmentDTO.class))
+                .toList();
+    }
+
     @Transactional
     public AppointmentDTO createAppointment(UserEntity patient, AppointmentRequest appointmentRequest) {
         // Comprobamos y obtenemos el slot de la cita que ha solicitado el usuario
@@ -82,5 +94,18 @@ public class AppointmentService {
         appointment = appointmentRepository.save(appointment);
 
         return modelMapper.map(appointment, AppointmentDTO.class);
+    }
+
+    @Transactional
+    public AppointmentDTO updateAppointmentDoctorObservations(Integer appointmentId, String doctorObservations) {
+        AppointmentEntity appointment = appointmentRepository.findById(appointmentId).orElseThrow(DataNotFoundException::appointmentNotFound);
+        appointment.setDoctorObservations(doctorObservations);
+        appointment = appointmentRepository.save(appointment);
+        return modelMapper.map(appointment, AppointmentDTO.class);
+    }
+
+    @Transactional(readOnly = true)
+    public boolean isProfessionalAssignedToAppointment(Integer appointmentId, Integer doctorId) {
+        return appointmentRepository.existsByIdAndSlot_Doctor_Id(appointmentId, doctorId);
     }
 }

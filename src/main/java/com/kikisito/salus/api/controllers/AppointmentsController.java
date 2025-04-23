@@ -1,9 +1,12 @@
 package com.kikisito.salus.api.controllers;
 
 import com.kikisito.salus.api.dto.AppointmentDTO;
+import com.kikisito.salus.api.dto.ReducedAppointmentDTO;
+import com.kikisito.salus.api.dto.request.ObservationsRequest;
 import com.kikisito.salus.api.dto.request.AppointmentRequest;
 import com.kikisito.salus.api.entity.UserEntity;
 import com.kikisito.salus.api.service.AppointmentService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -24,19 +27,26 @@ public class AppointmentsController {
 
     @GetMapping("/@me")
     @PreAuthorize("hasAuthority('USER')")
-    public ResponseEntity<List<AppointmentDTO>> getSessionUserAppointments(@AuthenticationPrincipal UserEntity user) {
-        return ResponseEntity.ok(appointmentService.getAllUserAppointments(user.getId()));
+    public ResponseEntity<List<ReducedAppointmentDTO>> getSessionUserAppointments(@AuthenticationPrincipal UserEntity user) {
+        return ResponseEntity.ok(appointmentService.getAllUserReducedAppointments(user.getId()));
     }
 
     @PostMapping("/@me/new")
     @PreAuthorize("hasAuthority('USER')")
-    public ResponseEntity<AppointmentDTO> createAppointment(@AuthenticationPrincipal UserEntity user, @RequestBody AppointmentRequest appointmentRequest) {
+    public ResponseEntity<AppointmentDTO> createAppointment(@AuthenticationPrincipal UserEntity user, @RequestBody @Valid AppointmentRequest appointmentRequest) {
         return ResponseEntity.status(HttpStatus.CREATED).body(appointmentService.createAppointment(user, appointmentRequest));
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN') or (hasAuthority('PROFESSIONAL') and @appointmentService.isProfessionalAssignedToAppointment(authentication.principal.medicalProfile.id, #id))")
     public ResponseEntity<AppointmentDTO> getAppointmentById(@PathVariable Integer id) {
         return ResponseEntity.ok(appointmentService.getAppointmentById(id));
     }
+
+    @PatchMapping("/{id}/doctor-observations")
+    @PreAuthorize("hasAuthority('ADMIN') or (hasAuthority('PROFESSIONAL') and @appointmentService.isProfessionalAssignedToAppointment(authentication.principal.medicalProfile.id, #id))")
+    public ResponseEntity<AppointmentDTO> updateAppointmentDoctorObservations(@PathVariable Integer id, @RequestBody @Valid ObservationsRequest request) {
+        return ResponseEntity.ok(appointmentService.updateAppointmentDoctorObservations(id, request.getObservations()));
+    }
+
 }

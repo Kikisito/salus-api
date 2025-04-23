@@ -11,12 +11,12 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Data
 @Builder
-public class AppointmentDTO {
+public class ReducedAppointmentDTO {
     private Integer id;
     private AppointmentSlotDTO slot;
     private UserDTO patient;
     private CitaType type;
     private CitaStatusType status;
     private String reason;
-    private String doctorObservations;
+    //private String doctorObservations;
 }
