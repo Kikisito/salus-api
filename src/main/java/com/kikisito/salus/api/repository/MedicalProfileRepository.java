@@ -10,6 +10,8 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 public interface MedicalProfileRepository extends JpaRepository<MedicalProfileEntity, Integer> {
     boolean existsMedicoEntitiesByUser(UserEntity user);
@@ -35,4 +37,6 @@ public interface MedicalProfileRepository extends JpaRepository<MedicalProfileEn
             "EXISTS (SELECT e FROM p.specialties e WHERE LOWER(e.name) LIKE LOWER(CONCAT('%', :search, '%')))")
     @PreAuthorize("hasAuthority('ADMIN')")
     int searchCount(@Param("search") String search);
+
+    Optional<MedicalProfileEntity> findByUser(UserEntity user);
 }

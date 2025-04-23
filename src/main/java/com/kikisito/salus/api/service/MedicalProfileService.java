@@ -73,6 +73,12 @@ public class MedicalProfileService {
     }
 
     @Transactional(readOnly = true)
+    public MedicalProfileDTO getMedicalProfileFromUserEntity(UserEntity userEntity) {
+        MedicalProfileEntity medicalProfileEntity = medicalProfileRepository.findByUser(userEntity).orElseThrow(DataNotFoundException::doctorNotFound);
+        return modelMapper.map(medicalProfileEntity, MedicalProfileDTO.class);
+    }
+
+    @Transactional(readOnly = true)
     public MedicalProfileDTO getMedicalProfile(Integer id) {
         MedicalProfileEntity medicalProfileEntity = medicalProfileRepository.findById(id).orElseThrow(DataNotFoundException::doctorNotFound);
         return modelMapper.map(medicalProfileEntity, MedicalProfileDTO.class);

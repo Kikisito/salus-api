@@ -5,6 +5,7 @@ import com.kikisito.salus.api.dto.MedicalProfileDTO;
 import com.kikisito.salus.api.dto.request.AddDoctorSpecialtyRequest;
 import com.kikisito.salus.api.dto.request.DoctorLicenseRequest;
 import com.kikisito.salus.api.dto.response.DoctorsListResponse;
+import com.kikisito.salus.api.entity.UserEntity;
 import com.kikisito.salus.api.service.MedicalProfileService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -12,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -119,5 +121,12 @@ public class MedicalProfileController {
     public ResponseEntity<Void> deleteMedicalProfile(@PathVariable("doctorId") Integer id) {
         medicalProfileService.deleteMedicalProfile(id);
         return ResponseEntity.noContent().build();
+    }
+
+    // Apartado: PROFESSIONAL
+    @GetMapping("/@me")
+    @PreAuthorize("hasAuthority('PROFESSIONAL')")
+    public ResponseEntity<MedicalProfileDTO> getMyMedicalProfile(@AuthenticationPrincipal UserEntity userEntity) {
+        return ResponseEntity.ok(medicalProfileService.getMedicalProfileFromUserEntity(userEntity));
     }
 }

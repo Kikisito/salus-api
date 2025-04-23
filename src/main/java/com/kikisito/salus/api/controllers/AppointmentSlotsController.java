@@ -23,13 +23,13 @@ public class AppointmentSlotsController {
     private final AppointmentSlotService appointmentSlotService;
 
     @GetMapping("/{doctorId}/{date}/daily")
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN') or (hasAuthority('PROFESSIONAL') and authentication.principal.medicalProfile.id == #doctorId)")
     public ResponseEntity<List<AppointmentSlotDTO>> getDoctorAppointmentSlots(@PathVariable Integer doctorId, @PathVariable @DateTimeFormat(pattern = "dd-MM-yyyy") LocalDate date) {
         return ResponseEntity.ok(appointmentSlotService.getAppointmentSlotsByDoctorAndDate(doctorId, date));
     }
 
     @GetMapping("/{doctorId}/{date}/weekly")
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN') or (hasAuthority('PROFESSIONAL') and authentication.principal.medicalProfile.id == #doctorId)")
     public ResponseEntity<List<AppointmentSlotDTO>> getDoctorWeeklyAppointmentSlots(@PathVariable Integer doctorId, @PathVariable @DateTimeFormat(pattern = "dd-MM-yyyy") LocalDate date) {
         return ResponseEntity.ok(appointmentSlotService.getWeeklyAppointmentSlotsByDoctorAndDate(doctorId, date));
     }

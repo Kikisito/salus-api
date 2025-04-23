@@ -40,4 +40,7 @@ public class MedicalProfileEntity {
 
     @OneToMany(mappedBy = "doctor")
     private List<DoctorScheduleEntity> schedules;
+
+    @OneToMany(mappedBy = "doctor", fetch = FetchType.LAZY)
+    private List<ReportEntity> reports;
 }
