@@ -1,13 +1,14 @@
 package com.kikisito.salus.api.dto.request;
 
 import com.kikisito.salus.api.constants.ErrorMessages;
-import com.kikisito.salus.api.type.AppointmentType;
 import com.kikisito.salus.api.type.ReportType;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.validator.constraints.Length;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -26,6 +27,12 @@ public class ReportRequest {
     private Integer patient;
 
     @NotNull(message = ErrorMessages.FIELD_CANNOT_BE_BLANK)
+    @NotBlank(message = ErrorMessages.FIELD_CANNOT_BE_BLANK)
+    @Length(min = 1, max = 30, message = ErrorMessages.FIELD_LENGTH_INVALID)
+    public String description;
+
+    @NotNull(message = ErrorMessages.FIELD_CANNOT_BE_BLANK)
+    @NotBlank(message = ErrorMessages.FIELD_CANNOT_BE_BLANK)
     private String diagnosis;
 
     private String treatment;

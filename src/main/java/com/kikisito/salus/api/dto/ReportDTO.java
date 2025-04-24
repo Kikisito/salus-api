@@ -18,6 +18,7 @@ public class ReportDTO {
     private Integer appointmentId;
     private MedicalProfileDTO doctor;
     private UserDTO patient;
+    private String description;
     private String diagnosis;
     private String treatment;
     private String observations;

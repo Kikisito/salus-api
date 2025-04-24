@@ -34,6 +34,9 @@ public class ReportEntity extends DatedEntity {
     @JoinColumn(name = "patient_id", nullable = false)
     private UserEntity patient;
 
+    @Column(nullable = false, length = 30)
+    private String description;
+
     @Column(nullable = false)
     private String diagnosis;
 

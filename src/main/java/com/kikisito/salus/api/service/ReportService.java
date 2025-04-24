@@ -116,7 +116,8 @@ public class ReportService {
     public ReportDTO updateReport(Integer reportId, ReportRequest reportRequest) {
         ReportEntity report = reportRepository.findById(reportId).orElseThrow(DataNotFoundException::reportNotFound);
 
-        // Solo permitimos cambiar el diagnóstico, tratamiento y observaciones
+        // Solo permitimos cambiar la descripción, diagnóstico, tratamiento y observaciones
+        report.setDescription(reportRequest.getDescription());
         report.setDiagnosis(reportRequest.getDiagnosis());
         report.setTreatment(reportRequest.getTreatment());
         report.setObservations(reportRequest.getObservations());

@@ -10,6 +10,7 @@ import com.kikisito.salus.api.entity.UserEntity;
 import com.kikisito.salus.api.exception.ConflictException;
 import com.kikisito.salus.api.exception.DataNotFoundException;
 import com.kikisito.salus.api.repository.*;
+import com.kikisito.salus.api.type.AppointmentStatusType;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -100,6 +101,14 @@ public class AppointmentService {
     public AppointmentDTO updateAppointmentDoctorObservations(Integer appointmentId, String doctorObservations) {
         AppointmentEntity appointment = appointmentRepository.findById(appointmentId).orElseThrow(DataNotFoundException::appointmentNotFound);
         appointment.setDoctorObservations(doctorObservations);
+        appointment = appointmentRepository.save(appointment);
+        return modelMapper.map(appointment, AppointmentDTO.class);
+    }
+
+    @Transactional
+    public AppointmentDTO updateAppointmentStatus(Integer appointmentId, AppointmentStatusType status) {
+        AppointmentEntity appointment = appointmentRepository.findById(appointmentId).orElseThrow(DataNotFoundException::appointmentNotFound);
+        appointment.setStatus(status);
         appointment = appointmentRepository.save(appointment);
         return modelMapper.map(appointment, AppointmentDTO.class);
     }

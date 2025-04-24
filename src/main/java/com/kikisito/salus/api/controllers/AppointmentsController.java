@@ -2,6 +2,7 @@ package com.kikisito.salus.api.controllers;
 
 import com.kikisito.salus.api.dto.AppointmentDTO;
 import com.kikisito.salus.api.dto.ReducedAppointmentDTO;
+import com.kikisito.salus.api.dto.request.AppointmentStatusRequest;
 import com.kikisito.salus.api.dto.request.ObservationsRequest;
 import com.kikisito.salus.api.dto.request.AppointmentRequest;
 import com.kikisito.salus.api.entity.UserEntity;
@@ -41,6 +42,12 @@ public class AppointmentsController {
     @PreAuthorize("hasAuthority('ADMIN') or (hasAuthority('PROFESSIONAL') and @appointmentService.isProfessionalAssignedToAppointment(#id, authentication.principal.medicalProfile.id))")
     public ResponseEntity<AppointmentDTO> getAppointmentById(@PathVariable Integer id) {
         return ResponseEntity.ok(appointmentService.getAppointmentById(id));
+    }
+
+    @PatchMapping("/{id}/status")
+    @PreAuthorize("hasAuthority('ADMIN') or (hasAuthority('PROFESSIONAL') and @appointmentService.isProfessionalAssignedToAppointment(#id, authentication.principal.medicalProfile.id))")
+    public ResponseEntity<AppointmentDTO> updateAppointmentStatus(@PathVariable Integer id, @RequestBody @Valid AppointmentStatusRequest request) {
+        return ResponseEntity.ok(appointmentService.updateAppointmentStatus(id, request.getStatus()));
     }
 
     @PatchMapping("/{id}/doctor-observations")
