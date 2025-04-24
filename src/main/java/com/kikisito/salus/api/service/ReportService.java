@@ -112,6 +112,31 @@ public class ReportService {
         return reportRepository.existsByIdAndDoctor_Id(reportId, doctorId);
     }
 
+    @Transactional
+    public ReportDTO updateReport(Integer reportId, ReportRequest reportRequest) {
+        ReportEntity report = reportRepository.findById(reportId).orElseThrow(DataNotFoundException::reportNotFound);
+
+        // Solo permitimos cambiar el diagnóstico, tratamiento y observaciones
+        report.setDiagnosis(reportRequest.getDiagnosis());
+        report.setTreatment(reportRequest.getTreatment());
+        report.setObservations(reportRequest.getObservations());
+
+        // Guardamos el informe
+        report = reportRepository.save(report);
+
+        // Devolvemos el informe guardado
+        return modelMapper.map(report, ReportDTO.class);
+    }
+
+    @Transactional
+    public void deleteReport(Integer reportId) {
+        // Obtenemos el informe por su id
+        ReportEntity report = reportRepository.findById(reportId).orElseThrow(DataNotFoundException::reportNotFound);
+
+        // Eliminamos el informe
+        reportRepository.delete(report);
+    }
+
     private byte[] generatePdfFromHtml(String templateHtml) {
         try {
             ByteArrayOutputStream out = new ByteArrayOutputStream();

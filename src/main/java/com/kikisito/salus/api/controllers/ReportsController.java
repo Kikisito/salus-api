@@ -43,10 +43,29 @@ public class ReportsController {
             "hasAuthority('ADMIN') " +
             "or (hasAuthority('PROFESSIONAL') " +
                 "and (@appointmentService.isProfessionalAssignedToAppointment(authentication.principal.medicalProfile.id, #request.appointment)" +
-                    "or #request.appointment == null)" +
+                    "or (#request.appointment == null and #request.doctor == authentication.principal.medicalProfile.id))" +
                 ")"
     )
     public ResponseEntity<ReportDTO> addReport(@RequestBody @Valid ReportRequest request) {
         return ResponseEntity.ok(reportService.addReport(request));
+    }
+
+    @PutMapping("/{reportId}")
+    @PreAuthorize(
+            "hasAuthority('ADMIN') " +
+            "or (hasAuthority('PROFESSIONAL') " +
+                "and (@appointmentService.isProfessionalAssignedToAppointment(authentication.principal.medicalProfile.id, #request.appointment)" +
+                    "or (#request.appointment == null and #request.doctor == authentication.principal.medicalProfile.id))" +
+                ")"
+    )
+    public ResponseEntity<ReportDTO> updateReport(@PathVariable Integer reportId, @RequestBody @Valid ReportRequest request) {
+        return ResponseEntity.ok(reportService.updateReport(reportId, request));
+    }
+
+    @DeleteMapping("/{reportId}")
+    @PreAuthorize("hasAuthority('ADMIN') or (hasAuthority('PROFESSIONAL') and @reportService.isProfessionalAssignedToReport(#reportId, authentication.principal.medicalProfile.id))")
+    public ResponseEntity<Void> deleteReport(@PathVariable Integer reportId) {
+        reportService.deleteReport(reportId);
+        return ResponseEntity.noContent().build();
     }
 }
