@@ -35,4 +35,5 @@ public final class ErrorMessages {
     public static final String APPOINTMENT_SLOT_IS_ALREADY_TAKEN = "Appointment slot is already taken";
     public static final String DOCTOR_DOES_NOT_HAVE_SPECIALTY = "Doctor does not have the requested specialty";
     public static final String DOCTOR_HAS_MEDICAL_DATA_LINKED = "Doctor has medical data linked to its profile. Cannot delete";
+    public static final String REPORT_NOT_FOUND = "Report not found";
 }

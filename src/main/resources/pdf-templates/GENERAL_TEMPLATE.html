@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <style>
+        @page {
+            size: A4;
+            margin: 1cm;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.5;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .logo {
+            max-height: 100px;
+            margin: 0 auto 15px;
+        }
+
+        h1 {
+            color: #2c3e50;
+            font-size: 22px;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 8px;
+        }
+
+        h2 {
+            color: #2c3e50;
+            font-size: 16px;
+            margin: 20px 0 8px;
+            border-bottom: 1px solid #bdc3c7;
+            padding-bottom: 3px;
+        }
+
+        .section {
+            margin-bottom: 15px;
+        }
+
+        .section p {
+            font-size: 12px;
+            margin: 4px 0;
+        }
+
+        .inline-data-table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            font-size: 13px;
+        }
+
+        .inline-data-table td {
+            padding: 8px;
+            vertical-align: top;
+        }
+
+        .inline-data-label {
+            font-weight: bold;
+            font-size: 11px;
+            display: block;
+            margin-bottom: 2px;
+        }
+
+        .inline-data-value {
+            font-size: 13px;
+        }
+
+        .patient-info {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        .patient-info td {
+            padding: 6px 8px;
+            vertical-align: top;
+            border-bottom: 1px solid #ecf0f1;
+        }
+
+        .label {
+            font-weight: bold;
+            width: 30%;
+        }
+
+        .value {
+            width: 70%;
+        }
+
+        .clinic-specialist {
+            display: table;
+            width: 100%;
+            margin-top: 30px;
+            font-size: 11px;
+            table-layout: fixed;
+        }
+
+        .clinic-specialist > div {
+            display: table-cell;
+            vertical-align: top;
+            padding: 0 5px;
+            word-break: break-word;
+        }
+
+        .clinic-specialist .clinic {
+            text-align: left;
+            width: 60%;
+            line-height: 0.75;
+            font-size: 11px;
+        }
+
+        .clinic-specialist .specialist {
+            text-align: right;
+            width: 40%;
+            line-height: 0.75;
+            font-size: 11px;
+        }
+
+        .disclaimer {
+            font-size: 9px;
+            font-style: italic;
+            margin-top: 20px;
+            padding: 8px;
+            background: #f8f9fa;
+            border-left: 3px solid #3498db;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <div style="text-align: center;">
+            <img src="${LOGO}" alt="Logo" class="logo" />
+        </div>
+        <h1>INFORME</h1>
+    </div>
+
+    <div class="section">
+        <h2>Paciente</h2>
+        <table class="inline-data-table">
+            <tr>
+                <td>
+                    <span class="inline-data-label">Nombre completo:</span>
+                    <span class="inline-data-value">${PATIENT_NAME} ${PATIENT_SURNAME}</span>
+                </td>
+                <td>
+                    <span class="inline-data-label">Documento de identidad:</span>
+                    <span class="inline-data-value">${PATIENT_ID_CARD}</span>
+                </td>
+                <td>
+                    <span class="inline-data-label">Fecha de nacimiento:</span>
+                    <span class="inline-data-value">${PATIENT_BIRTH_DATE}</span>
+                </td>
+            </tr>
+        </table>
+
+        <table class="patient-info">
+            <tr>
+                <td class="label">Fecha de consulta:</td>
+                <td class="value">${APPOINTMENT_DATE}</td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="section">
+        <h2>Diagnóstico</h2>
+        <p>${DIAGNOSIS}</p>
+    </div>
+
+    <div class="section">
+        <h2>Tratamiento</h2>
+        <p>${TREATMENT}</p>
+    </div>
+
+    <div class="section">
+        <h2>Observaciones</h2>
+        <p>${OBSERVATIONS}</p>
+    </div>
+
+    <div class="clinic-specialist">
+        <div class="clinic">
+            <p><strong>${MEDICAL_CENTER_NAME}</strong></p>
+            <p>${MEDICAL_CENTER_ADDRESS_LINE_1}</p>
+            <p>${MEDICAL_CENTER_ADDRESS_LINE_2}</p>
+            <p>${MEDICAL_CENTER_LOCALITY}, ${MEDICAL_CENTER_MUNICIPALITY}</p>
+            <p>${MEDICAL_CENTER_PROVINCE}, ${MEDICAL_CENTER_ZIP_CODE} (${MEDICAL_CENTER_COUNTRY})</p>
+            <p>Tel: ${MEDICAL_CENTER_PHONE} | Email: ${MEDICAL_CENTER_EMAIL}</p>
+        </div>
+        <div class="specialist">
+            <p><strong>Dr./Dra. ${DOCTOR_NAME} ${DOCTOR_SURNAME}</strong></p>
+            <p>${DOCTOR_SPECIALTY}</p>
+            <p>Nº Colegiado: ${DOCTOR_LICENSE}</p>
+        </div>
+    </div>
+
+    <div class="disclaimer">
+        Aviso legal
+    </div>
+</div>
+</body>
+</html>

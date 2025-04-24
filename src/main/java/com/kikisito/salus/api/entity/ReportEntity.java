@@ -1,5 +1,6 @@
 package com.kikisito.salus.api.entity;
 
+import com.kikisito.salus.api.type.ReportType;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
@@ -16,9 +17,14 @@ public class ReportEntity extends DatedEntity {
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Integer id;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    @Builder.Default
+    private ReportType type = ReportType.GENERAL;
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "appointment_id")
-    private AppointmentEntity slot;
+    private AppointmentEntity appointment;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "doctor_id", nullable = false)

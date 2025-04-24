@@ -1,10 +1,12 @@
 package com.kikisito.salus.api.entity;
 
-import com.kikisito.salus.api.type.CitaStatusType;
-import com.kikisito.salus.api.type.CitaType;
+import com.kikisito.salus.api.type.AppointmentStatusType;
+import com.kikisito.salus.api.type.AppointmentType;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
+
+import java.util.List;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -27,16 +29,21 @@ public class AppointmentEntity extends DatedEntity {
     private UserEntity patient;
 
     @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
     @Builder.Default
-    private CitaType type = CitaType.PRESENCIAL;
+    private AppointmentType type = AppointmentType.IN_PERSON;
 
     @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
     @Builder.Default
-    private CitaStatusType status = CitaStatusType.PENDIENTE;
+    private AppointmentStatusType status = AppointmentStatusType.PENDING;
 
     @Column(nullable = false)
     private String reason;
 
     @Column
     private String doctorObservations;
+
+    @OneToMany(mappedBy = "appointment", fetch = FetchType.LAZY)
+    private List<ReportEntity> reports;
 }

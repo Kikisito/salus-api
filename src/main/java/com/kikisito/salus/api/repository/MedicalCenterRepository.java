@@ -8,8 +8,13 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 public interface MedicalCenterRepository extends JpaRepository<MedicalCenterEntity, Integer> {
     @Query("SELECT c FROM MedicalCenterEntity c WHERE LOWER(c.name) LIKE LOWER(CONCAT('%', :search, '%'))")
     Page<MedicalCenterEntity> findByNameContainingIgnoreCase(@Param("search") String search, Pageable pageable);
+
+    @Query("SELECT c FROM MedicalCenterEntity c ORDER BY c.id ASC")
+    Optional<MedicalCenterEntity> findFirst();
 }

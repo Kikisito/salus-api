@@ -1,7 +1,7 @@
 package com.kikisito.salus.api.dto;
 
-import com.kikisito.salus.api.type.CitaStatusType;
-import com.kikisito.salus.api.type.CitaType;
+import com.kikisito.salus.api.type.AppointmentStatusType;
+import com.kikisito.salus.api.type.AppointmentType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -15,8 +15,8 @@ public class ReducedAppointmentDTO {
     private Integer id;
     private AppointmentSlotDTO slot;
     private UserDTO patient;
-    private CitaType type;
-    private CitaStatusType status;
+    private AppointmentType type;
+    private AppointmentStatusType status;
     private String reason;
     //private String doctorObservations;
 }

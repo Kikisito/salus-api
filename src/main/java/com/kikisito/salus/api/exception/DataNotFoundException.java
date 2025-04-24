@@ -42,4 +42,8 @@ public class DataNotFoundException extends ApiRuntimeException {
     public static DataNotFoundException appointmentNotFound() {
         return new DataNotFoundException("data_not_found.cita", ErrorMessages.APPOINTMENT_NOT_FOUND);
     }
+
+    public static DataNotFoundException reportNotFound() {
+        return new DataNotFoundException("data_not_found.informe", ErrorMessages.REPORT_NOT_FOUND);
+    }
 }
