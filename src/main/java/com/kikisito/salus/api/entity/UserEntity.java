@@ -86,6 +86,9 @@ public class UserEntity implements UserDetails {
     @OneToMany(mappedBy = "patient", fetch = FetchType.LAZY)
     private List<ReportEntity> reports;
 
+    @OneToMany(mappedBy = "patient", fetch = FetchType.LAZY)
+    private List<PrescriptionEntity> prescriptions;
+
     // Impide que el usuario pueda crear nuevas citas
     @Column
     @Builder.Default

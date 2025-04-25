@@ -1,27 +1,24 @@
 package com.kikisito.salus.api.dto;
 
-import com.kikisito.salus.api.type.ReportType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
 @Builder
-public class ReportDTO {
+public class PrescriptionDTO {
     private Integer id;
-    private ReportType type;
-    private Integer appointmentId;
     private MedicalProfileDTO doctor;
     private UserDTO patient;
-    private String description;
-    private String diagnosis;
-    private String treatment;
-    private String observations;
+    private SpecialtyDTO specialty;
+    private Integer appointmentId;
+    private List<MedicationDTO> medications;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }

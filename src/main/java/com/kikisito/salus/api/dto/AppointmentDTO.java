@@ -7,6 +7,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @AllArgsConstructor
@@ -21,5 +22,8 @@ public class AppointmentDTO {
     private AppointmentStatusType status;
     private String reason;
     private String doctorObservations;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
     private List<ReportDTO> reports;
+    private List<PrescriptionDTO> prescriptions;
 }

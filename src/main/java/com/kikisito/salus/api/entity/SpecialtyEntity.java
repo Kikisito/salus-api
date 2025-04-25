@@ -31,4 +31,7 @@ public class SpecialtyEntity {
 
     @OneToMany(mappedBy = "specialty")
     private List<DoctorScheduleEntity> schedules;
+
+    @OneToMany(mappedBy = "specialty")
+    private List<PrescriptionEntity> prescriptions;
 }

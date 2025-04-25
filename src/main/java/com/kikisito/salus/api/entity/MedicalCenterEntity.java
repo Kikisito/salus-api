@@ -47,6 +47,6 @@ public class MedicalCenterEntity {
     @Column(nullable = false)
     private String locality;
 
-    @OneToMany(mappedBy = "medicalCenter", cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "medicalCenter", cascade = CascadeType.ALL)
     private List<RoomEntity> rooms;
 }

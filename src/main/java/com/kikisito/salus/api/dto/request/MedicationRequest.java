@@ -1,0 +1,38 @@
+package com.kikisito.salus.api.dto.request;
+
+import com.kikisito.salus.api.constants.ErrorMessages;
+import com.kikisito.salus.api.dto.PrescriptionDTO;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.time.LocalDate;
+
+@AllArgsConstructor
+@NoArgsConstructor
+@Data
+@Builder
+public class MedicationRequest {
+    @NotNull(message = ErrorMessages.FIELD_CANNOT_BE_BLANK)
+    @NotBlank(message = ErrorMessages.FIELD_CANNOT_BE_BLANK)
+    private String name;
+
+    @NotNull(message = ErrorMessages.FIELD_CANNOT_BE_BLANK)
+    @NotBlank(message = ErrorMessages.FIELD_CANNOT_BE_BLANK)
+    private String dosage;
+
+    @NotNull(message = ErrorMessages.FIELD_CANNOT_BE_BLANK)
+    @NotBlank(message = ErrorMessages.FIELD_CANNOT_BE_BLANK)
+    private String frequency;
+
+    @NotNull(message = ErrorMessages.FIELD_CANNOT_BE_BLANK)
+    private LocalDate startDate;
+
+    @NotNull(message = ErrorMessages.FIELD_CANNOT_BE_BLANK)
+    private LocalDate endDate;
+
+    private String instructions;
+}

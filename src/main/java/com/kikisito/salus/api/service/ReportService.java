@@ -19,6 +19,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 
@@ -161,6 +162,9 @@ public class ReportService {
     }
 
     private String replacePlaceholders(String html, ReportEntity report) {
+        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+        DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
+
         // Logo
         html = html.replace("${LOGO}", this.getLogoPath());
 
@@ -168,10 +172,10 @@ public class ReportService {
         html = html.replace("${PATIENT_NAME}", report.getPatient().getNombre());
         html = html.replace("${PATIENT_SURNAME}", report.getPatient().getApellidos());
         html = html.replace("${PATIENT_ID_CARD}", report.getPatient().getNif());
-        html = html.replace("${PATIENT_BIRTH_DATE}", report.getPatient().getFechaNacimiento().toString());
+        html = html.replace("${PATIENT_BIRTH_DATE}", report.getPatient().getFechaNacimiento().format(dateFormatter));
 
         // Datos de la consulta
-        html = html.replace("${APPOINTMENT_DATE}", report.getAppointment() != null ? report.getAppointment().getSlot().getDate().toString() : "Sin consulta asociada");
+        html = html.replace("${APPOINTMENT_DATE}", report.getAppointment() != null ? report.getAppointment().getSlot().getDate().format(dateFormatter) + " " + report.getAppointment().getSlot().getStartTime().format(timeFormatter) : "Sin consulta asociada");
 
         // Datos del informe
         html = html.replace("${DIAGNOSIS}", report.getDiagnosis());
@@ -201,7 +205,7 @@ public class ReportService {
 
     private String getTemplateHtml(ReportType reportType) {
         try {
-            InputStream inputStream = new ClassPathResource("pdf-templates/" + reportType.name() + "_TEMPLATE.html").getInputStream();
+            InputStream inputStream = new ClassPathResource("pdf-templates/" + reportType.name() + "_REPORT_TEMPLATE.html").getInputStream();
             String html = StreamUtils.copyToString(inputStream, StandardCharsets.UTF_8);
 
             return html;

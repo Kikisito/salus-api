@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <style>
+        @page {
+            size: A4;
+            margin: 1cm;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .logo {
+            max-height: 100px;
+            margin-bottom: 15px;
+        }
+
+        h1 {
+            color: #2c3e50;
+            font-size: 22px;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 8px;
+        }
+
+        h2 {
+            color: #2c3e50;
+            font-size: 16px;
+            margin: 20px 0 8px;
+            border-bottom: 1px solid #bdc3c7;
+            padding-bottom: 3px;
+        }
+
+        .section {
+            margin-bottom: 20px;
+        }
+
+        .section p {
+            font-size: 13px;
+            margin: 4px 0;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        .data-table td {
+            padding: 6px 8px;
+            vertical-align: top;
+            border-bottom: 1px solid #ecf0f1;
+        }
+
+        .label {
+            font-weight: bold;
+            width: 30%;
+        }
+
+        .value {
+            width: 70%;
+        }
+
+        .medication-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+            margin-top: 10px;
+        }
+
+        .medication-table th,
+        .medication-table td {
+            border: 1px solid #ccc;
+            padding: 6px 8px;
+            text-align: left;
+        }
+
+        .medication-table th {
+            background-color: #ecf0f1;
+            font-weight: bold;
+        }
+
+        .clinic-specialist {
+            display: table;
+            width: 100%;
+            font-size: 11px;
+            margin-top: 20px;
+        }
+
+        .clinic-specialist > div {
+            display: table-cell;
+            vertical-align: top;
+            padding: 0 5px;
+        }
+
+        .clinic {
+            text-align: left;
+            width: 60%;
+            line-height: 0.75;
+        }
+
+        .specialist {
+            text-align: right;
+            width: 40%;
+            line-height: 0.75;
+        }
+
+        .disclaimer {
+            font-size: 9px;
+            font-style: italic;
+            margin-top: 20px;
+            background: #f8f9fa;
+            padding: 8px;
+            border-left: 3px solid #3498db;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <img src="${LOGO}" alt="Logo" class="logo" />
+        <h1>RECETA MÉDICA</h1>
+    </div>
+
+    <div class="section">
+        <h2>Datos del paciente</h2>
+        <table class="data-table">
+            <tr>
+                <td class="label">Nombre completo:</td>
+                <td class="value">${PATIENT_NAME} ${PATIENT_SURNAME}</td>
+            </tr>
+            <tr>
+                <td class="label">Documento de identidad:</td>
+                <td class="value">${PATIENT_ID_CARD}</td>
+            </tr>
+            <tr>
+                <td class="label">Fecha de nacimiento:</td>
+                <td class="value">${PATIENT_BIRTH_DATE}</td>
+            </tr>
+            <tr>
+                <td class="label">Fecha de la receta:</td>
+                <td class="value">${PRESCRIPTION_DATE}</td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="section">
+        <h2>Medicamentos prescritos</h2>
+        <table class="medication-table">
+            <thead>
+            <tr>
+                <th>Medicamento</th>
+                <th>Dosis</th>
+                <th>Frecuencia</th>
+                <th>Inicio</th>
+                <th>Fin</th>
+                <th>Instrucciones</th>
+            </tr>
+            </thead>
+            <tbody>
+            ${MEDICATIONS_ROWS}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="clinic-specialist">
+        <div class="clinic">
+            <p><strong>${MEDICAL_CENTER_NAME}</strong></p>
+            <p>${MEDICAL_CENTER_ADDRESS_LINE_1}</p>
+            <p>${MEDICAL_CENTER_ADDRESS_LINE_2}</p>
+            <p>${MEDICAL_CENTER_LOCALITY}, ${MEDICAL_CENTER_MUNICIPALITY}</p>
+            <p>${MEDICAL_CENTER_PROVINCE}, ${MEDICAL_CENTER_ZIP_CODE} (${MEDICAL_CENTER_COUNTRY})</p>
+            <p>Tel: ${MEDICAL_CENTER_PHONE} | Email: ${MEDICAL_CENTER_EMAIL}</p>
+        </div>
+        <div class="specialist">
+            <p><strong>Dr./Dra. ${DOCTOR_NAME} ${DOCTOR_SURNAME}</strong></p>
+            <p>${DOCTOR_SPECIALTY}</p>
+            <p>Nº Colegiado: ${DOCTOR_LICENSE}</p>
+        </div>
+    </div>
+
+    <div class="disclaimer">
+        Esta receta es válida únicamente para el paciente indicado. En caso de dudas, consulte con su médico o farmacéutico.
+    </div>
+</div>
+</body>
+</html>

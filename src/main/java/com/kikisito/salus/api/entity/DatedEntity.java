@@ -5,7 +5,7 @@ import jakarta.persistence.MappedSuperclass;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -15,10 +15,10 @@ import java.time.LocalDate;
 public class DatedEntity {
     @Column(nullable = false)
     @Builder.Default
-    private LocalDate createdAt = LocalDate.now();
+    private LocalDateTime createdAt = LocalDateTime.now();
 
     @Column(nullable = false)
     @Builder.Default
     @Setter
-    private LocalDate updatedAt = LocalDate.now();
+    private LocalDateTime updatedAt = LocalDateTime.now();
 }
