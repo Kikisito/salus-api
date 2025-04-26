@@ -14,6 +14,7 @@ MAIL_SMTP_FROM: "ua-pracs@kikisito.com"
 APP_NAME: "Salus"
 APP_HOST: http://localhost:8080
 APP_SECRET: "KB6z+5wrQCzu7cALLthZ1rKd1EEL/SI9ANLMwh1yH1M="
+APP_FILE_STORAGE_UPLOAD_DIR: "./uploads/files"
 
 spring:
   profiles:
@@ -45,10 +46,21 @@ spring:
           auth: 'true'
           starttls:
             enable: 'true'
+  servlet:
+    multipart:
+      max-file-size: 20MB
+      max-request-size: 20MB
+
+server:
+  tomcat:
+    max-swallow-size: 2GB # Necesario para devolver respuesta al servidor
 
 application:
   name: "${APP_NAME}"
   host: "${APP_HOST}"
+  file:
+    storage:
+      upload-dir: "${APP_FILE_STORAGE_UPLOAD_DIR}"
   security:
     jwt:
       secret-key: "${APP_SECRET}"

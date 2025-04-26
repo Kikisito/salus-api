@@ -1,5 +1,6 @@
 package com.kikisito.salus.api.config;
 
+import com.kikisito.salus.api.entity.UserEntity;
 import com.kikisito.salus.api.exception.DataNotFoundException;
 import com.kikisito.salus.api.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -7,6 +8,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.domain.AuditorAware;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -47,5 +49,10 @@ public class ApplicationConfig {
     @Bean
     public ModelMapper modelMapper() {
         return new ModelMapper();
+    }
+
+    @Bean
+    public AuditorAware<UserEntity> auditorProvider() {
+        return new AuditorAwareConfiguration();
     }
 }

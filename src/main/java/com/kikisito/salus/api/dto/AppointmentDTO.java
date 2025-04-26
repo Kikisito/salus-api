@@ -26,4 +26,5 @@ public class AppointmentDTO {
     private LocalDateTime updatedAt;
     private List<ReportDTO> reports;
     private List<PrescriptionDTO> prescriptions;
+    private List<MedicalTestDTO> medicalTests;
 }

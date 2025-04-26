@@ -38,3 +38,6 @@ out/
 
 ### Docker ###
 pg-data/
+
+### Uploads folder ###
+/uploads/

@@ -16,38 +16,46 @@ public class DataNotFoundException extends ApiRuntimeException {
     }
 
     public static DataNotFoundException medicalCenterNotFound() {
-        return new DataNotFoundException("data_not_found.centro_medico", ErrorMessages.MEDICAL_CENTER_NOT_FOUND);
+        return new DataNotFoundException("data_not_found.medical_center", ErrorMessages.MEDICAL_CENTER_NOT_FOUND);
     }
 
     public static DataNotFoundException roomNotFound() {
-        return new DataNotFoundException("data_not_found.consulta", ErrorMessages.ROOM_NOT_FOUND);
+        return new DataNotFoundException("data_not_found.room", ErrorMessages.ROOM_NOT_FOUND);
     }
 
     public static DataNotFoundException doctorNotFound() {
-        return new DataNotFoundException("data_not_found.medico", ErrorMessages.DOCTOR_NOT_FOUND);
+        return new DataNotFoundException("data_not_found.doctor", ErrorMessages.DOCTOR_NOT_FOUND);
     }
 
     public static DataNotFoundException specialtyNotFound() {
-        return new DataNotFoundException("data_not_found.especialidad", ErrorMessages.SPECIALTY_NOT_FOUND);
+        return new DataNotFoundException("data_not_found.specialty", ErrorMessages.SPECIALTY_NOT_FOUND);
     }
 
     public static DataNotFoundException scheduleNotFound() {
-        return new DataNotFoundException("data_not_found.agenda", ErrorMessages.SCHEDULE_NOT_FOUND);
+        return new DataNotFoundException("data_not_found.schedule", ErrorMessages.SCHEDULE_NOT_FOUND);
     }
 
     public static DataNotFoundException appointmentSlotNotFound() {
-        return new DataNotFoundException("data_not_found.cita_slot", ErrorMessages.APPOINTMENT_SLOT_NOT_FOUND);
+        return new DataNotFoundException("data_not_found.appointment_slot", ErrorMessages.APPOINTMENT_SLOT_NOT_FOUND);
     }
 
     public static DataNotFoundException appointmentNotFound() {
-        return new DataNotFoundException("data_not_found.cita", ErrorMessages.APPOINTMENT_NOT_FOUND);
+        return new DataNotFoundException("data_not_found.appointment", ErrorMessages.APPOINTMENT_NOT_FOUND);
     }
 
     public static DataNotFoundException reportNotFound() {
-        return new DataNotFoundException("data_not_found.informe", ErrorMessages.REPORT_NOT_FOUND);
+        return new DataNotFoundException("data_not_found.report", ErrorMessages.REPORT_NOT_FOUND);
     }
 
     public static DataNotFoundException prescriptionNotFound() {
-        return new DataNotFoundException("data_not_found.receta", ErrorMessages.PRESCRIPTION_NOT_FOUND);
+        return new DataNotFoundException("data_not_found.prescription", ErrorMessages.PRESCRIPTION_NOT_FOUND);
+    }
+
+    public static DataNotFoundException medicalTestNotFound() {
+        return new DataNotFoundException("data_not_found.medical_test", ErrorMessages.MEDICAL_TEST_NOT_FOUND);
+    }
+
+    public static DataNotFoundException attachmentNotFound() {
+        return new DataNotFoundException("data_not_found.attachment", ErrorMessages.ATTACHMENT_NOT_FOUND);
     }
 }

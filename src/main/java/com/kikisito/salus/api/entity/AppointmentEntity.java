@@ -49,4 +49,7 @@ public class AppointmentEntity extends DatedEntity {
 
     @OneToMany(mappedBy = "appointment", fetch = FetchType.LAZY)
     private List<PrescriptionEntity> prescriptions;
+
+    @OneToMany(mappedBy = "appointment", fetch = FetchType.LAZY)
+    private List<MedicalTestEntity> medicalTests;
 }

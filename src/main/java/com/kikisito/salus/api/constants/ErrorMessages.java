@@ -37,4 +37,7 @@ public final class ErrorMessages {
     public static final String DOCTOR_HAS_MEDICAL_DATA_LINKED = "Doctor has medical data linked to its profile. Cannot delete";
     public static final String REPORT_NOT_FOUND = "Report not found";
     public static final String PRESCRIPTION_NOT_FOUND = "Prescription not found";
+    public static final String ATTACHMENT_NOT_FOUND = "Attachment not found";
+    public static final String MEDICAL_TEST_NOT_FOUND = "Medical test not found";
+    public static final String PAYLOAD_TOO_LARGE = "Payload too large";
 }
