@@ -109,8 +109,17 @@ public class ReportService {
     }
 
     @Transactional(readOnly = true)
-    public boolean isProfessionalAssignedToReport(Integer reportId, Integer doctorId) {
-        return reportRepository.existsByIdAndDoctor_Id(reportId, doctorId);
+    public boolean canProfessionalAccessReport(Integer reportId, Integer doctorId) {
+        ReportEntity report = reportRepository.findById(reportId).orElseThrow(DataNotFoundException::reportNotFound);
+        MedicalProfileEntity doctor = medicalProfileRepository.findById(doctorId).orElseThrow(DataNotFoundException::doctorNotFound);
+
+        // Comprobamos si el informe está asociado al médico, a una cita cuyo doctor es el médico o a una especialidad del médico
+        boolean isReportAssociatedToDoctor = report.getDoctor().equals(doctor);
+        boolean isReportAppointmentAssociatedToDoctor = report.getAppointment() != null && report.getAppointment().getSlot().getDoctor().equals(doctor);
+        boolean isReportSpecialtyAssociatedToDoctorSpecialties = report.getDoctor().getSpecialties().stream()
+                .anyMatch(specialty -> doctor.getSpecialties().contains(specialty));
+
+        return isReportAssociatedToDoctor || isReportAppointmentAssociatedToDoctor || isReportSpecialtyAssociatedToDoctorSpecialties;
     }
 
     @Transactional

@@ -14,5 +14,4 @@ public interface PrescriptionRepository extends JpaRepository<PrescriptionEntity
     List<PrescriptionEntity> findAllByAppointment(AppointmentEntity appointment);
     List<PrescriptionEntity> findAllByDoctor(MedicalProfileEntity medicalProfile);
     List<PrescriptionEntity> findAllByPatient(UserEntity patient);
-    boolean existsByIdAndDoctor(Integer id, MedicalProfileEntity medicalProfile);
 }

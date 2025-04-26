@@ -23,7 +23,7 @@ public class PrescriptionController {
     @GetMapping("/by-appointment/{appointmentId}")
     @PreAuthorize(
             "hasAuthority('ADMIN') or " +
-            "(hasAuthority('PROFESSIONAL') and @appointmentService.isProfessionalAssignedToAppointment(#appointmentId, authentication.principal.medicalProfile.id))"
+            "(hasAuthority('PROFESSIONAL') and @appointmentService.canProfessionalAccessAppointment(#appointmentId, authentication.principal.medicalProfile.id))"
     )
     public ResponseEntity<List<PrescriptionDTO>> getPrescriptionsByAppointment(@PathVariable Integer appointmentId) {
         List<PrescriptionDTO> prescriptions = prescriptionService.getAppointmentPrescriptions(appointmentId);
@@ -51,16 +51,17 @@ public class PrescriptionController {
     }
 
     @GetMapping(value = "/{prescriptionId}/pdf", produces = "application/pdf")
-    @PreAuthorize("hasAuthority('ADMIN') or (hasAuthority('PROFESSIONAL') and (hasAuthority('PROFESSIONAL') and @prescriptionService.isProfessionalAssignedToPrescription(#prescriptionId, authentication.principal.medicalProfile.id)))")
+    @PreAuthorize("hasAuthority('ADMIN') or (hasAuthority('PROFESSIONAL') and (hasAuthority('PROFESSIONAL') and @prescriptionService.canProfessionalAccessPrescription(#prescriptionId, authentication.principal.medicalProfile.id)))")
     public ResponseEntity<byte[]> getPrescriptionPdf(@PathVariable Integer prescriptionId) {
         return ResponseEntity.ok(prescriptionService.getPrescriptionPdf(prescriptionId));
     }
 
     @PostMapping("/add")
-    @PreAuthorize(
-            "hasAuthority('ADMIN') or " +
-            "(hasAuthority('PROFESSIONAL') and " +
-                    "(#request.appointment == null or @appointmentService.isProfessionalAssignedToAppointment(#request.appointment, authentication.principal.medicalProfile.id)))"
+    @PreAuthorize("hasAuthority('ADMIN') " +
+            "or (" +
+                "hasAuthority('PROFESSIONAL') " +
+                "and (#request.appointment == null or @appointmentService.canProfessionalAccessAppointment(#request.appointment, authentication.principal.medicalProfile.id) and #request.doctor == authentication.principal.medicalProfile.id)" +
+            ")"
     )
     public ResponseEntity<PrescriptionDTO> addPrescription(@RequestBody @Valid PrescriptionRequest request) {
         PrescriptionDTO prescription = prescriptionService.addPrescription(request);
@@ -70,7 +71,7 @@ public class PrescriptionController {
     @PutMapping("/{prescriptionId}")
     @PreAuthorize(
             "hasAuthority('ADMIN') or " +
-            "(hasAuthority('PROFESSIONAL') and @prescriptionService.isProfessionalAssignedToPrescription(#prescriptionId, authentication.principal.medicalProfile.id))"
+            "(hasAuthority('PROFESSIONAL') and @prescriptionService.canProfessionalAccessPrescription(#prescriptionId, authentication.principal.medicalProfile.id))"
     )
     public ResponseEntity<PrescriptionDTO> updatePrescription(@PathVariable Integer prescriptionId, @RequestBody @Valid PrescriptionRequest request) {
         PrescriptionDTO prescription = prescriptionService.updatePrescription(prescriptionId, request);
@@ -80,7 +81,7 @@ public class PrescriptionController {
     @DeleteMapping("/{prescriptionId}")
     @PreAuthorize(
             "hasAuthority('ADMIN') or " +
-            "(hasAuthority('PROFESSIONAL') and @prescriptionService.isProfessionalAssignedToPrescription(#prescriptionId, authentication.principal.medicalProfile.id))"
+            "(hasAuthority('PROFESSIONAL') and @prescriptionService.canProfessionalAccessPrescription(#prescriptionId, authentication.principal.medicalProfile.id))"
     )
     public ResponseEntity<Void> deletePrescription(@PathVariable Integer prescriptionId) {
         prescriptionService.deletePrescription(prescriptionId);

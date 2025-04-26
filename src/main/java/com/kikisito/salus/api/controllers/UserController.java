@@ -134,10 +134,10 @@ public class UserController {
         return ResponseEntity.ok(users);
     }
 
-    @GetMapping("/{id}")
-    @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity<UserDTO> getUserById(@PathVariable int id) {
-        return ResponseEntity.ok(userService.getUserProfile(id));
+    @GetMapping("/{userId}")
+    @PreAuthorize("hasAuthority('ADMIN') or (hasAuthority('PROFESSIONAL') and @appointmentService.patientHasAtLeastOneAppointmentWithDoctor(#userId, authentication.principal.medicalProfile.id))")
+    public ResponseEntity<UserDTO> getUserById(@PathVariable int userId) {
+        return ResponseEntity.ok(userService.getUserProfile(userId));
     }
 
     @PutMapping("/{id}")

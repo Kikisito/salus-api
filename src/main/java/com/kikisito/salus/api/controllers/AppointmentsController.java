@@ -39,19 +39,19 @@ public class AppointmentsController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAuthority('ADMIN') or (hasAuthority('PROFESSIONAL') and @appointmentService.isProfessionalAssignedToAppointment(#id, authentication.principal.medicalProfile.id))")
+    @PreAuthorize("hasAuthority('ADMIN') or (hasAuthority('PROFESSIONAL') and @appointmentService.canProfessionalAccessAppointment(#id, authentication.principal.medicalProfile.id))")
     public ResponseEntity<AppointmentDTO> getAppointmentById(@PathVariable Integer id) {
         return ResponseEntity.ok(appointmentService.getAppointmentById(id));
     }
 
     @PatchMapping("/{id}/status")
-    @PreAuthorize("hasAuthority('ADMIN') or (hasAuthority('PROFESSIONAL') and @appointmentService.isProfessionalAssignedToAppointment(#id, authentication.principal.medicalProfile.id))")
+    @PreAuthorize("hasAuthority('ADMIN') or (hasAuthority('PROFESSIONAL') and @appointmentService.canProfessionalAccessAppointment(#id, authentication.principal.medicalProfile.id))")
     public ResponseEntity<AppointmentDTO> updateAppointmentStatus(@PathVariable Integer id, @RequestBody @Valid AppointmentStatusRequest request) {
         return ResponseEntity.ok(appointmentService.updateAppointmentStatus(id, request.getStatus()));
     }
 
     @PatchMapping("/{id}/doctor-observations")
-    @PreAuthorize("hasAuthority('ADMIN') or (hasAuthority('PROFESSIONAL') and @appointmentService.isProfessionalAssignedToAppointment(#id, authentication.principal.medicalProfile.id))")
+    @PreAuthorize("hasAuthority('ADMIN') or (hasAuthority('PROFESSIONAL') and @appointmentService.canProfessionalAccessAppointment(#id, authentication.principal.medicalProfile.id))")
     public ResponseEntity<AppointmentDTO> updateAppointmentDoctorObservations(@PathVariable Integer id, @RequestBody @Valid ObservationsRequest request) {
         return ResponseEntity.ok(appointmentService.updateAppointmentDoctorObservations(id, request.getObservations()));
     }

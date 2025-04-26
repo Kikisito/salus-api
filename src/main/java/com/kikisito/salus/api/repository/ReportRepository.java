@@ -10,6 +10,4 @@ import java.util.List;
 @Repository
 public interface ReportRepository extends JpaRepository<ReportEntity, Integer> {
     List<ReportEntity> findByAppointment(AppointmentEntity appointment);
-
-    boolean existsByIdAndDoctor_Id(Integer id, Integer doctorId);
 }

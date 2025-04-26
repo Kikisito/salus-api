@@ -3,10 +3,7 @@ package com.kikisito.salus.api.service;
 import com.kikisito.salus.api.dto.AppointmentDTO;
 import com.kikisito.salus.api.dto.ReducedAppointmentDTO;
 import com.kikisito.salus.api.dto.request.AppointmentRequest;
-import com.kikisito.salus.api.entity.AppointmentEntity;
-import com.kikisito.salus.api.entity.AppointmentSlotEntity;
-import com.kikisito.salus.api.entity.MedicalProfileEntity;
-import com.kikisito.salus.api.entity.UserEntity;
+import com.kikisito.salus.api.entity.*;
 import com.kikisito.salus.api.exception.ConflictException;
 import com.kikisito.salus.api.exception.DataNotFoundException;
 import com.kikisito.salus.api.repository.*;
@@ -114,7 +111,25 @@ public class AppointmentService {
     }
 
     @Transactional(readOnly = true)
-    public boolean isProfessionalAssignedToAppointment(Integer appointmentId, Integer doctorId) {
-        return appointmentRepository.existsByIdAndSlot_Doctor_Id(appointmentId, doctorId);
+    public boolean canProfessionalAccessAppointment(Integer appointmentId, Integer doctorId) {
+        MedicalProfileEntity doctor = medicalProfileRepository.findById(doctorId).orElseThrow(DataNotFoundException::doctorNotFound);
+        AppointmentEntity appointment = appointmentRepository.findById(appointmentId).orElseThrow(DataNotFoundException::appointmentNotFound);
+
+        // Comprobamos si el médico ha atendido a este paciente o la cita es de alguna de las especialidades que tiene
+        boolean appointmentIsFromDoctor = appointment.getSlot().getDoctor().equals(doctor);
+
+        List<SpecialtyEntity> specialties = doctor.getSpecialties();
+        boolean appointmentIsFromDoctorSpecialty = specialties.stream()
+                .anyMatch(specialty -> specialty.equals(appointment.getSlot().getSpecialty()));
+
+        return appointmentIsFromDoctor || appointmentIsFromDoctorSpecialty;
+    }
+
+    @Transactional(readOnly = true)
+    public boolean patientHasAtLeastOneAppointmentWithDoctor(Integer userId, Integer doctorId) {
+        UserEntity user = userRepository.findById(userId).orElseThrow(DataNotFoundException::userNotFound);
+        MedicalProfileEntity doctor = medicalProfileRepository.findById(doctorId).orElseThrow(DataNotFoundException::doctorNotFound);
+
+        return appointmentRepository.existsBySlot_DoctorAndPatient(doctor, user);
     }
 }

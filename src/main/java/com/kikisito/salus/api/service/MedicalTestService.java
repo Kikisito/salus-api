@@ -120,7 +120,16 @@ public class MedicalTestService {
 
     @Transactional(readOnly = true)
     public boolean isDoctorResponsibleOfMedicalTest(Integer medicalTestId, Integer doctorId) {
-        return medicalTestRepository.existsByIdAndDoctor_Id(medicalTestId, doctorId);
+        MedicalTestEntity medicalTestEntity = medicalTestRepository.findById(medicalTestId).orElseThrow(DataNotFoundException::medicalTestNotFound);
+        MedicalProfileEntity doctor = medicalProfileRepository.findById(doctorId).orElseThrow(DataNotFoundException::doctorNotFound);
+
+        // Comprobamos si el informe está asociado al médico, a una cita cuyo doctor es el médico o a una especialidad del médico
+        boolean isMedicalTestAssociatedToDoctor = medicalTestEntity.getDoctor().equals(doctor);
+        boolean isMedicalTestAppointmentAssociatedToDoctor = medicalTestEntity.getAppointment() != null && medicalTestEntity.getAppointment().getSlot().getDoctor().equals(doctor);
+        boolean isMedicalTestSpecialtyAssociatedToDoctorSpecialties = medicalTestEntity.getDoctor().getSpecialties().stream()
+                .anyMatch(specialty -> doctor.getSpecialties().contains(specialty));
+
+        return isMedicalTestAssociatedToDoctor || isMedicalTestAppointmentAssociatedToDoctor || isMedicalTestSpecialtyAssociatedToDoctorSpecialties;
     }
 
     // PDF

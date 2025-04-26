@@ -36,8 +36,8 @@ public class MedicalTestController {
     @PreAuthorize(
             "hasAuthority('ADMIN')" +
             "or (hasAuthority('PROFESSIONAL') " +
-                    "and (#medicalTestRequest.appointment == null or @appointmentService.isProfessionalAssignedToAppointment(#medicalTestRequest.appointment, authentication.principal.medicalProfile.id)))" +
-                    "and (#medicalTestRequest.doctor == authentication.principal.medicalProfile.id)"
+                    "and (#medicalTestRequest.appointment == null or @appointmentService.canProfessionalAccessAppointment(#medicalTestRequest.appointment, authentication.principal.medicalProfile.id))" +
+                    "and (#medicalTestRequest.doctor == authentication.principal.medicalProfile.id))"
     )
     public ResponseEntity<MedicalTestDTO> addMedicalTest(
             @RequestPart @Valid MedicalTestRequest medicalTestRequest,
@@ -48,7 +48,7 @@ public class MedicalTestController {
 
     @DeleteMapping("/{medicalTestId}")
     @PreAuthorize(
-            "(hasAuthority('ADMIN'))" +
+            "hasAuthority('ADMIN')" +
             "or (hasAuthority('PROFESSIONAL') and @medicalTestService.isDoctorResponsibleOfMedicalTest(#medicalTestId, authentication.principal.medicalProfile.id))"
     )
     public ResponseEntity<Void> deleteMedicalTest(@PathVariable Integer medicalTestId) {

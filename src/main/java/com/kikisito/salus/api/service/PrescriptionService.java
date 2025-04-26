@@ -1,6 +1,5 @@
 package com.kikisito.salus.api.service;
 
-import com.kikisito.salus.api.dto.MedicationDTO;
 import com.kikisito.salus.api.dto.PrescriptionDTO;
 import com.kikisito.salus.api.dto.request.MedicationRequest;
 import com.kikisito.salus.api.dto.request.PrescriptionRequest;
@@ -195,9 +194,17 @@ public class PrescriptionService {
     }
 
     @Transactional(readOnly = true)
-    public boolean isProfessionalAssignedToPrescription(Integer prescriptionId, Integer professionalId) {
+    public boolean canProfessionalAccessPrescription(Integer prescriptionId, Integer professionalId) {
+        PrescriptionEntity prescription = prescriptionRepository.findById(prescriptionId).orElseThrow(DataNotFoundException::prescriptionNotFound);
         MedicalProfileEntity doctor = medicalProfileRepository.findById(professionalId).orElseThrow(DataNotFoundException::doctorNotFound);
-        return prescriptionRepository.existsByIdAndDoctor(prescriptionId, doctor);
+
+        // Comprobamos si la receta está asociado al médico, a una cita cuyo doctor es el médico o a una especialidad del médico
+        boolean isPrescriptionAssociatedToDoctor = prescription.getDoctor().equals(doctor);
+        boolean isPrescriptionAppointmentAssociatedToDoctor = prescription.getAppointment() != null && prescription.getAppointment().getSlot().getDoctor().equals(doctor);
+        boolean isPrescriptionSpecialtyAssociatedToDoctorSpecialties = prescription.getDoctor().getSpecialties().stream()
+                .anyMatch(specialty -> doctor.getSpecialties().contains(specialty));
+
+        return isPrescriptionAssociatedToDoctor || isPrescriptionAppointmentAssociatedToDoctor || isPrescriptionSpecialtyAssociatedToDoctorSpecialties;
     }
 
     private byte[] generatePdfFromHtml(String templateHtml) {
