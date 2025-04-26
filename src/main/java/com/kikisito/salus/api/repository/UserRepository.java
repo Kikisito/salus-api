@@ -1,5 +1,6 @@
 package com.kikisito.salus.api.repository;
 
+import com.kikisito.salus.api.entity.MedicalProfileEntity;
 import com.kikisito.salus.api.entity.UserEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -24,6 +25,18 @@ public interface UserRepository extends JpaRepository<UserEntity, Integer> {
     @Query("SELECT u FROM UserEntity u WHERE LOWER(u.email) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(u.nif) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(u.nombre) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(u.apellidos) LIKE LOWER(CONCAT('%', :search, '%'))")
     @PreAuthorize("hasAuthority('ADMIN')")
     Page<UserEntity> searchUsers(@Param("search") String search, Pageable pageable);
+
+    @Query("SELECT DISTINCT u FROM UserEntity u JOIN AppointmentEntity a ON u = a.patient JOIN AppointmentSlotEntity ap ON a.slot = ap WHERE ap.doctor = :doctor")
+    Page<UserEntity> findDoctorPatients(MedicalProfileEntity doctor, Pageable pageable);
+
+    @Query("SELECT DISTINCT u FROM UserEntity u JOIN AppointmentEntity a ON u = a.patient JOIN AppointmentSlotEntity ap ON a.slot = ap WHERE ap.doctor = :doctor AND (LOWER(u.email) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(u.nif) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(u.nombre) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(u.apellidos) LIKE LOWER(CONCAT('%', :search, '%')))")
+    Page<UserEntity> searchDoctorPatients(MedicalProfileEntity doctor, @Param("search") String search, Pageable pageable);
+
+    @Query("SELECT DISTINCT COUNT(u) FROM UserEntity u JOIN AppointmentEntity a ON u = a.patient JOIN AppointmentSlotEntity ap ON a.slot = ap WHERE ap.doctor = :doctor")
+    int countDoctorPatients(MedicalProfileEntity doctor);
+
+    @Query("SELECT DISTINCT COUNT(u) FROM UserEntity u JOIN AppointmentEntity a ON u = a.patient JOIN AppointmentSlotEntity ap ON a.slot = ap WHERE ap.doctor = :doctor AND (LOWER(u.email) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(u.nif) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(u.nombre) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(u.apellidos) LIKE LOWER(CONCAT('%', :search, '%')))")
+    int searchDoctorPatientsCount(MedicalProfileEntity doctor, @Param("search") String search);
 
     @Query("SELECT COUNT(u) FROM UserEntity u WHERE LOWER(u.email) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(u.nif) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(u.nombre) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(u.apellidos) LIKE LOWER(CONCAT('%', :search, '%'))")
     @PreAuthorize("hasAuthority('ADMIN')")

@@ -4,7 +4,6 @@ import com.kikisito.salus.api.dto.DireccionDTO;
 import com.kikisito.salus.api.dto.UserDTO;
 import com.kikisito.salus.api.dto.request.CreateUserRequest;
 import com.kikisito.salus.api.dto.request.PasswordChangeRequest;
-import com.kikisito.salus.api.dto.request.RegisterRequest;
 import com.kikisito.salus.api.dto.request.RestrictUserRequest;
 import com.kikisito.salus.api.dto.response.AuthenticationResponse;
 import com.kikisito.salus.api.dto.response.UsersListResponse;
@@ -81,6 +80,56 @@ public class UserController {
             users = userService.searchUsers(search, page.get(), DEFAULT_PAGE_SIZE);
         } else {
             users = userService.searchUsers(search, 0, DEFAULT_PAGE_SIZE);
+        }
+        return ResponseEntity.ok(users);
+    }
+
+    @GetMapping(value = { "/patients/{doctorId}", "/patients/{doctorId}/{page}", "/patients/{doctorId}/{page}/{limit}"})
+    @PreAuthorize("hasAuthority('ADMIN') or (hasAuthority('PROFESSIONAL') and authentication.principal.medicalProfile.id == #doctorId)")
+    public ResponseEntity<UsersListResponse> getDoctorPatients(@PathVariable Integer doctorId, @PathVariable Optional<Integer> page, @PathVariable Optional<Integer> limit) {
+        // Validación antes de realizar la consulta
+        if(page.isPresent() && page.get() < 0) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        // Limitamos el número de usuarios a mostrar en [1,MAX_ROWS_PER_PAGE] para evitar problemas de rendimiento
+        if(limit.isPresent() && (limit.get() < 1 || limit.get() > MAX_ROWS_PER_PAGE)) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        // Obtenemos la lista de usuarios
+        UsersListResponse users;
+        if(page.isPresent() && limit.isPresent()) {
+            users = userService.getDoctorPatients(doctorId, page.get(), limit.get());
+        } else if(page.isPresent()) {
+            users = userService.getDoctorPatients(doctorId, page.get(), DEFAULT_PAGE_SIZE);
+        } else {
+            users = userService.getDoctorPatients(doctorId, 0, DEFAULT_PAGE_SIZE);
+        }
+        return ResponseEntity.ok(users);
+    }
+
+    @GetMapping("/patients/search/{search}/{doctorId}/{page}/{limit}")
+    @PreAuthorize("hasAuthority('ADMIN') or (hasAuthority('PROFESSIONAL') and authentication.principal.medicalProfile.id == #doctorId)")
+    public ResponseEntity<UsersListResponse> searchDoctorPatients(@PathVariable Integer doctorId, @PathVariable String search, @PathVariable Optional<Integer> page, @PathVariable Optional<Integer> limit) {
+        // Validación antes de realizar la consulta
+        if(page.isPresent() && page.get() < 0) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        // Limitamos el número de usuarios a mostrar en [1,MAX_ROWS_PER_PAGE] para evitar problemas de rendimiento
+        if(limit.isPresent() && (limit.get() < 1 || limit.get() > MAX_ROWS_PER_PAGE)) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        // Obtenemos la lista de usuarios
+        UsersListResponse users;
+        if(page.isPresent() && limit.isPresent()) {
+            users = userService.getDoctorPatientsBySearch(doctorId, search, page.get(), limit.get());
+        } else if(page.isPresent()) {
+            users = userService.getDoctorPatientsBySearch(doctorId, search, page.get(), DEFAULT_PAGE_SIZE);
+        } else {
+            users = userService.getDoctorPatientsBySearch(doctorId, search, 0, DEFAULT_PAGE_SIZE);
         }
         return ResponseEntity.ok(users);
     }

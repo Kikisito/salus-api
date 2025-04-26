@@ -7,9 +7,11 @@ import com.kikisito.salus.api.dto.request.RegisterRequest;
 import com.kikisito.salus.api.dto.request.RestrictUserRequest;
 import com.kikisito.salus.api.dto.response.UsersListResponse;
 import com.kikisito.salus.api.embeddable.DireccionEmbeddable;
+import com.kikisito.salus.api.entity.MedicalProfileEntity;
 import com.kikisito.salus.api.entity.UserEntity;
 import com.kikisito.salus.api.exception.ConflictException;
 import com.kikisito.salus.api.exception.DataNotFoundException;
+import com.kikisito.salus.api.repository.MedicalProfileRepository;
 import com.kikisito.salus.api.repository.UserRepository;
 import com.kikisito.salus.api.type.AccountStatusType;
 import com.kikisito.salus.api.type.RoleType;
@@ -41,6 +43,9 @@ public class UserService {
     private final AuthService authService;
 
     @Autowired
+    private final MedicalProfileRepository medicalProfileRepository;
+
+    @Autowired
     private final EmailingService emailingService;
 
     @Autowired
@@ -66,6 +71,36 @@ public class UserService {
 
         return UsersListResponse.builder()
                 .count(userRepository.count())
+                .users(usersDTO)
+                .build();
+    }
+
+    @Transactional(readOnly = true)
+    public UsersListResponse getDoctorPatients(Integer doctorId, Integer page, Integer limit) {
+        MedicalProfileEntity doctor = medicalProfileRepository.findById(doctorId).orElseThrow(DataNotFoundException::doctorNotFound);
+
+        Page<UserEntity> userEntities = userRepository.findDoctorPatients(doctor, PageRequest.of(page, limit));
+        List<UserDTO> usersDTO = userEntities.stream()
+                .map(userEntity -> modelMapper.map(userEntity, UserDTO.class))
+                .toList();
+
+        return UsersListResponse.builder()
+                .count(userRepository.countDoctorPatients(doctor))
+                .users(usersDTO)
+                .build();
+    }
+
+    @Transactional(readOnly = true)
+    public UsersListResponse getDoctorPatientsBySearch(Integer doctorId, String search, Integer page, Integer limit) {
+        MedicalProfileEntity doctor = medicalProfileRepository.findById(doctorId).orElseThrow(DataNotFoundException::doctorNotFound);
+
+        Page<UserEntity> userEntities = userRepository.searchDoctorPatients(doctor, search, PageRequest.of(page, limit));
+        List<UserDTO> usersDTO = userEntities.stream()
+                .map(userEntity -> modelMapper.map(userEntity, UserDTO.class))
+                .toList();
+
+        return UsersListResponse.builder()
+                .count(userRepository.searchDoctorPatientsCount(doctor, search))
                 .users(usersDTO)
                 .build();
     }
