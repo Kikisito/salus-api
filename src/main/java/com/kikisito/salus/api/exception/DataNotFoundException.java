@@ -58,4 +58,8 @@ public class DataNotFoundException extends ApiRuntimeException {
     public static DataNotFoundException attachmentNotFound() {
         return new DataNotFoundException("data_not_found.attachment", ErrorMessages.ATTACHMENT_NOT_FOUND);
     }
+
+    public static DataNotFoundException medicationNotFound() {
+        return new DataNotFoundException("data_not_found.medication", ErrorMessages.MEDICATION_NOT_FOUND);
+    }
 }

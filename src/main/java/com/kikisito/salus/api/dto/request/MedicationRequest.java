@@ -16,6 +16,8 @@ import java.time.LocalDate;
 @Data
 @Builder
 public class MedicationRequest {
+    private Integer id;
+
     @NotNull(message = ErrorMessages.FIELD_CANNOT_BE_BLANK)
     @NotBlank(message = ErrorMessages.FIELD_CANNOT_BE_BLANK)
     private String name;

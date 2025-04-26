@@ -39,5 +39,6 @@ public final class ErrorMessages {
     public static final String PRESCRIPTION_NOT_FOUND = "Prescription not found";
     public static final String ATTACHMENT_NOT_FOUND = "Attachment not found";
     public static final String MEDICAL_TEST_NOT_FOUND = "Medical test not found";
+    public static final String MEDICATION_NOT_FOUND = "Medication not found";
     public static final String PAYLOAD_TOO_LARGE = "Payload too large";
 }

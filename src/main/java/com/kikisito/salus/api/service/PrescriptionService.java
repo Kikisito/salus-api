@@ -1,6 +1,8 @@
 package com.kikisito.salus.api.service;
 
+import com.kikisito.salus.api.dto.MedicationDTO;
 import com.kikisito.salus.api.dto.PrescriptionDTO;
+import com.kikisito.salus.api.dto.request.MedicationRequest;
 import com.kikisito.salus.api.dto.request.PrescriptionRequest;
 import com.kikisito.salus.api.entity.*;
 import com.kikisito.salus.api.exception.DataNotFoundException;
@@ -137,6 +139,52 @@ public class PrescriptionService {
         PrescriptionEntity prescription = prescriptionRepository.save(savedPrescription);
 
         // Convertimos la receta a DTO para devolverla
+        return modelMapper.map(prescription, PrescriptionDTO.class);
+    }
+
+    @Transactional
+    public PrescriptionDTO updatePrescription(Integer prescriptionId, PrescriptionRequest request) {
+        // Obtenemos la receta de la base de datos
+        PrescriptionEntity prescription = prescriptionRepository.findById(prescriptionId).orElseThrow(DataNotFoundException::prescriptionNotFound);
+
+        // Medicamentos existentes en la receta en la base de datos
+        List<MedicationEntity> existingMedications = prescription.getMedications();
+
+        // Medicamentos de la petición
+        List<MedicationRequest> requestMedications = request.getMedications();
+
+        // Borramos los medicamentos de la base de datos que no están en la petición
+        List<MedicationEntity> deletingMedications = existingMedications.stream()
+                .filter(medication -> requestMedications.stream().noneMatch(requestMedication -> requestMedication.getId() != null && requestMedication.getId().equals(medication.getId())))
+                .toList();
+
+        for(MedicationEntity medication : deletingMedications) {
+            prescription.getMedications().remove(medication);
+        }
+
+        prescription = prescriptionRepository.save(prescription);
+
+        // Ahora añadimos los nuevos medicamentos
+        PrescriptionEntity finalPrescription = prescription;
+        List<MedicationEntity> newMedications = requestMedications.stream().filter(med -> med.getId() == null)
+                .map(med -> MedicationEntity.builder()
+                        .name(med.getName())
+                        .dosage(med.getDosage())
+                        .frequency(med.getFrequency())
+                        .startDate(med.getStartDate())
+                        .endDate(med.getEndDate())
+                        .instructions(med.getInstructions())
+                        .prescription(finalPrescription) // Conexión a la receta
+                        .build()
+                ).collect(Collectors.toList());
+
+        // Añadimos los nuevos medicamentos a la receta
+        prescription.addMedications(newMedications);
+
+        // Guardamos la receta con la lista de medicinas nueva
+        prescriptionRepository.save(prescription);
+
+        // Devolvemos la receta actualizada
         return modelMapper.map(prescription, PrescriptionDTO.class);
     }
 

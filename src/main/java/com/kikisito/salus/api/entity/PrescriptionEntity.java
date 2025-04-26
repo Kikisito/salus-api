@@ -36,4 +36,8 @@ public class PrescriptionEntity extends DatedEntity {
 
     @OneToMany(mappedBy = "prescription", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     private List<MedicationEntity> medications;
+
+    public void addMedications(List<MedicationEntity> medications) {
+        this.medications.addAll(medications);
+    }
 }

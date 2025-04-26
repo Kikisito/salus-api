@@ -67,6 +67,16 @@ public class PrescriptionController {
         return ResponseEntity.ok(prescription);
     }
 
+    @PutMapping("/{prescriptionId}")
+    @PreAuthorize(
+            "hasAuthority('ADMIN') or " +
+            "(hasAuthority('PROFESSIONAL') and @prescriptionService.isProfessionalAssignedToPrescription(#prescriptionId, authentication.principal.medicalProfile.id))"
+    )
+    public ResponseEntity<PrescriptionDTO> updatePrescription(@PathVariable Integer prescriptionId, @RequestBody @Valid PrescriptionRequest request) {
+        PrescriptionDTO prescription = prescriptionService.updatePrescription(prescriptionId, request);
+        return ResponseEntity.ok(prescription);
+    }
+
     @DeleteMapping("/{prescriptionId}")
     @PreAuthorize(
             "hasAuthority('ADMIN') or " +
