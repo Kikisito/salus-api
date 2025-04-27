@@ -38,6 +38,15 @@ public class AppointmentsController {
         return ResponseEntity.status(HttpStatus.CREATED).body(appointmentService.createAppointment(user, appointmentRequest));
     }
 
+    @GetMapping("/patient/{patientId}/doctor/{doctorId}")
+    @PreAuthorize("hasAuthority('ADMIN') or (hasAuthority('PROFESSIONAL') and #doctorId == authentication.principal.medicalProfile.id)")
+    public ResponseEntity<List<AppointmentDTO>> getPatientAppointmentsWithDoctorOrItsSpecialties(
+            @PathVariable Integer patientId,
+            @PathVariable Integer doctorId
+    ) {
+        return ResponseEntity.ok(appointmentService.getPatientAppointmentsWithDoctorOrItsSpecialties(patientId, doctorId));
+    }
+
     @GetMapping("/{id}")
     @PreAuthorize("hasAuthority('ADMIN') or (hasAuthority('PROFESSIONAL') and @appointmentService.canProfessionalAccessAppointment(#id, authentication.principal.medicalProfile.id))")
     public ResponseEntity<AppointmentDTO> getAppointmentById(@PathVariable Integer id) {
@@ -55,5 +64,4 @@ public class AppointmentsController {
     public ResponseEntity<AppointmentDTO> updateAppointmentDoctorObservations(@PathVariable Integer id, @RequestBody @Valid ObservationsRequest request) {
         return ResponseEntity.ok(appointmentService.updateAppointmentDoctorObservations(id, request.getObservations()));
     }
-
 }

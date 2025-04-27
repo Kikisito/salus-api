@@ -61,6 +61,17 @@ public class AppointmentService {
                 .toList();
     }
 
+    @Transactional(readOnly = true)
+    public List<AppointmentDTO> getPatientAppointmentsWithDoctorOrItsSpecialties(Integer patientId, Integer doctorId) {
+        UserEntity user = userRepository.findById(patientId).orElseThrow(DataNotFoundException::userNotFound);
+        MedicalProfileEntity doctor = medicalProfileRepository.findById(doctorId).orElseThrow(DataNotFoundException::doctorNotFound);
+
+        List<AppointmentEntity> appointments = appointmentRepository.findByPatientWithDoctorOrItsSpecialties(user, doctor, doctor.getSpecialties());
+
+        return appointments.stream()
+                .map(appointment -> modelMapper.map(appointment, AppointmentDTO.class))
+                .toList();
+    }
 
     @Transactional(readOnly = true)
     public List<ReducedAppointmentDTO> getAllUserReducedAppointments(Integer userId) {
