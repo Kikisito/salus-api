@@ -42,6 +42,9 @@ public class ReportService {
     private MedicalCenterRepository medicalCenterRepository;
 
     @Autowired
+    private SpecialtyRepository specialtyRepository;
+
+    @Autowired
     private ModelMapper modelMapper;
 
     @Transactional(readOnly = true)
@@ -58,6 +61,18 @@ public class ReportService {
                 .toList();
     }
 
+    @Transactional(readOnly = true)
+    public List<ReportDTO> getPatientReportsWithDoctorOrItsSpecialties(Integer patientId, Integer doctorId) {
+        UserEntity user = userRepository.findById(patientId).orElseThrow(DataNotFoundException::userNotFound);
+        MedicalProfileEntity doctor = medicalProfileRepository.findById(doctorId).orElseThrow(DataNotFoundException::doctorNotFound);
+
+        List<ReportEntity> reports = reportRepository.findByPatientWithDoctorOrItsSpecialties(user, doctor, doctor.getSpecialties());
+
+        return reports.stream()
+                .map(report -> modelMapper.map(report, ReportDTO.class))
+                .toList();
+    }
+
     @Transactional
     public ReportDTO addReport(ReportRequest reportRequest) {
         // Si el informe está asociado a una cita, la recuperamos
@@ -69,11 +84,15 @@ public class ReportService {
         // Obtenemos el paciente asociado al informe
         UserEntity patient = userRepository.findById(reportRequest.getPatient()).orElseThrow(DataNotFoundException::userNotFound);
 
+        // Obtenemos la especialidad asociada al informe
+        SpecialtyEntity specialty = specialtyRepository.findById(reportRequest.getSpecialty()).orElseThrow(DataNotFoundException::specialtyNotFound);
+
         // Creamos el informe con las entidades asociadas
         ReportEntity report = ReportEntity.builder()
                 .appointment(appointment.orElse(null))
                 .doctor(medicalProfile)
                 .patient(patient)
+                .specialty(specialty)
                 .build();
 
         // Mapeamos el resto de datos del informe

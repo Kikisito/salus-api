@@ -55,6 +55,18 @@ public class MedicalTestService {
     private ModelMapper modelMapper;
 
     @Transactional(readOnly = true)
+    public List<MedicalTestDTO> getPatientMedicalTestsWithDoctorOrItsSpecialties(Integer patientId, Integer doctorId) {
+        UserEntity user = userRepository.findById(patientId).orElseThrow(DataNotFoundException::userNotFound);
+        MedicalProfileEntity doctor = medicalProfileRepository.findById(doctorId).orElseThrow(DataNotFoundException::doctorNotFound);
+
+        List<MedicalTestEntity> medicalTests = medicalTestRepository.findByPatientWithDoctorOrItsSpecialties(user, doctor, doctor.getSpecialties());
+
+        return medicalTests.stream()
+                .map(medicalTest -> modelMapper.map(medicalTest, MedicalTestDTO.class))
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
     public byte[] getMedicalTestPdf(Integer medicalTestId) {
         // Obtenemos el informe por su id
         MedicalTestEntity report = medicalTestRepository.findById(medicalTestId).orElseThrow(DataNotFoundException::medicalTestNotFound);

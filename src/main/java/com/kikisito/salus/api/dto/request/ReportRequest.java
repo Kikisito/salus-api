@@ -21,6 +21,9 @@ public class ReportRequest {
     private Integer appointment;
 
     @NotNull(message = ErrorMessages.FIELD_CANNOT_BE_BLANK)
+    private Integer specialty;
+
+    @NotNull(message = ErrorMessages.FIELD_CANNOT_BE_BLANK)
     private Integer doctor;
 
     @NotNull(message = ErrorMessages.FIELD_CANNOT_BE_BLANK)

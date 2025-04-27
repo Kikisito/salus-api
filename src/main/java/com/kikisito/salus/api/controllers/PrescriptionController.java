@@ -20,7 +20,7 @@ public class PrescriptionController {
     @Autowired
     private final PrescriptionService prescriptionService;
 
-    @GetMapping("/by-appointment/{appointmentId}")
+    @GetMapping("/appointment/{appointmentId}")
     @PreAuthorize(
             "hasAuthority('ADMIN') or " +
             "(hasAuthority('PROFESSIONAL') and @appointmentService.canProfessionalAccessAppointment(#appointmentId, authentication.principal.medicalProfile.id))"
@@ -30,7 +30,7 @@ public class PrescriptionController {
         return ResponseEntity.ok(prescriptions);
     }
 
-    @GetMapping("/by-doctor/{doctorId}")
+    @GetMapping("/doctor/{doctorId}")
     @PreAuthorize(
             "hasAuthority('ADMIN') or " +
             "(hasAuthority('PROFESSIONAL') and #doctorId == authentication.principal.medicalProfile.id)"
@@ -40,7 +40,7 @@ public class PrescriptionController {
         return ResponseEntity.ok(prescriptions);
     }
 
-    @GetMapping("/by-patient/{patientId}")
+    @GetMapping("/patient/{patientId}")
     @PreAuthorize(
             "hasAuthority('ADMIN') or " +
             "(hasAuthority('USER') and #patientId == authentication.principal.id)"
@@ -48,6 +48,15 @@ public class PrescriptionController {
     public ResponseEntity<List<PrescriptionDTO>> getPrescriptionsByPatient(@PathVariable Integer patientId) {
         List<PrescriptionDTO> prescriptions = prescriptionService.getPatientPrescriptions(patientId);
         return ResponseEntity.ok(prescriptions);
+    }
+
+    @GetMapping("/patient/{patientId}/doctor/{doctorId}")
+    @PreAuthorize("hasAuthority('ADMIN') or (hasAuthority('PROFESSIONAL') and #doctorId == authentication.principal.medicalProfile.id)")
+    public ResponseEntity<List<PrescriptionDTO>> getPatientPrescriptionsWithDoctorOrItsSpecialties(
+            @PathVariable Integer patientId,
+            @PathVariable Integer doctorId
+    ) {
+        return ResponseEntity.ok(prescriptionService.getPatientPrescriptionsWithDoctorOrItsSpecialties(patientId, doctorId));
     }
 
     @GetMapping(value = "/{prescriptionId}/pdf", produces = "application/pdf")

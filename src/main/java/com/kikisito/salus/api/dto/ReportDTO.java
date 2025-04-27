@@ -15,6 +15,7 @@ import java.time.LocalDateTime;
 public class ReportDTO {
     private Integer id;
     private ReportType type;
+    private SpecialtyDTO specialty;
     private Integer appointmentId;
     private MedicalProfileDTO doctor;
     private UserDTO patient;

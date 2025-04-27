@@ -26,6 +26,15 @@ public class ReportsController {
         return ResponseEntity.ok(reportService.getAppointmentReports(appointmentId));
     }
 
+    @GetMapping("/patient/{patientId}/doctor/{doctorId}")
+    @PreAuthorize("hasAuthority('ADMIN') or (hasAuthority('PROFESSIONAL') and #doctorId == authentication.principal.medicalProfile.id)")
+    public ResponseEntity<List<ReportDTO>> getPatientAppointmentsWithDoctorOrItsSpecialties(
+            @PathVariable Integer patientId,
+            @PathVariable Integer doctorId
+    ) {
+        return ResponseEntity.ok(reportService.getPatientReportsWithDoctorOrItsSpecialties(patientId, doctorId));
+    }
+
     @GetMapping("/{reportId}")
     @PreAuthorize("hasAuthority('ADMIN') or (hasAuthority('PROFESSIONAL') and @reportService.canProfessionalAccessReport(#reportId, authentication.principal.medicalProfile.id))")
     public ResponseEntity<ReportDTO> getReport(@PathVariable Integer reportId) {

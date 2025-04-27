@@ -81,6 +81,18 @@ public class PrescriptionService {
     }
 
     @Transactional(readOnly = true)
+    public List<PrescriptionDTO> getPatientPrescriptionsWithDoctorOrItsSpecialties(Integer patientId, Integer doctorId) {
+        UserEntity user = userRepository.findById(patientId).orElseThrow(DataNotFoundException::userNotFound);
+        MedicalProfileEntity doctor = medicalProfileRepository.findById(doctorId).orElseThrow(DataNotFoundException::doctorNotFound);
+
+        List<PrescriptionEntity> prescriptions = prescriptionRepository.findByPatientWithDoctorOrItsSpecialties(user, doctor, doctor.getSpecialties());
+
+        return prescriptions.stream()
+                .map(prescription -> modelMapper.map(prescription, PrescriptionDTO.class))
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
     public byte[] getPrescriptionPdf(Integer prescriptionId) {
         PrescriptionEntity prescription = prescriptionRepository.findById(prescriptionId).orElseThrow(DataNotFoundException::prescriptionNotFound);
 

@@ -27,6 +27,10 @@ public class ReportEntity extends DatedEntity {
     private AppointmentEntity appointment;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "specialty_id", nullable = false)
+    private SpecialtyEntity specialty;
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "doctor_id", nullable = false)
     private MedicalProfileEntity doctor;
 

@@ -21,6 +21,15 @@ import java.util.List;
 public class MedicalTestController {
     @Autowired
     private final MedicalTestService medicalTestService;
+
+    @GetMapping("/patient/{patientId}/doctor/{doctorId}")
+    @PreAuthorize("hasAuthority('ADMIN') or (hasAuthority('PROFESSIONAL') and #doctorId == authentication.principal.medicalProfile.id)")
+    public ResponseEntity<List<MedicalTestDTO>> getPatientMedicalTestsWithDoctorOrItsSpecialties(
+            @PathVariable Integer patientId,
+            @PathVariable Integer doctorId
+    ) {
+        return ResponseEntity.ok(medicalTestService.getPatientMedicalTestsWithDoctorOrItsSpecialties(patientId, doctorId));
+    }
     
     @GetMapping(value = "/{medicalTestId}/pdf", produces = "application/pdf")
     @PreAuthorize(
