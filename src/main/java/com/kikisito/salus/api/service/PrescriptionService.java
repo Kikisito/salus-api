@@ -115,7 +115,7 @@ public class PrescriptionService {
         SpecialtyEntity specialty = specialtyRepository.findById(request.getSpecialty()).orElseThrow(DataNotFoundException::specialtyNotFound);
 
         // Cita
-        Optional<AppointmentEntity> appointmentOptional = appointmentRepository.findById(request.getAppointment());
+        Optional<AppointmentEntity> appointmentOptional = request.getAppointment() != null ? appointmentRepository.findById(request.getAppointment()) : Optional.empty();
 
         // La medicación se hace después de la prescripción
         PrescriptionEntity initialPrescription = PrescriptionEntity.builder()

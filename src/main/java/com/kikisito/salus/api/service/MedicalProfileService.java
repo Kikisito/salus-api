@@ -1,5 +1,6 @@
 package com.kikisito.salus.api.service;
 
+import com.kikisito.salus.api.dto.ReducedUserDTO;
 import com.kikisito.salus.api.dto.SpecialtyDTO;
 import com.kikisito.salus.api.dto.MedicalProfileDTO;
 import com.kikisito.salus.api.dto.UserDTO;
@@ -111,7 +112,7 @@ public class MedicalProfileService {
 
         // Devolvemos el perfil médico tras mapearlo a DTO con el usuario DTO
         MedicalProfileDTO medicalProfileDTO = modelMapper.map(medicalProfileEntity, MedicalProfileDTO.class);
-        medicalProfileDTO.setUser(modelMapper.map(userEntity, UserDTO.class));
+        medicalProfileDTO.setUser(modelMapper.map(userEntity, ReducedUserDTO.class));
         return medicalProfileDTO;
     }
 

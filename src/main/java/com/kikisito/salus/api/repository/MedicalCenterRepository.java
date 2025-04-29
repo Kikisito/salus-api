@@ -15,6 +15,6 @@ public interface MedicalCenterRepository extends JpaRepository<MedicalCenterEnti
     @Query("SELECT c FROM MedicalCenterEntity c WHERE LOWER(c.name) LIKE LOWER(CONCAT('%', :search, '%'))")
     Page<MedicalCenterEntity> findByNameContainingIgnoreCase(@Param("search") String search, Pageable pageable);
 
-    @Query("SELECT c FROM MedicalCenterEntity c ORDER BY c.id ASC")
+    @Query("SELECT c FROM MedicalCenterEntity c ORDER BY c.id ASC LIMIT 1")
     Optional<MedicalCenterEntity> findFirst();
 }

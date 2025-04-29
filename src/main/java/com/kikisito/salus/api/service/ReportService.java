@@ -76,7 +76,7 @@ public class ReportService {
     @Transactional
     public ReportDTO addReport(ReportRequest reportRequest) {
         // Si el informe está asociado a una cita, la recuperamos
-        Optional<AppointmentEntity> appointment = appointmentRepository.findById(reportRequest.getAppointment());
+        Optional<AppointmentEntity> appointment = reportRequest.getAppointment() != null ? appointmentRepository.findById(reportRequest.getAppointment()) : Optional.empty();
 
         // Obtenemos el médico asociado al informe
         MedicalProfileEntity medicalProfile = medicalProfileRepository.findById(reportRequest.getDoctor()).orElseThrow(DataNotFoundException::doctorNotFound);

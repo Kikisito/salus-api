@@ -28,14 +28,30 @@ public class AppointmentsController {
 
     @GetMapping("/@me")
     @PreAuthorize("hasAuthority('USER')")
-    public ResponseEntity<List<ReducedAppointmentDTO>> getSessionUserAppointments(@AuthenticationPrincipal UserEntity user) {
-        return ResponseEntity.ok(appointmentService.getAllUserReducedAppointments(user.getId()));
+    public ResponseEntity<List<ReducedAppointmentDTO>> getSessionUserUpcomingAppointments(@AuthenticationPrincipal UserEntity user) {
+        return ResponseEntity.ok(appointmentService.getUserUpcomingAppointmentsReduced(user.getId()));
+    }
+
+    @GetMapping("/@me/past")
+    @PreAuthorize("hasAuthority('USER')")
+    public ResponseEntity<List<ReducedAppointmentDTO>> getSessionUserPastAppointments(@AuthenticationPrincipal UserEntity user) {
+        return ResponseEntity.ok(appointmentService.getUserPastAppointmentsReduced(user.getId()));
     }
 
     @PostMapping("/@me/new")
     @PreAuthorize("hasAuthority('USER')")
     public ResponseEntity<AppointmentDTO> createAppointment(@AuthenticationPrincipal UserEntity user, @RequestBody @Valid AppointmentRequest appointmentRequest) {
         return ResponseEntity.status(HttpStatus.CREATED).body(appointmentService.createAppointment(user, appointmentRequest));
+    }
+
+    @DeleteMapping("/{id}")
+    @PreAuthorize(
+            "hasAuthority('ADMIN')" +
+            "or (hasAuthority('USER') and @appointmentService.canUserDeleteAppointment(#id, authentication.principal))"
+    )
+    public ResponseEntity<Void> deleteAppointment(@PathVariable Integer id) {
+        appointmentService.deleteAppointment(id);
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/patient/{patientId}/doctor/{doctorId}")

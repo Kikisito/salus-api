@@ -85,7 +85,7 @@ public class MedicalTestService {
         MedicalProfileEntity doctor = medicalProfileRepository.findById(request.getDoctor()).orElseThrow(DataNotFoundException::doctorNotFound);
         UserEntity patient = userRepository.findById(request.getPatient()).orElseThrow(DataNotFoundException::userNotFound);
         SpecialtyEntity specialty = specialtyRepository.findById(request.getSpecialty()).orElseThrow(DataNotFoundException::specialtyNotFound);
-        Optional<AppointmentEntity> appointmentOptional = appointmentRepository.findById(request.getAppointment());
+        Optional<AppointmentEntity> appointmentOptional = request.getAppointment() != null ? appointmentRepository.findById(request.getAppointment()) : Optional.empty();
 
         // Guardamos la prueba médica
         MedicalTestEntity medicalTestEntity = modelMapper.map(request, MedicalTestEntity.class);

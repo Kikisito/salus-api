@@ -25,6 +25,12 @@ public class MedicalProfileEntity {
     @Column(nullable = false, unique = true)
     private String license;
 
+    @Column
+    private String workEmail;
+
+    @Column
+    private String workPhone;
+
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "doctor_specialties",
             joinColumns = @JoinColumn(name = "doctor_id"),

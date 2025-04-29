@@ -18,5 +18,6 @@ public class ReducedAppointmentDTO {
     private AppointmentType type;
     private AppointmentStatusType status;
     private String reason;
+    // Las observaciones del doctor no se envían al paciente, son como notas privadas de los profesionales
     //private String doctorObservations;
 }

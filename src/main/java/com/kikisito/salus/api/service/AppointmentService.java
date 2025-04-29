@@ -35,6 +35,15 @@ public class AppointmentService {
     @Autowired
     private ModelMapper modelMapper;
 
+    @Autowired
+    private ReportRepository reportRepository;
+
+    @Autowired
+    private PrescriptionRepository prescriptionRepository;
+
+    @Autowired
+    private MedicalTestRepository medicalTestRepository;
+
     @Transactional(readOnly = true)
     public List<AppointmentDTO> getAllDoctorAppointmentsByDate(Integer doctorId, LocalDate date) {
         MedicalProfileEntity medico = medicalProfileRepository.findById(doctorId).orElseThrow(DataNotFoundException::doctorNotFound);
@@ -52,7 +61,7 @@ public class AppointmentService {
 
 
     @Transactional(readOnly = true)
-    public List<AppointmentDTO> getAllUserAppointments(Integer userId) {
+    public List<AppointmentDTO> getUserAppointments(Integer userId) {
         UserEntity user = userRepository.findById(userId).orElseThrow(DataNotFoundException::userNotFound);
         List<AppointmentEntity> citas = appointmentRepository.findByPatient(user);
 
@@ -74,9 +83,19 @@ public class AppointmentService {
     }
 
     @Transactional(readOnly = true)
-    public List<ReducedAppointmentDTO> getAllUserReducedAppointments(Integer userId) {
+    public List<ReducedAppointmentDTO> getUserUpcomingAppointmentsReduced(Integer userId) {
         UserEntity user = userRepository.findById(userId).orElseThrow(DataNotFoundException::userNotFound);
-        List<AppointmentEntity> citas = appointmentRepository.findByPatient(user);
+        List<AppointmentEntity> citas = appointmentRepository.findUpcomingAppointmentsByPatient(user);
+
+        return citas.stream()
+                .map(cita -> modelMapper.map(cita, ReducedAppointmentDTO.class))
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<ReducedAppointmentDTO> getUserPastAppointmentsReduced(Integer userId) {
+        UserEntity user = userRepository.findById(userId).orElseThrow(DataNotFoundException::userNotFound);
+        List<AppointmentEntity> citas = appointmentRepository.findPastAppointmentsByPatient(user);
 
         return citas.stream()
                 .map(cita -> modelMapper.map(cita, ReducedAppointmentDTO.class))
@@ -119,6 +138,59 @@ public class AppointmentService {
         appointment.setStatus(status);
         appointment = appointmentRepository.save(appointment);
         return modelMapper.map(appointment, AppointmentDTO.class);
+    }
+
+    @Transactional
+    public void deleteAppointment(Integer appointmentId) {
+        AppointmentEntity appointment = appointmentRepository.findById(appointmentId).orElseThrow(DataNotFoundException::appointmentNotFound);
+
+        // Comprobamos que no falten menos de 24 horas para la cita
+        if (appointment.getSlot().getDate().isBefore(LocalDate.now().plusDays(1))) {
+            throw ConflictException.appointmentCannotBeDeleted();
+        }
+
+        // Desvinculamos de la cita todos los posibles ficheros asociados a ella
+        if(appointment.getReports() != null && !appointment.getReports().isEmpty()) {
+            appointment.getReports().forEach(report -> {
+                report.setAppointment(null);
+                reportRepository.save(report);
+            });
+        }
+
+        if(appointment.getPrescriptions() != null && !appointment.getPrescriptions().isEmpty()) {
+            appointment.getPrescriptions().forEach(prescription -> {
+                prescription.setAppointment(null);
+                prescriptionRepository.save(prescription);
+            });
+        }
+
+        if(appointment.getMedicalTests() != null && !appointment.getMedicalTests().isEmpty()) {
+            appointment.getMedicalTests().forEach(medicalTest -> {
+                medicalTest.setAppointment(null);
+                medicalTestRepository.save(medicalTest);
+            });
+        }
+
+        // Desvinculamos el slot de la cita
+        AppointmentSlotEntity appointmentSlot = appointment.getSlot();
+        appointmentSlot.setAppointment(null);
+        appointmentSlotRepository.save(appointmentSlot);
+
+        // Finalmente, eliminamos la cita
+        appointmentRepository.delete(appointment);
+    }
+
+    @Transactional(readOnly = true)
+    public boolean canUserDeleteAppointment(Integer appointmentId, UserEntity user) {
+        AppointmentEntity appointment = appointmentRepository.findById(appointmentId).orElseThrow(DataNotFoundException::appointmentNotFound);
+
+        // Comprobamos que la cita pertenece al usuario
+        if (!appointment.getPatient().getId().equals(user.getId())) {
+            return false;
+        }
+
+        // Comprobamos que no falten menos de 24 horas para la cita y devolvemos
+        return appointment.getSlot().getDate().isAfter(LocalDate.now().plusDays(1));
     }
 
     @Transactional(readOnly = true)

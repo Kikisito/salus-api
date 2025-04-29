@@ -24,4 +24,10 @@ public interface AppointmentRepository extends JpaRepository<AppointmentEntity, 
     boolean existsBySlot_Doctor(MedicalProfileEntity doctor);
 
     boolean existsBySlot_DoctorAndPatient(MedicalProfileEntity doctor, UserEntity patient);
+
+    @Query("SELECT a FROM AppointmentEntity a WHERE a.patient = :patient AND a.slot.date >= CURRENT_DATE")
+    List<AppointmentEntity> findUpcomingAppointmentsByPatient(UserEntity patient);
+
+    @Query("SELECT a FROM AppointmentEntity a WHERE a.patient = :patient AND a.slot.date < CURRENT_DATE")
+    List<AppointmentEntity> findPastAppointmentsByPatient(UserEntity patient);
 }

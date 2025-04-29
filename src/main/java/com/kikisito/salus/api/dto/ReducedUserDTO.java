@@ -5,17 +5,13 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
 @Builder
-public class MedicalProfileDTO {
+public class ReducedUserDTO {
     private Integer id;
-    private ReducedUserDTO user;
-    private String license;
-    private String workEmail;
-    private String workPhone;
-    private List<SpecialtyDTO> specialties;
+    private String nombre;
+    private String apellidos;
+    private String sexo;
 }

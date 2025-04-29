@@ -46,4 +46,8 @@ public class ConflictException extends ApiRuntimeException {
     public static ConflictException doctorHasMedicalDataLinked() {
         return new ConflictException("conflict.doctor_has_appointments", ErrorMessages.DOCTOR_HAS_MEDICAL_DATA_LINKED);
     }
+
+    public static ConflictException appointmentCannotBeDeleted() {
+        return new ConflictException("conflict.appointment_cannot_be_deleted", ErrorMessages.APPOINTMENT_CANNOT_BE_DELETED);
+    }
 }
