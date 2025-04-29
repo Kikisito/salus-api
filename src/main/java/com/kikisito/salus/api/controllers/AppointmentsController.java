@@ -64,7 +64,9 @@ public class AppointmentsController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAuthority('ADMIN') or (hasAuthority('PROFESSIONAL') and @appointmentService.canProfessionalAccessAppointment(#id, authentication.principal.medicalProfile.id))")
+    @PreAuthorize(  "hasAuthority('ADMIN')" +
+                    "or (hasAuthority('PROFESSIONAL') and @appointmentService.canProfessionalAccessAppointment(#id, authentication.principal.medicalProfile.id))" +
+                    "or (hasAuthority('USER') and @appointmentService.canUserAccessAppointment(#id, authentication.principal))")
     public ResponseEntity<AppointmentDTO> getAppointmentById(@PathVariable Integer id) {
         return ResponseEntity.ok(appointmentService.getAppointmentById(id));
     }

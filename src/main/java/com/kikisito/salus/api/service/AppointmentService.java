@@ -194,6 +194,14 @@ public class AppointmentService {
     }
 
     @Transactional(readOnly = true)
+    public boolean canUserAccessAppointment(Integer appointmentId, UserEntity user) {
+        AppointmentEntity appointment = appointmentRepository.findById(appointmentId).orElseThrow(DataNotFoundException::appointmentNotFound);
+
+        // Comprobamos que la cita pertenece al usuario
+        return appointment.getPatient().getId().equals(user.getId());
+    }
+
+    @Transactional(readOnly = true)
     public boolean canProfessionalAccessAppointment(Integer appointmentId, Integer doctorId) {
         MedicalProfileEntity doctor = medicalProfileRepository.findById(doctorId).orElseThrow(DataNotFoundException::doctorNotFound);
         AppointmentEntity appointment = appointmentRepository.findById(appointmentId).orElseThrow(DataNotFoundException::appointmentNotFound);
