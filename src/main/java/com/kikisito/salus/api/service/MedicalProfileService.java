@@ -85,6 +85,11 @@ public class MedicalProfileService {
         MedicalCenterEntity medicalCenter = medicalCenterRepository.findById(medicalCenterId).orElseThrow(DataNotFoundException::medicalCenterNotFound);
         SpecialtyEntity specialty = specialtyRepository.findById(specialtyId).orElseThrow(DataNotFoundException::specialtyNotFound);
 
+        // Evitamos fechas pasadas
+        if (date.isBefore(LocalDate.now())) {
+            throw ConflictException.dateInPast();
+        }
+
         // Buscamos los perfiles médicos que cumplen con los criterios
         List<MedicalProfileEntity> medicalProfiles = medicalProfileRepository.findByMedicalCenterSpecialtyAndHasAvailabilityAfter(
                 medicalCenter,

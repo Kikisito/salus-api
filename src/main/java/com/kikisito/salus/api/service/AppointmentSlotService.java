@@ -15,7 +15,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -104,6 +103,11 @@ public class AppointmentSlotService {
         MedicalProfileEntity doctor = medicalProfileRepository.findById(doctorId).orElseThrow(DataNotFoundException::doctorNotFound);
         SpecialtyEntity specialty = specialtyRepository.findById(specialtyId).orElseThrow(DataNotFoundException::specialtyNotFound);
         MedicalCenterEntity medicalCenter = medicalCenterRepository.findById(medicalCenterId).orElseThrow(DataNotFoundException::medicalCenterNotFound);
+
+        // Evitamos fechas pasadas
+        if (date.isBefore(LocalDate.now())) {
+            throw ConflictException.dateInPast();
+        }
 
         // Recuperamos los huecos de la semana
         List<AppointmentSlotEntity> slots = appointmentSlotRepository.findAvailableDatesByDoctorAndMedicalCenterAndSpecialtyAfterDate(medicalCenter, specialty, doctor, date);

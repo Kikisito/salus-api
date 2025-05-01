@@ -50,4 +50,8 @@ public class ConflictException extends ApiRuntimeException {
     public static ConflictException appointmentCannotBeDeleted() {
         return new ConflictException("conflict.appointment_cannot_be_deleted", ErrorMessages.APPOINTMENT_CANNOT_BE_DELETED);
     }
+    public static ConflictException dateInPast() {
+        return new ConflictException("conflict.date_is_in_the_past", ErrorMessages.DATE_IN_PAST);
+    }
+
 }

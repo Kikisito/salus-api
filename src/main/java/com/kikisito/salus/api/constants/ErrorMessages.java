@@ -42,4 +42,5 @@ public final class ErrorMessages {
     public static final String MEDICATION_NOT_FOUND = "Medication not found";
     public static final String PAYLOAD_TOO_LARGE = "Payload too large";
     public static final String APPOINTMENT_CANNOT_BE_DELETED = "Appointment cannot be deleted";
+    public static final String DATE_IN_PAST = "Date is in the past";
 }

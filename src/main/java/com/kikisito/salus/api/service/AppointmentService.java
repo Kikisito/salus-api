@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 
 @Service
@@ -106,6 +107,14 @@ public class AppointmentService {
     public AppointmentDTO createAppointment(UserEntity patient, AppointmentRequest appointmentRequest) {
         // Comprobamos y obtenemos el slot de la cita que ha solicitado el usuario
         AppointmentSlotEntity appointmentSlot = appointmentSlotRepository.findById(appointmentRequest.getAppointmentSlot()).orElseThrow(DataNotFoundException::appointmentSlotNotFound);
+
+        // Comprobamos que la cita no esté en el pasado
+        if (
+                appointmentSlot.getDate().isBefore(LocalDate.now())
+                || (appointmentSlot.getDate().isEqual(LocalDate.now()) && appointmentSlot.getStartTime().isBefore(LocalTime.now()))
+        ) {
+            throw ConflictException.dateInPast();
+        }
 
         // Comprobamos que no tenga ninguna cita asociada, es decir, que esté disponible
         if(appointmentSlot.getAppointment() != null) {
