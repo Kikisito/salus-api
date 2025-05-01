@@ -7,11 +7,13 @@ import com.kikisito.salus.api.service.MedicalCenterService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.Optional;
 
 @RestController
@@ -32,6 +34,26 @@ public class MedicalCentersController {
     @PreAuthorize("hasAuthority('USER')")
     public ResponseEntity<MedicalCentersListResponse> searchMedicalCenter(@PathVariable String search, @PathVariable Optional<Integer> page, @PathVariable Optional<Integer> limit) {
         return ResponseEntity.ok(medicalCenterService.searchMedicalCenters(search, page, limit));
+    }
+
+    @GetMapping(value = {
+            "/specialty/{specialtyId}/available-after/{date}",
+            "/specialty/{specialtyId}/available-after/{date}/page/{page}",
+            "/specialty/{specialtyId}/available-after/{date}/page/{page}/limit/{limit}"
+    })
+    @PreAuthorize("hasAuthority('USER')")
+    public ResponseEntity<MedicalCentersListResponse> getAvailableMedicalCenters(@PathVariable Integer specialtyId, @PathVariable @DateTimeFormat(pattern = "dd-MM-yyyy") LocalDate date, @PathVariable Optional<Integer> page, @PathVariable Optional<Integer> limit) {
+        return ResponseEntity.ok(medicalCenterService.getMedicalCentersByAvailableSpecialtyAfterDate(specialtyId, date, page, limit));
+    }
+
+    @GetMapping(value = {
+            "/specialty/{specialtyId}/available-after/{date}/search/{search}",
+            "/specialty/{specialtyId}/available-after/{date}/search/{search}/page/{page}",
+            "/specialty/{specialtyId}/available-after/{date}/search/{search}/page/{page}/limit/{limit}"
+    })
+    @PreAuthorize("hasAuthority('USER')")
+    public ResponseEntity<MedicalCentersListResponse> searchAvailableMedicalCenters(@PathVariable Integer specialtyId, @PathVariable String search, @PathVariable @DateTimeFormat(pattern = "dd-MM-yyyy") LocalDate date, @PathVariable Optional<Integer> page, @PathVariable Optional<Integer> limit) {
+        return ResponseEntity.ok(medicalCenterService.searchMedicalCentersByAvailableSpecialtyAfterDate(specialtyId, search, date, page, limit));
     }
 
     @PostMapping("/add")

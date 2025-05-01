@@ -14,6 +14,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -61,6 +62,48 @@ public class MedicalCenterService {
 
         // Obtenemos los centros médicos de la base de datos
         Page<MedicalCenterEntity> medicalCenters = medicalCenterRepository.findByNameContainingIgnoreCase(search, PageRequest.of(page, limit));
+
+        // Convertimos los centros médicos a DTOs
+        List<MedicalCenterDTO> medicalCenterDTOS = medicalCenters.getContent().stream()
+                .map(c -> modelMapper.map(c, MedicalCenterDTO.class))
+                .collect(Collectors.toList());
+
+        return MedicalCentersListResponse.builder()
+                .count(medicalCenters.getTotalElements())
+                .medicalCenters(medicalCenterDTOS)
+                .build();
+    }
+
+    @Transactional(readOnly = true)
+    public MedicalCentersListResponse getMedicalCentersByAvailableSpecialtyAfterDate(Integer specialtyId, LocalDate date, Optional<Integer> optionalPage, Optional<Integer> optionalLimit) {
+        // Usamos los métodos Math.max y Math.min para asegurarnos de que
+        // los valores de page y limit estén dentro de los límites permitidos
+        Integer page = Math.max(optionalPage.orElse(DEFAULT_PAGE), DEFAULT_PAGE);
+        Integer limit = Math.min(optionalLimit.orElse(DEFAULT_PAGE_SIZE), MAX_ROWS_PER_PAGE);
+
+        // Obtenemos los centros médicos de la base de datos
+        Page<MedicalCenterEntity> medicalCenters = medicalCenterRepository.findByAvailableSpecialtyAfterDate(specialtyId, date, PageRequest.of(page, limit));
+
+        // Convertimos los centros médicos a DTOs
+        List<MedicalCenterDTO> medicalCenterDTOS = medicalCenters.getContent().stream()
+                .map(c -> modelMapper.map(c, MedicalCenterDTO.class))
+                .collect(Collectors.toList());
+
+        return MedicalCentersListResponse.builder()
+                .count(medicalCenters.getTotalElements())
+                .medicalCenters(medicalCenterDTOS)
+                .build();
+    }
+
+    @Transactional(readOnly = true)
+    public MedicalCentersListResponse searchMedicalCentersByAvailableSpecialtyAfterDate(Integer specialtyId, String search, LocalDate date, Optional<Integer> optionalPage, Optional<Integer> optionalLimit) {
+        // Usamos los métodos Math.max y Math.min para asegurarnos de que
+        // los valores de page y limit estén dentro de los límites permitidos
+        Integer page = Math.max(optionalPage.orElse(DEFAULT_PAGE), DEFAULT_PAGE);
+        Integer limit = Math.min(optionalLimit.orElse(DEFAULT_PAGE_SIZE), MAX_ROWS_PER_PAGE);
+
+        // Obtenemos los centros médicos de la base de datos
+        Page<MedicalCenterEntity> medicalCenters = medicalCenterRepository.searchByAvailableSpecialtyAfterDate(specialtyId, search, date, PageRequest.of(page, limit));
 
         // Convertimos los centros médicos a DTOs
         List<MedicalCenterDTO> medicalCenterDTOS = medicalCenters.getContent().stream()

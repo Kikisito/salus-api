@@ -40,6 +40,12 @@ public class AppointmentSlotsController {
         return ResponseEntity.ok(appointmentSlotService.getAppointmentSlot(appointmentSlotId));
     }
 
+    @GetMapping("/medical-center/{medicalCenterId}/specialty/{specialtyId}/doctor/{doctorId}/after/{date}")
+    @PreAuthorize("hasAuthority('USER')")
+    public ResponseEntity<List<AppointmentSlotDTO>> getDoctorAndSpecialtyAvailableAppointmentSlots(@PathVariable Integer medicalCenterId, @PathVariable Integer specialtyId, @PathVariable Integer doctorId, @PathVariable @DateTimeFormat(pattern = "dd-MM-yyyy") LocalDate date) {
+        return ResponseEntity.ok(appointmentSlotService.getAvailableDatesByDoctorAndMedicalCenterAndSpecialtyAfterDate(medicalCenterId, specialtyId, doctorId, date));
+    }
+
     @PostMapping("/add")
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<AppointmentSlotDTO> createAppointmentSlot(@RequestBody @Valid AppointmentSlotRequest appointmentSlotRequest) {

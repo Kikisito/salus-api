@@ -38,7 +38,7 @@ public class AppointmentEntity extends DatedEntity {
     @Builder.Default
     private AppointmentStatusType status = AppointmentStatusType.PENDING;
 
-    @Column(nullable = false)
+    @Column
     private String reason;
 
     @Column

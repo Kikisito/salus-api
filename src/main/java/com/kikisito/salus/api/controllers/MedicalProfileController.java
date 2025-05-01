@@ -10,12 +10,14 @@ import com.kikisito.salus.api.service.MedicalProfileService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -78,6 +80,12 @@ public class MedicalProfileController {
             doctors = medicalProfileService.searchMedicalProfiles(search, 0, DEFAULT_PAGE_SIZE);
         }
         return ResponseEntity.ok(doctors);
+    }
+
+    @GetMapping("/medical-center/{medicalCenterId}/specialty/{specialtyId}/available-after/{date}")
+    @PreAuthorize("hasAuthority('USER')")
+    public ResponseEntity<List<MedicalProfileDTO>> getAvailableDoctors(@PathVariable Integer medicalCenterId, @PathVariable Integer specialtyId, @PathVariable @DateTimeFormat(pattern = "dd-MM-yyyy") LocalDate date) {
+        return ResponseEntity.ok(medicalProfileService.getMedicalProfilesByMedicalCenterSpecialtyAndHasAvailabilityAfter(medicalCenterId, specialtyId, date));
     }
 
     @GetMapping("/{doctorId}")

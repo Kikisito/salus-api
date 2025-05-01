@@ -23,7 +23,7 @@ public class SpecialtiesController {
     private final SpecialtyService perfilMedicoService;
 
     @GetMapping(value = { "/all", "/all/{page}", "/all/{page}/{limit}"})
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasAuthority('USER')")
     public ResponseEntity<SpecialtiesListResponse> getAllSpecialties(@PathVariable Optional<Integer> page, @PathVariable Optional<Integer> limit) {
         return ResponseEntity.ok(perfilMedicoService.getAllSpecialties(page, limit));
     }

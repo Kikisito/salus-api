@@ -2,10 +2,7 @@ package com.kikisito.salus.api.service;
 
 import com.kikisito.salus.api.dto.AppointmentSlotDTO;
 import com.kikisito.salus.api.dto.request.AppointmentSlotRequest;
-import com.kikisito.salus.api.entity.AppointmentSlotEntity;
-import com.kikisito.salus.api.entity.RoomEntity;
-import com.kikisito.salus.api.entity.SpecialtyEntity;
-import com.kikisito.salus.api.entity.MedicalProfileEntity;
+import com.kikisito.salus.api.entity.*;
 import com.kikisito.salus.api.exception.ConflictException;
 import com.kikisito.salus.api.exception.DataNotFoundException;
 import com.kikisito.salus.api.repository.*;
@@ -35,6 +32,9 @@ public class AppointmentSlotService {
 
     @Autowired
     private final MedicalProfileRepository medicalProfileRepository;
+
+    @Autowired
+    private final MedicalCenterRepository medicalCenterRepository;
 
     @Autowired
     private SpecialtyRepository specialtyRepository;
@@ -97,6 +97,21 @@ public class AppointmentSlotService {
     public AppointmentSlotDTO getAppointmentSlot(Integer appointmentSlotId) {
         AppointmentSlotEntity appointmentSlot = appointmentSlotRepository.findById(appointmentSlotId).orElseThrow(DataNotFoundException::appointmentSlotNotFound);
         return modelMapper.map(appointmentSlot, AppointmentSlotDTO.class);
+    }
+
+    @Transactional(readOnly = true)
+    public List<AppointmentSlotDTO> getAvailableDatesByDoctorAndMedicalCenterAndSpecialtyAfterDate(Integer medicalCenterId, Integer specialtyId, Integer doctorId, LocalDate date) {
+        MedicalProfileEntity doctor = medicalProfileRepository.findById(doctorId).orElseThrow(DataNotFoundException::doctorNotFound);
+        SpecialtyEntity specialty = specialtyRepository.findById(specialtyId).orElseThrow(DataNotFoundException::specialtyNotFound);
+        MedicalCenterEntity medicalCenter = medicalCenterRepository.findById(medicalCenterId).orElseThrow(DataNotFoundException::medicalCenterNotFound);
+
+        // Recuperamos los huecos de la semana
+        List<AppointmentSlotEntity> slots = appointmentSlotRepository.findAvailableDatesByDoctorAndMedicalCenterAndSpecialtyAfterDate(medicalCenter, specialty, doctor, date);
+
+        // Mapeo de los slots a DTOs y devolvemos la lista
+        return slots.stream()
+                .map(appointmentSlot -> modelMapper.map(appointmentSlot, AppointmentSlotDTO.class))
+                .toList();
     }
 
     @Transactional

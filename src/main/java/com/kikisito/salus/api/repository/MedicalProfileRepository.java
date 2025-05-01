@@ -1,6 +1,8 @@
 package com.kikisito.salus.api.repository;
 
+import com.kikisito.salus.api.entity.MedicalCenterEntity;
 import com.kikisito.salus.api.entity.MedicalProfileEntity;
+import com.kikisito.salus.api.entity.SpecialtyEntity;
 import com.kikisito.salus.api.entity.UserEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -10,6 +12,8 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -39,4 +43,15 @@ public interface MedicalProfileRepository extends JpaRepository<MedicalProfileEn
     int searchCount(@Param("search") String search);
 
     Optional<MedicalProfileEntity> findByUser(UserEntity user);
+
+    @Query("SELECT p FROM MedicalProfileEntity p " +
+            "JOIN AppointmentSlotEntity slots ON p.id = slots.doctor.id " +
+            "JOIN RoomEntity r ON slots.room.id = r.id " +
+            "JOIN MedicalCenterEntity mc ON r.medicalCenter.id = mc.id " +
+            "WHERE mc = :medicalCenter AND slots.specialty = :specialty AND slots.date >= :date AND slots.appointment IS NULL")
+    List<MedicalProfileEntity> findByMedicalCenterSpecialtyAndHasAvailabilityAfter(
+            @Param("medicalCenter") MedicalCenterEntity medicalCenter,
+            @Param("specialty") SpecialtyEntity specialty,
+            @Param("date") LocalDate date
+    );
 }

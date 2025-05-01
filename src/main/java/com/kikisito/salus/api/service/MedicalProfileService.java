@@ -7,15 +7,13 @@ import com.kikisito.salus.api.dto.UserDTO;
 import com.kikisito.salus.api.dto.request.AddDoctorSpecialtyRequest;
 import com.kikisito.salus.api.dto.request.DoctorLicenseRequest;
 import com.kikisito.salus.api.dto.response.DoctorsListResponse;
+import com.kikisito.salus.api.entity.MedicalCenterEntity;
 import com.kikisito.salus.api.entity.SpecialtyEntity;
 import com.kikisito.salus.api.entity.MedicalProfileEntity;
 import com.kikisito.salus.api.entity.UserEntity;
 import com.kikisito.salus.api.exception.ConflictException;
 import com.kikisito.salus.api.exception.DataNotFoundException;
-import com.kikisito.salus.api.repository.AppointmentRepository;
-import com.kikisito.salus.api.repository.SpecialtyRepository;
-import com.kikisito.salus.api.repository.MedicalProfileRepository;
-import com.kikisito.salus.api.repository.UserRepository;
+import com.kikisito.salus.api.repository.*;
 import com.kikisito.salus.api.type.RoleType;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -25,6 +23,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -32,6 +31,9 @@ import java.util.List;
 public class MedicalProfileService {
     @Autowired
     private final MedicalProfileRepository medicalProfileRepository;
+
+    @Autowired
+    private final MedicalCenterRepository medicalCenterRepository;
 
     @Autowired
     private final UserRepository userRepository;
@@ -71,6 +73,29 @@ public class MedicalProfileService {
                 .count(medicalProfileRepository.searchCount(search))
                 .doctors(doctorsDTO)
                 .build();
+    }
+
+    @Transactional(readOnly = true)
+    public List<MedicalProfileDTO> getMedicalProfilesByMedicalCenterSpecialtyAndHasAvailabilityAfter(
+            Integer medicalCenterId,
+            Integer specialtyId,
+            LocalDate date
+    ) {
+        // Obtenemos el centro médico y la especialidad
+        MedicalCenterEntity medicalCenter = medicalCenterRepository.findById(medicalCenterId).orElseThrow(DataNotFoundException::medicalCenterNotFound);
+        SpecialtyEntity specialty = specialtyRepository.findById(specialtyId).orElseThrow(DataNotFoundException::specialtyNotFound);
+
+        // Buscamos los perfiles médicos que cumplen con los criterios
+        List<MedicalProfileEntity> medicalProfiles = medicalProfileRepository.findByMedicalCenterSpecialtyAndHasAvailabilityAfter(
+                medicalCenter,
+                specialty,
+                date
+        );
+
+        // Devolvemos la lista de perfiles médicos mapeados a DTO
+        return medicalProfiles.stream()
+                .map(medicalProfileEntity -> modelMapper.map(medicalProfileEntity, MedicalProfileDTO.class))
+                .toList();
     }
 
     @Transactional(readOnly = true)

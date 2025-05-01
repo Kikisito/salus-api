@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.util.Optional;
 
 @Repository
@@ -17,4 +18,19 @@ public interface MedicalCenterRepository extends JpaRepository<MedicalCenterEnti
 
     @Query("SELECT c FROM MedicalCenterEntity c ORDER BY c.id ASC LIMIT 1")
     Optional<MedicalCenterEntity> findFirst();
+
+    @Query("SELECT DISTINCT mc FROM MedicalCenterEntity mc " +
+            "JOIN RoomEntity r ON r.medicalCenter.id = mc.id " +
+            "JOIN AppointmentSlotEntity slots ON slots.room.id = r.id " +
+            "WHERE slots.specialty.id = :specialtyId AND slots.date >= :date AND slots.appointment IS NULL")
+    Page<MedicalCenterEntity> findByAvailableSpecialtyAfterDate(@Param("specialtyId") Integer specialtyId, @Param("date") LocalDate date, Pageable pageable);
+
+    @Query("SELECT DISTINCT mc FROM MedicalCenterEntity mc " +
+            "JOIN RoomEntity r ON r.medicalCenter.id = mc.id " +
+            "JOIN AppointmentSlotEntity slots ON slots.room.id = r.id " +
+            "WHERE slots.specialty.id = :specialtyId AND slots.date >= :date AND slots.appointment IS NULL " +
+            "AND (LOWER(mc.name) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(mc.addressLine1) LIKE LOWER(CONCAT('%', :search, '%'))" +
+                "OR (LOWER(mc.locality) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(mc.municipality) LIKE LOWER(CONCAT('%', :search, '%')))" +
+            ")")
+    Page<MedicalCenterEntity> searchByAvailableSpecialtyAfterDate(@Param("specialtyId") Integer specialtyId, @Param("search") String search, @Param("date") LocalDate date, Pageable pageable);
 }
