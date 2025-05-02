@@ -37,23 +37,23 @@ public class MedicalCentersController {
     }
 
     @GetMapping(value = {
-            "/specialty/{specialtyId}/available-after/{date}",
-            "/specialty/{specialtyId}/available-after/{date}/page/{page}",
-            "/specialty/{specialtyId}/available-after/{date}/page/{page}/limit/{limit}"
+            "/specialty/{specialtyId}/available",
+            "/specialty/{specialtyId}/available/page/{page}",
+            "/specialty/{specialtyId}/available/page/{page}/limit/{limit}"
     })
     @PreAuthorize("hasAuthority('USER')")
-    public ResponseEntity<MedicalCentersListResponse> getAvailableMedicalCenters(@PathVariable Integer specialtyId, @PathVariable @DateTimeFormat(pattern = "dd-MM-yyyy") LocalDate date, @PathVariable Optional<Integer> page, @PathVariable Optional<Integer> limit) {
-        return ResponseEntity.ok(medicalCenterService.getMedicalCentersByAvailableSpecialtyAfterDate(specialtyId, date, page, limit));
+    public ResponseEntity<MedicalCentersListResponse> getAvailableMedicalCenters(@PathVariable Integer specialtyId, @PathVariable Optional<Integer> page, @PathVariable Optional<Integer> limit) {
+        return ResponseEntity.ok(medicalCenterService.getMedicalCentersByAvailableSpecialty(specialtyId, page, limit));
     }
 
     @GetMapping(value = {
-            "/specialty/{specialtyId}/available-after/{date}/search/{search}",
-            "/specialty/{specialtyId}/available-after/{date}/search/{search}/page/{page}",
-            "/specialty/{specialtyId}/available-after/{date}/search/{search}/page/{page}/limit/{limit}"
+            "/specialty/{specialtyId}/available/search/{search}",
+            "/specialty/{specialtyId}/available/search/{search}/page/{page}",
+            "/specialty/{specialtyId}/available/search/{search}/page/{page}/limit/{limit}"
     })
     @PreAuthorize("hasAuthority('USER')")
-    public ResponseEntity<MedicalCentersListResponse> searchAvailableMedicalCenters(@PathVariable Integer specialtyId, @PathVariable String search, @PathVariable @DateTimeFormat(pattern = "dd-MM-yyyy") LocalDate date, @PathVariable Optional<Integer> page, @PathVariable Optional<Integer> limit) {
-        return ResponseEntity.ok(medicalCenterService.searchMedicalCentersByAvailableSpecialtyAfterDate(specialtyId, search, date, page, limit));
+    public ResponseEntity<MedicalCentersListResponse> searchAvailableMedicalCenters(@PathVariable Integer specialtyId, @PathVariable String search, @PathVariable Optional<Integer> page, @PathVariable Optional<Integer> limit) {
+        return ResponseEntity.ok(medicalCenterService.searchMedicalCentersByAvailableSpecialty(specialtyId, search, page, limit));
     }
 
     @PostMapping("/add")

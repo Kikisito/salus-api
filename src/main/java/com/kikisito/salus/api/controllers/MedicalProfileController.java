@@ -82,10 +82,10 @@ public class MedicalProfileController {
         return ResponseEntity.ok(doctors);
     }
 
-    @GetMapping("/medical-center/{medicalCenterId}/specialty/{specialtyId}/available-after/{date}")
+    @GetMapping("/medical-center/{medicalCenterId}/specialty/{specialtyId}/available")
     @PreAuthorize("hasAuthority('USER')")
-    public ResponseEntity<List<MedicalProfileDTO>> getAvailableDoctors(@PathVariable Integer medicalCenterId, @PathVariable Integer specialtyId, @PathVariable @DateTimeFormat(pattern = "dd-MM-yyyy") LocalDate date) {
-        return ResponseEntity.ok(medicalProfileService.getMedicalProfilesByMedicalCenterSpecialtyAndHasAvailabilityAfter(medicalCenterId, specialtyId, date));
+    public ResponseEntity<List<MedicalProfileDTO>> getAvailableDoctors(@PathVariable Integer medicalCenterId, @PathVariable Integer specialtyId) {
+        return ResponseEntity.ok(medicalProfileService.getMedicalProfilesByMedicalCenterSpecialtyAndHasAvailability(medicalCenterId, specialtyId));
     }
 
     @GetMapping("/{doctorId}")

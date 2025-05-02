@@ -12,7 +12,6 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Repository;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -48,10 +47,12 @@ public interface MedicalProfileRepository extends JpaRepository<MedicalProfileEn
             "JOIN AppointmentSlotEntity slots ON p.id = slots.doctor.id " +
             "JOIN RoomEntity r ON slots.room.id = r.id " +
             "JOIN MedicalCenterEntity mc ON r.medicalCenter.id = mc.id " +
-            "WHERE mc = :medicalCenter AND slots.specialty = :specialty AND slots.date >= :date AND slots.appointment IS NULL")
-    List<MedicalProfileEntity> findByMedicalCenterSpecialtyAndHasAvailabilityAfter(
+            "WHERE mc = :medicalCenter " +
+                "AND slots.specialty = :specialty " +
+                "AND (slots.date > CURRENT_DATE OR (slots.date = CURRENT_DATE AND slots.startTime > CURRENT_TIME)) " +
+                "AND slots.appointment IS NULL")
+    List<MedicalProfileEntity> findByMedicalCenterSpecialtyAndHasAvailability(
             @Param("medicalCenter") MedicalCenterEntity medicalCenter,
-            @Param("specialty") SpecialtyEntity specialty,
-            @Param("date") LocalDate date
+            @Param("specialty") SpecialtyEntity specialty
     );
 }

@@ -3,7 +3,6 @@ package com.kikisito.salus.api.service;
 import com.kikisito.salus.api.dto.ReducedUserDTO;
 import com.kikisito.salus.api.dto.SpecialtyDTO;
 import com.kikisito.salus.api.dto.MedicalProfileDTO;
-import com.kikisito.salus.api.dto.UserDTO;
 import com.kikisito.salus.api.dto.request.AddDoctorSpecialtyRequest;
 import com.kikisito.salus.api.dto.request.DoctorLicenseRequest;
 import com.kikisito.salus.api.dto.response.DoctorsListResponse;
@@ -23,7 +22,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -76,25 +74,18 @@ public class MedicalProfileService {
     }
 
     @Transactional(readOnly = true)
-    public List<MedicalProfileDTO> getMedicalProfilesByMedicalCenterSpecialtyAndHasAvailabilityAfter(
+    public List<MedicalProfileDTO> getMedicalProfilesByMedicalCenterSpecialtyAndHasAvailability(
             Integer medicalCenterId,
-            Integer specialtyId,
-            LocalDate date
+            Integer specialtyId
     ) {
         // Obtenemos el centro médico y la especialidad
         MedicalCenterEntity medicalCenter = medicalCenterRepository.findById(medicalCenterId).orElseThrow(DataNotFoundException::medicalCenterNotFound);
         SpecialtyEntity specialty = specialtyRepository.findById(specialtyId).orElseThrow(DataNotFoundException::specialtyNotFound);
 
-        // Evitamos fechas pasadas
-        if (date.isBefore(LocalDate.now())) {
-            throw ConflictException.dateInPast();
-        }
-
         // Buscamos los perfiles médicos que cumplen con los criterios
-        List<MedicalProfileEntity> medicalProfiles = medicalProfileRepository.findByMedicalCenterSpecialtyAndHasAvailabilityAfter(
+        List<MedicalProfileEntity> medicalProfiles = medicalProfileRepository.findByMedicalCenterSpecialtyAndHasAvailability(
                 medicalCenter,
-                specialty,
-                date
+                specialty
         );
 
         // Devolvemos la lista de perfiles médicos mapeados a DTO

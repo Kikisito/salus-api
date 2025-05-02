@@ -18,9 +18,12 @@ public interface AppointmentSlotRepository extends JpaRepository<AppointmentSlot
     @Query("SELECT slots FROM AppointmentSlotEntity slots " +
             "JOIN RoomEntity r ON slots.room = r " +
             "JOIN MedicalCenterEntity mc ON r.medicalCenter = mc " +
-            "WHERE mc = :medicalCenter AND slots.specialty = :specialty AND slots.doctor = :doctor AND slots.date >= :date AND slots.appointment IS NULL")
-    List<AppointmentSlotEntity> findAvailableDatesByDoctorAndMedicalCenterAndSpecialtyAfterDate(@Param("medicalCenter") MedicalCenterEntity medicalCenter,
-                                                                                     @Param("specialty") SpecialtyEntity specialty,
-                                                                                     @Param("doctor") MedicalProfileEntity doctor,
-                                                                                     @Param("date") LocalDate date);
+            "WHERE mc = :medicalCenter " +
+                "AND slots.specialty = :specialty " +
+                "AND slots.doctor = :doctor " +
+                "AND (slots.date > CURRENT_DATE OR (slots.date = CURRENT_DATE AND slots.startTime > CURRENT_TIME)) " +
+                "AND slots.appointment IS NULL")
+    List<AppointmentSlotEntity> findAvailableDatesByDoctorAndMedicalCenterAndSpecialty(@Param("medicalCenter") MedicalCenterEntity medicalCenter,
+                                                                                       @Param("specialty") SpecialtyEntity specialty,
+                                                                                       @Param("doctor") MedicalProfileEntity doctor);
 }
