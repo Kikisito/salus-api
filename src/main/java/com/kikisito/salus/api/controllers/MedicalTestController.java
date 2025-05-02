@@ -30,13 +30,22 @@ public class MedicalTestController {
     ) {
         return ResponseEntity.ok(medicalTestService.getPatientMedicalTestsWithDoctorOrItsSpecialties(patientId, doctorId));
     }
+
+    @GetMapping("/patient/{patientId}")
+    @PreAuthorize("""
+            hasAuthority('ADMIN') or
+            (hasAuthority('USER') and #patientId == authentication.principal.medicalProfile.id)
+            """)
+    public ResponseEntity<List<MedicalTestDTO>> getPatientMedicalTests(@PathVariable Integer patientId) {
+        return ResponseEntity.ok(medicalTestService.getPatientMedicalTests(patientId));
+    }
     
     @GetMapping(value = "/{medicalTestId}/pdf", produces = "application/pdf")
-    @PreAuthorize(
-            "hasAuthority('ADMIN')" +
-                    "or (hasAuthority('PROFESSIONAL') " +
-                        "and @medicalTestService.isDoctorResponsibleOfMedicalTest(#medicalTestId, authentication.principal.medicalProfile.id))"
-    )
+    @PreAuthorize("""
+            hasAuthority('ADMIN') or
+            (hasAuthority('PROFESSIONAL') and @medicalTestService.isDoctorResponsibleOfMedicalTest(#medicalTestId, authentication.principal.medicalProfile.id)) or
+            (hasAuthority('USER') and @medicalTestService.getReportPatient(#medicalTestId).id == authentication.principal.medicalProfile.id)
+            """)
     public ResponseEntity<byte[]> getReportPdf(@PathVariable Integer medicalTestId) {
         return ResponseEntity.ok(medicalTestService.getMedicalTestPdf(medicalTestId));
     }

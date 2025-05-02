@@ -55,6 +55,16 @@ public class MedicalTestService {
     private ModelMapper modelMapper;
 
     @Transactional(readOnly = true)
+    public List<MedicalTestDTO> getPatientMedicalTests(Integer patientId) {
+        UserEntity user = userRepository.findById(patientId).orElseThrow(DataNotFoundException::userNotFound);
+        List<MedicalTestEntity> medicalTests = medicalTestRepository.findByPatient(user);
+
+        return medicalTests.stream()
+                .map(medicalTest -> modelMapper.map(medicalTest, MedicalTestDTO.class))
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
     public List<MedicalTestDTO> getPatientMedicalTestsWithDoctorOrItsSpecialties(Integer patientId, Integer doctorId) {
         UserEntity user = userRepository.findById(patientId).orElseThrow(DataNotFoundException::userNotFound);
         MedicalProfileEntity doctor = medicalProfileRepository.findById(doctorId).orElseThrow(DataNotFoundException::doctorNotFound);
@@ -142,6 +152,12 @@ public class MedicalTestService {
                 .anyMatch(specialty -> doctor.getSpecialties().contains(specialty));
 
         return isMedicalTestAssociatedToDoctor || isMedicalTestAppointmentAssociatedToDoctor || isMedicalTestSpecialtyAssociatedToDoctorSpecialties;
+    }
+
+    @Transactional(readOnly = true)
+    public UserEntity getReportPatient(Integer medicalTestId) {
+        MedicalTestEntity medicalTest = medicalTestRepository.findById(medicalTestId).orElseThrow(DataNotFoundException::medicalTestNotFound);
+        return medicalTest.getPatient();
     }
 
     // PDF

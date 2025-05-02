@@ -15,4 +15,6 @@ import java.util.List;
 public interface MedicalTestRepository extends JpaRepository<MedicalTestEntity, Integer> {
     @Query("SELECT mt FROM MedicalTestEntity mt WHERE mt.patient = :patient AND (mt.doctor = :doctor OR mt.specialty IN :specialties)")
     List<MedicalTestEntity> findByPatientWithDoctorOrItsSpecialties(UserEntity patient, MedicalProfileEntity doctor, Collection<SpecialtyEntity> specialties);
+
+    List<MedicalTestEntity> findByPatient(UserEntity patient);
 }
