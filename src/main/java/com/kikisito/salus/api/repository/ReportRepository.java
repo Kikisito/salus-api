@@ -12,6 +12,8 @@ import java.util.List;
 public interface ReportRepository extends JpaRepository<ReportEntity, Integer> {
     List<ReportEntity> findByAppointment(AppointmentEntity appointment);
 
+    List<ReportEntity> findByPatient(UserEntity patient);
+
     @Query("SELECT r FROM ReportEntity r WHERE r.patient = :patient AND (r.doctor = :doctor OR r.specialty IN :specialties)")
     List<ReportEntity> findByPatientWithDoctorOrItsSpecialties(UserEntity patient, MedicalProfileEntity doctor, Collection<SpecialtyEntity> specialties);
 }

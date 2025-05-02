@@ -48,6 +48,20 @@ public class ReportService {
     private ModelMapper modelMapper;
 
     @Transactional(readOnly = true)
+    public List<ReportDTO> getUserReports(Integer userId) {
+        // Obtenemos el usuario que el usuario ha introducido
+        UserEntity user = userRepository.findById(userId).orElseThrow(DataNotFoundException::userNotFound);
+
+        // Obtenemos todos los informes por su paciente
+        List<ReportEntity> reports = reportRepository.findByPatient(user);
+
+        // Devolvemos la lista de informes
+        return reports.stream()
+                .map(report -> modelMapper.map(report, ReportDTO.class))
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
     public List<ReportDTO> getAppointmentReports(Integer appointmentId) {
         // Obtenemos la cita que el usuario ha introducido
         AppointmentEntity appointment = appointmentRepository.findById(appointmentId).orElseThrow(DataNotFoundException::appointmentNotFound);
@@ -240,5 +254,11 @@ public class ReportService {
         } catch (IOException ex) {
             throw new RuntimeException("Error loading HTML template", ex);
         }
+    }
+
+    @Transactional(readOnly = true)
+    public UserEntity getReportPatient(Integer reportId) {
+        ReportEntity report = reportRepository.findById(reportId).orElseThrow(DataNotFoundException::reportNotFound);
+        return report.getPatient();
     }
 }

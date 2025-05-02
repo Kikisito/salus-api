@@ -20,6 +20,15 @@ public class ReportsController {
     @Autowired
     private final ReportService reportService;
 
+    @GetMapping("/user/{userId}")
+    @PreAuthorize("""
+            hasAuthority('ADMIN') or
+            (hasAuthority('USER') and #userId == authentication.principal.id)
+            """)
+    public ResponseEntity<List<ReportDTO>> getUserReports(@PathVariable Integer userId) {
+        return ResponseEntity.ok(reportService.getUserReports(userId));
+    }
+
     @GetMapping("/by-appointment/{appointmentId}")
     @PreAuthorize("hasAuthority('ADMIN') or (hasAuthority('PROFESSIONAL') and @appointmentService.canProfessionalAccessAppointment(#appointmentId, authentication.principal.medicalProfile.id))")
     public ResponseEntity<List<ReportDTO>> getUserReportsByAppointment(@PathVariable Integer appointmentId) {
@@ -42,7 +51,11 @@ public class ReportsController {
     }
 
     @GetMapping(value = "/{reportId}/pdf", produces = "application/pdf")
-    @PreAuthorize("hasAuthority('ADMIN') or (hasAuthority('PROFESSIONAL') and @reportService.canProfessionalAccessReport(#reportId, authentication.principal.medicalProfile.id))")
+    @PreAuthorize("""
+            hasAuthority('ADMIN') or
+            (hasAuthority('PROFESSIONAL') and @reportService.canProfessionalAccessReport(#reportId, authentication.principal.medicalProfile.id)) or
+            (hasAuthority('USER') and @reportService.getReportPatient(#reportId).id == authentication.principal.id)
+            """)    
     public ResponseEntity<byte[]> getReportPdf(@PathVariable Integer reportId) {
         return ResponseEntity.ok(reportService.getReportPdf(reportId));
     }
