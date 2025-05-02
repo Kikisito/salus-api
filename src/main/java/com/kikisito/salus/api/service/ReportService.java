@@ -181,6 +181,12 @@ public class ReportService {
         reportRepository.delete(report);
     }
 
+    @Transactional(readOnly = true)
+    public UserEntity getReportPatient(Integer reportId) {
+        ReportEntity report = reportRepository.findById(reportId).orElseThrow(DataNotFoundException::reportNotFound);
+        return report.getPatient();
+    }
+
     private byte[] generatePdfFromHtml(String templateHtml) {
         try {
             ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -254,11 +260,5 @@ public class ReportService {
         } catch (IOException ex) {
             throw new RuntimeException("Error loading HTML template", ex);
         }
-    }
-
-    @Transactional(readOnly = true)
-    public UserEntity getReportPatient(Integer reportId) {
-        ReportEntity report = reportRepository.findById(reportId).orElseThrow(DataNotFoundException::reportNotFound);
-        return report.getPatient();
     }
 }

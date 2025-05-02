@@ -219,6 +219,12 @@ public class PrescriptionService {
         return isPrescriptionAssociatedToDoctor || isPrescriptionAppointmentAssociatedToDoctor || isPrescriptionSpecialtyAssociatedToDoctorSpecialties;
     }
 
+    @Transactional(readOnly = true)
+    public UserEntity getReportPatient(Integer prescriptionId) {
+        PrescriptionEntity prescription = prescriptionRepository.findById(prescriptionId).orElseThrow(DataNotFoundException::prescriptionNotFound);
+        return prescription.getPatient();
+    }
+    
     private byte[] generatePdfFromHtml(String templateHtml) {
         try {
             ByteArrayOutputStream out = new ByteArrayOutputStream();

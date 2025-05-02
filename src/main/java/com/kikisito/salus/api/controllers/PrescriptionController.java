@@ -60,7 +60,11 @@ public class PrescriptionController {
     }
 
     @GetMapping(value = "/{prescriptionId}/pdf", produces = "application/pdf")
-    @PreAuthorize("hasAuthority('ADMIN') or (hasAuthority('PROFESSIONAL') and (hasAuthority('PROFESSIONAL') and @prescriptionService.canProfessionalAccessPrescription(#prescriptionId, authentication.principal.medicalProfile.id)))")
+    @PreAuthorize("""
+                hasAuthority('ADMIN') or
+                (hasAuthority('PROFESSIONAL') and @prescriptionService.canProfessionalAccessPrescription(#prescriptionId, authentication.principal.medicalProfile.id)) or
+                (hasAuthority('USER') and @prescriptionService.getReportPatient(#prescriptionId).id == authentication.principal.id)
+                """)
     public ResponseEntity<byte[]> getPrescriptionPdf(@PathVariable Integer prescriptionId) {
         return ResponseEntity.ok(prescriptionService.getPrescriptionPdf(prescriptionId));
     }
