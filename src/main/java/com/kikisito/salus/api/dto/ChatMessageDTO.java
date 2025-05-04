@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @Builder
 public class ChatMessageDTO {
     private Integer id;
-    private ChatDTO chat;
+    private Integer chatId;
     private MessageSenderType senderType;
     private String content;
     private String createdAt; // sentAt

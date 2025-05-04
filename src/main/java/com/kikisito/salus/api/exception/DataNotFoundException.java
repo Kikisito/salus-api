@@ -62,4 +62,8 @@ public class DataNotFoundException extends ApiRuntimeException {
     public static DataNotFoundException medicationNotFound() {
         return new DataNotFoundException("data_not_found.medication", ErrorMessages.MEDICATION_NOT_FOUND);
     }
+
+    public static DataNotFoundException chatNotFound() {
+        return new DataNotFoundException("data_not_found.chat", ErrorMessages.CHAT_NOT_FOUND);
+    }
 }

@@ -15,7 +15,7 @@ public class ChatDTO {
     private Integer id;
     private ReducedUserDTO patient;
     private MedicalProfileDTO doctor;
-    private String lastMessage;
+    private ChatMessageDTO lastMessage;
     private Integer unreadMessages;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;

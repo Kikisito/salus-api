@@ -33,5 +33,6 @@ public class ChatMessagesEntity extends DatedEntity {
     private String content;
 
     @Column(nullable = false)
-    private Boolean read;
+    @Builder.Default
+    private Boolean read = false;
 }

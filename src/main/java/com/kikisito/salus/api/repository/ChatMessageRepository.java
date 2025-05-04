@@ -11,6 +11,7 @@ import java.util.List;
 @Repository
 public interface ChatMessageRepository extends JpaRepository<ChatMessagesEntity, Integer> {
     List<ChatMessagesEntity> findByChatOrderByCreatedAtAsc(ChatEntity chat);
+    List<ChatMessagesEntity> findByChatAndSenderTypeAndReadIsFalse(ChatEntity chat, MessageSenderType senderType);
 
     int countByChatAndReadFalseAndSenderType(ChatEntity chat, MessageSenderType senderType);
 }

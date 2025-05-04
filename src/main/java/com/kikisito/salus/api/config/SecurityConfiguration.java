@@ -37,7 +37,8 @@ public class SecurityConfiguration {
             "/api/v1/auth/forgot-password/request",
             "/api/v1/auth/forgot-password/reset",
             "/api/v1/auth/available/email",
-            "/api/v1/auth/available/nif"
+            "/api/v1/auth/available/nif",
+            "/ws/**", // Los WebSockets tienen su propia configuración de seguridad
     };
 
     @Bean
