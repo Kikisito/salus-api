@@ -7,6 +7,7 @@ import com.kikisito.salus.api.entity.ChatEntity;
 import com.kikisito.salus.api.entity.ChatMessagesEntity;
 import com.kikisito.salus.api.entity.MedicalProfileEntity;
 import com.kikisito.salus.api.entity.UserEntity;
+import com.kikisito.salus.api.exception.ConflictException;
 import com.kikisito.salus.api.exception.DataNotFoundException;
 import com.kikisito.salus.api.repository.ChatMessageRepository;
 import com.kikisito.salus.api.repository.ChatRepository;
@@ -20,6 +21,7 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.swing.event.ChangeEvent;
 import java.util.List;
 import java.util.Optional;
 
@@ -66,14 +68,19 @@ public class ChatService {
                 .toList();
     }
 
-    @Transactional(readOnly = true)
-    public ChatDTO getChatInfo(Integer doctorId, Integer userId) {
+    @Transactional
+    public ChatDTO getChatInfo(Integer doctorId, Integer userId, UserEntity userRequest) {
         UserEntity patient = userRepository.findById(userId).orElseThrow(DataNotFoundException::userNotFound);
         MedicalProfileEntity doctor = medicalProfileRepository.findById(doctorId).orElseThrow(DataNotFoundException::doctorNotFound);
 
-        ChatEntity chat = chatRepository.findByPatientAndDoctor(patient, doctor).orElseThrow(DataNotFoundException::chatNotFound);
+        MessageSenderType senderType = userRequest.getId().equals(doctor.getUser().getId()) ? MessageSenderType.DOCTOR : MessageSenderType.PATIENT;
 
-        MessageSenderType senderType = patient.getId().equals(chat.getPatient().getId()) ? MessageSenderType.PATIENT : MessageSenderType.DOCTOR;
+        ChatEntity chat;
+        if(senderType == MessageSenderType.PATIENT) {
+            chat = chatRepository.findByPatientAndDoctor(patient, doctor).orElseThrow(DataNotFoundException::chatNotFound);
+        } else {
+            chat = this.getOrCreateConversation(patient, doctor);
+        }
 
         return this.convertToFullDTO(chat, senderType);
     }
@@ -149,6 +156,11 @@ public class ChatService {
     }
 
     private ChatEntity getOrCreateConversation(UserEntity patient, MedicalProfileEntity doctor) {
+        // Comprobamos que el paciente y el médico no sean la misma persona
+        if(patient.getId().equals(doctor.getId())) {
+            throw ConflictException.cannotCreateChatWithSameSenderAndReceiver();
+        }
+
         Optional<ChatEntity> chat = chatRepository.findByPatientAndDoctor(patient, doctor);
 
         // Si el chat ya existe, lo devolvemos

@@ -40,8 +40,8 @@ public class ChatController {
             (hasAuthority('USER') and #patientId == authentication.principal.id) or
             (hasAuthority('PROFESSIONAL') and #doctorId == authentication.principal.id)
             """)
-    public ResponseEntity<ChatDTO> getChatInfo(@PathVariable Integer doctorId, @PathVariable Integer patientId) {
-        return ResponseEntity.ok(chatService.getChatInfo(doctorId, patientId));
+    public ResponseEntity<ChatDTO> getChatInfo(@PathVariable Integer doctorId, @PathVariable Integer patientId, @AuthenticationPrincipal UserEntity userRequest) {
+        return ResponseEntity.ok(chatService.getChatInfo(doctorId, patientId, userRequest));
     }
 
     @GetMapping("/doctor/{doctorId}/patient/{patientId}")
