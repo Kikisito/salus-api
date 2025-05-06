@@ -40,7 +40,7 @@ public class AppointmentsController {
 
     @PostMapping("/new")
     @PreAuthorize("""
-                    (hasAuthority('USER') and #appointmentRequest.patient == authentication.principal.id) or
+                    (hasAuthority('USER') and #appointmentRequest.patient == authentication.principal.id and authentication.principal.restricted == false) or
                     hasAuthority('ADMIN')
                 """)
     public ResponseEntity<AppointmentDTO> createAppointment(@RequestBody @Valid AppointmentRequest appointmentRequest) {
