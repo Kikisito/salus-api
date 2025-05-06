@@ -38,10 +38,13 @@ public class AppointmentsController {
         return ResponseEntity.ok(appointmentService.getUserPastAppointmentsReduced(user.getId()));
     }
 
-    @PostMapping("/@me/new")
-    @PreAuthorize("hasAuthority('USER')")
-    public ResponseEntity<AppointmentDTO> createAppointment(@AuthenticationPrincipal UserEntity user, @RequestBody @Valid AppointmentRequest appointmentRequest) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(appointmentService.createAppointment(user, appointmentRequest));
+    @PostMapping("/new")
+    @PreAuthorize("""
+                    (hasAuthority('USER') and #appointmentRequest.patient == authentication.principal.id) or
+                    hasAuthority('ADMIN')
+                """)
+    public ResponseEntity<AppointmentDTO> createAppointment(@RequestBody @Valid AppointmentRequest appointmentRequest) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(appointmentService.createAppointment(appointmentRequest));
     }
 
     @DeleteMapping("/{id}")
@@ -49,8 +52,8 @@ public class AppointmentsController {
             "hasAuthority('ADMIN')" +
             "or (hasAuthority('USER') and @appointmentService.canUserDeleteAppointment(#id, authentication.principal))"
     )
-    public ResponseEntity<Void> deleteAppointment(@PathVariable Integer id) {
-        appointmentService.deleteAppointment(id);
+    public ResponseEntity<Void> deleteAppointment(@PathVariable Integer id, @AuthenticationPrincipal UserEntity userRequest) {
+        appointmentService.deleteAppointment(id, userRequest);
         return ResponseEntity.noContent().build();
     }
 

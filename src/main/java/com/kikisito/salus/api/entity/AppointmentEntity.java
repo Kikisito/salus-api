@@ -5,6 +5,8 @@ import com.kikisito.salus.api.type.AppointmentType;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
+import org.springframework.data.annotation.CreatedBy;
+import org.springframework.data.annotation.LastModifiedBy;
 
 import java.util.List;
 
@@ -27,6 +29,16 @@ public class AppointmentEntity extends DatedEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "patient_id")
     private UserEntity patient;
+
+    @CreatedBy
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "created_by", nullable = false)
+    private UserEntity createdBy;
+
+    @LastModifiedBy
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "last_modified_by", nullable = false)
+    private UserEntity lastModifiedBy;
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)

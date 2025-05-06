@@ -4,6 +4,9 @@ import com.kikisito.salus.api.type.ReportType;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
+import org.springframework.data.annotation.CreatedBy;
+import org.springframework.data.annotation.LastModifiedBy;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -12,6 +15,7 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @Entity
 @Table(name = "reports")
+@EntityListeners(AuditingEntityListener.class)
 public class ReportEntity extends DatedEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
@@ -37,6 +41,16 @@ public class ReportEntity extends DatedEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "patient_id", nullable = false)
     private UserEntity patient;
+
+    @CreatedBy
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "created_by", nullable = false)
+    private UserEntity createdBy;
+
+    @LastModifiedBy
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "last_modified_by", nullable = false)
+    private UserEntity lastModifiedBy;
 
     @Column(nullable = false, length = 30)
     private String description;

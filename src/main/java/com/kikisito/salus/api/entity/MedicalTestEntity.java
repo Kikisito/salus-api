@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
+import org.springframework.data.annotation.CreatedBy;
+import org.springframework.data.annotation.LastModifiedBy;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -37,6 +39,16 @@ public class MedicalTestEntity extends DatedEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "appointment_id")
     private AppointmentEntity appointment;
+
+    @CreatedBy
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "created_by", nullable = false)
+    private UserEntity createdBy;
+
+    @LastModifiedBy
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "last_modified_by", nullable = false)
+    private UserEntity lastModifiedBy;
 
     @OneToMany(mappedBy = "medicalTest", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<AttachmentEntity> attachments;

@@ -11,6 +11,7 @@ import com.kikisito.salus.api.type.AppointmentStatusType;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -104,7 +105,10 @@ public class AppointmentService {
     }
 
     @Transactional
-    public AppointmentDTO createAppointment(UserEntity patient, AppointmentRequest appointmentRequest) {
+    public AppointmentDTO createAppointment(AppointmentRequest appointmentRequest) {
+        // Comprobamos que el usuario existe
+        UserEntity patient = userRepository.findById(appointmentRequest.getPatient()).orElseThrow(DataNotFoundException::userNotFound);
+
         // Comprobamos y obtenemos el slot de la cita que ha solicitado el usuario
         AppointmentSlotEntity appointmentSlot = appointmentSlotRepository.findById(appointmentRequest.getAppointmentSlot()).orElseThrow(DataNotFoundException::appointmentSlotNotFound);
 
@@ -150,11 +154,12 @@ public class AppointmentService {
     }
 
     @Transactional
-    public void deleteAppointment(Integer appointmentId) {
+    public void deleteAppointment(Integer appointmentId, UserEntity userRequest) {
         AppointmentEntity appointment = appointmentRepository.findById(appointmentId).orElseThrow(DataNotFoundException::appointmentNotFound);
 
-        // Comprobamos que no falten menos de 24 horas para la cita
-        if (appointment.getSlot().getDate().isBefore(LocalDate.now().plusDays(1))) {
+        // Comprobamos que no falten menos de 24 horas para la cita y que el usuario no sea un admin
+        if (appointment.getSlot().getDate().isBefore(LocalDate.now().plusDays(1))
+                && !userRequest.getAuthorities().contains(new SimpleGrantedAuthority("ADMIN"))) {
             throw ConflictException.appointmentCannotBeDeleted();
         }
 
