@@ -29,6 +29,9 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 public class AuthService {
+    @Value("${application.name}")
+    private String appName;
+
     @Value("${application.host}")
     private String host;
 
@@ -57,10 +60,8 @@ public class AuthService {
     private static final Base64.Encoder base64Encoder = Base64.getUrlEncoder();
 
     private final static String VERIFY_EMAIL_SUBJECT = "Verifica tu correo electrónico";
-    private final static String VERIFY_EMAIL_TEXT = "Te damos la bienvenida. Por favor, verifica tu correo electrónico a través del siguiente enlace: {link}";
-
     private final static String PASSWORD_RESET_EMAIL_SUBJECT = "Recuperación de contraseña";
-    private final static String PASSWORD_RESET_EMAIL_TEXT = "Para recuperar tu contraseña haz click en el siguiente enlace: {token}";
+    private final static String PASSWORD_RESET_SUCCESS_SUBJECT = "Tu contraseña ha sido cambiada";
 
     @Transactional
     public void startPasswordRecoveryProcess(String email, String nif) {
@@ -116,6 +117,18 @@ public class AuthService {
 
         // Borramos el token de recuperación de contraseña
         passwordResetRepository.delete(passwordReset);
+
+        // Enviamos un email de confirmación de cambio de contraseña
+        Map<String, Object> variables = new HashMap<>();
+        variables.put("appName", appName);
+        variables.put("user", userEntity);
+
+        emailingService.sendTemplateEmail(
+                userEntity.getEmail(),
+                PASSWORD_RESET_SUCCESS_SUBJECT,
+                "password-change-success",
+                variables
+        );
     }
 
     @Transactional
@@ -194,8 +207,8 @@ public class AuthService {
         userEntity.setVerificationToken(jwtService.generateEmailVerificationToken(userEntity.getEmail()));
         UserEntity savedUser = saveCredentials(userEntity);
 
-        String verificationLink = host + "VERIFY_EMAIL_PATH" + savedUser.getVerificationToken();
-        emailingService.sendEmail(savedUser.getEmail(), VERIFY_EMAIL_SUBJECT, VERIFY_EMAIL_TEXT.replace("{link}", verificationLink));
+        // Enviamos el email de verificación
+        this.sendVerificationEmail(savedUser);
     }
 
     @Transactional
@@ -235,7 +248,16 @@ public class AuthService {
         userRepository.save(userEntity);
 
         // Enviamos un email de confirmación
-        emailingService.sendEmail(userEntity.getEmail(), "Cambio de contraseña", "Tu contraseña ha sido cambiada. Si no has sido tú, por favor, contacta con nosotros.");
+        Map<String, Object> variables = new HashMap<>();
+        variables.put("appName", appName);
+        variables.put("user", userEntity);
+
+        emailingService.sendTemplateEmail(
+                userEntity.getEmail(),
+                PASSWORD_RESET_SUCCESS_SUBJECT,
+                "password-change-success",
+                variables
+        );
 
         // Creamos un token de sesión para la sesión actual
         return this.createToken(userEntity);
@@ -310,13 +332,34 @@ public class AuthService {
     }
 
     public void sendPasswordResetEmail(UserEntity userEntity, String token) {
-        // todo: Cambiar el enlace
-        emailingService.sendEmail(userEntity.getEmail(), PASSWORD_RESET_EMAIL_SUBJECT, PASSWORD_RESET_EMAIL_TEXT.replace("{token}", token));
+        Map<String, Object> variables = new HashMap<>();
+        variables.put("appName", appName);
+        variables.put("user", userEntity);
+        variables.put("host", host);
+        variables.put("passwordResetToken", token);
+
+        emailingService.sendTemplateEmail(
+                userEntity.getEmail(),
+                PASSWORD_RESET_EMAIL_SUBJECT,
+                "password-reset-email",
+                variables
+        );
     }
 
     public void sendVerificationEmail(UserEntity userEntity) {
-        // todo: Cambiar el enlace
-        String verificationLink = host + "VERIFY_EMAIL_PATH" + userEntity.getVerificationToken();
-        emailingService.sendEmail(userEntity.getEmail(), VERIFY_EMAIL_SUBJECT, VERIFY_EMAIL_TEXT.replace("{link}", verificationLink));
+        String token = userEntity.getVerificationToken();
+
+        Map<String, Object> variables = new HashMap<>();
+        variables.put("appName", appName);
+        variables.put("user", userEntity);
+        variables.put("host", host);
+        variables.put("verificationToken", token);
+
+        emailingService.sendTemplateEmail(
+                userEntity.getEmail(),
+                VERIFY_EMAIL_SUBJECT,
+                "verify-email",
+                variables
+        );
     }
 }

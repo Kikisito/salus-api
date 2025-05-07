@@ -26,13 +26,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.security.SecureRandom;
-import java.util.Base64;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
 public class UserService {
+    @Value("${application.name}")
+    private String appName;
+
     @Value("${application.host}")
     private String host;
 
@@ -240,7 +241,7 @@ public class UserService {
                 .apellidos(request.getApellidos())
                 .sexo(request.getSexo())
                 .email(request.getEmail())
-                .password(passwordEncoder.encode(this.generateRandomPassword(128))) // Al crear la cuenta un tercero, la contraseña será aleatoria y el usuario deberá resetearla
+                .password(passwordEncoder.encode(this.generateRandomPassword(32))) // Al crear la cuenta un tercero, la contraseña será aleatoria y el usuario deberá resetearla
                 .telefono(request.getTelefono())
                 .fechaNacimiento(request.getFechaNacimiento())
                 .direccion(direccionEmbeddable)
@@ -254,9 +255,18 @@ public class UserService {
         String passwordResetToken = authService.createPasswordResetToken(savedUser).getToken();
 
         // Enviamos el email de reseteo de contraseña
-        // todo: Cambiar el enlace
-        emailingService.sendEmail(savedUser.getEmail(), WELCOME_EMAIL_NO_PASSWORD_TEXT_SUBJECT,
-                String.format(WELCOME_EMAIL_NO_PASSWORD_TEXT_BODY, savedUser.getNombre(), host + "/forgot-password/reset/" + passwordResetToken));
+        Map<String, Object> variables = new HashMap<>();
+        variables.put("appName", appName);
+        variables.put("user", userEntity);
+        variables.put("host", host);
+        variables.put("passwordResetToken", passwordResetToken);
+
+        emailingService.sendTemplateEmail(
+                savedUser.getEmail(),
+                WELCOME_EMAIL_NO_PASSWORD_TEXT_SUBJECT,
+                "welcome-email-with-password-reset",
+                variables
+        );
 
         return modelMapper.map(savedUser, UserDTO.class);
     }

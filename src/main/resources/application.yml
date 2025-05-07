@@ -12,7 +12,7 @@ MAIL_PASSWORD: "h1JjbpxjtR4tpKPu#e0OvOwkZvtWLh$8S@q2f3Dc09YiJs1GulW9M2ZF*&vm#4bs
 MAIL_SMTP_FROM: "ua-pracs@kikisito.com"
 
 APP_NAME: "Salus"
-APP_HOST: http://localhost:8080
+APP_HOST: http://localhost:9000
 APP_SECRET: "KB6z+5wrQCzu7cALLthZ1rKd1EEL/SI9ANLMwh1yH1M="
 APP_FILE_STORAGE_UPLOAD_DIR: "./uploads/files"
 

@@ -34,6 +34,7 @@ public class SecurityConfiguration {
     private final String[] publicPaths = {
             "/api/v1/auth/login",
             "/api/v1/auth/register",
+            "/api/v1/auth/verification/verify",
             "/api/v1/auth/forgot-password/request",
             "/api/v1/auth/forgot-password/reset",
             "/api/v1/auth/available/email",

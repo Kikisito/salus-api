@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
@@ -31,17 +32,16 @@ public class AuthController {
         return ResponseEntity.ok(authService.register(registerRequest));
     }
 
-    @GetMapping("/verification/verify")
-    public ResponseEntity<HttpStatus> verifyEmailByToken(@RequestParam("token") String token) {
-        authService.verifyEmailByToken(token);
+    @PostMapping("/verification/verify")
+    public ResponseEntity<HttpStatus> verifyEmailByToken(@RequestBody @Valid VerifyEmailRequest request) {
+        authService.verifyEmailByToken(request.getToken());
         return ResponseEntity.ok().build();
     }
 
     @PostMapping("/verification/resend")
     @PreAuthorize("hasAuthority('USER')")
-    public ResponseEntity<HttpStatus> resendVerification() {
-        UserEntity userEntity = (UserEntity) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        authService.resendVerificationEmail(userEntity);
+    public ResponseEntity<HttpStatus> resendVerification(@AuthenticationPrincipal UserEntity user) {
+        authService.resendVerificationEmail(user);
         return ResponseEntity.ok().build();
     }
 
