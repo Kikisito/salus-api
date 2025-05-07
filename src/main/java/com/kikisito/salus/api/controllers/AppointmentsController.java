@@ -40,8 +40,12 @@ public class AppointmentsController {
 
     @PostMapping("/new")
     @PreAuthorize("""
-                    (hasAuthority('USER') and #appointmentRequest.patient == authentication.principal.id and authentication.principal.restricted == false) or
-                    hasAuthority('ADMIN')
+                    (
+                        hasAuthority('USER')
+                        and #appointmentRequest.patient == authentication.principal.id
+                        and authentication.principal.restricted == false
+                        and @appointmentService.countAppointmentsByPatient(authentication.principal) < 5
+                    ) or hasAuthority('ADMIN')
                 """)
     public ResponseEntity<AppointmentDTO> createAppointment(@RequestBody @Valid AppointmentRequest appointmentRequest) {
         return ResponseEntity.status(HttpStatus.CREATED).body(appointmentService.createAppointment(appointmentRequest));

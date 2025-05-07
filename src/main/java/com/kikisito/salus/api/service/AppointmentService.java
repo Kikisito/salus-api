@@ -237,4 +237,9 @@ public class AppointmentService {
 
         return appointmentRepository.existsBySlot_DoctorAndPatient(doctor, user);
     }
+
+    @Transactional
+    public Integer countAppointmentsByPatient(UserEntity patient) {
+        return appointmentRepository.countByPatient(patient);
+    }
 }
