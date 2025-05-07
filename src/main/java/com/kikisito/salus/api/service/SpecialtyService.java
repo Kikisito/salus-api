@@ -9,6 +9,7 @@ import com.kikisito.salus.api.repository.SpecialtyRepository;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,7 +38,7 @@ public class SpecialtyService {
         Integer limit = Math.min(optionalLimit.orElse(DEFAULT_PAGE_SIZE), MAX_ROWS_PER_PAGE);
 
         // Obtenemos las especialidades de la base de datos
-        List<SpecialtyEntity> specialties = specialtyRepository.findAll(PageRequest.of(page, limit)).getContent();
+        Page<SpecialtyEntity> specialties = specialtyRepository.findAll(PageRequest.of(page, limit));
 
         // Convertimos las especialidades a DTOs
         List<SpecialtyDTO> specialtyDTOS = specialties.stream()
@@ -45,7 +46,7 @@ public class SpecialtyService {
                 .toList();
 
         return SpecialtiesListResponse.builder()
-                .count(specialties.size())
+                .count(specialties.getTotalElements())
                 .specialties(specialtyDTOS)
                 .build();
     }

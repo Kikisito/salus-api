@@ -1,6 +1,7 @@
 package com.kikisito.salus.api.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.kikisito.salus.api.type.AccountStatusType;
 import com.kikisito.salus.api.type.RoleType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -30,4 +31,5 @@ public class UserDTO {
     private DireccionDTO direccion;
     private List<RoleType> rolesList;
     private Boolean restricted;
+    private AccountStatusType accountStatusType;
 }
