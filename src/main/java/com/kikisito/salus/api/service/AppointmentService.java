@@ -112,6 +112,11 @@ public class AppointmentService {
         // Comprobamos y obtenemos el slot de la cita que ha solicitado el usuario
         AppointmentSlotEntity appointmentSlot = appointmentSlotRepository.findById(appointmentRequest.getAppointmentSlot()).orElseThrow(DataNotFoundException::appointmentSlotNotFound);
 
+        // Si el paciente y el médico son el mismo, lanzamos una excepción
+        if(appointmentSlot.getDoctor().getUser().getId().equals(patient.getId())) {
+            throw ConflictException.appointmentSlotCannotBeBookedByDoctor();
+        }
+
         // Comprobamos que la cita no esté en el pasado
         if (
                 appointmentSlot.getDate().isBefore(LocalDate.now())

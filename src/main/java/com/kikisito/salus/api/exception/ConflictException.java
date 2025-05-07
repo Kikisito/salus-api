@@ -62,4 +62,8 @@ public class ConflictException extends ApiRuntimeException {
     public static ConflictException dayMismatch() {
         return new ConflictException("conflict.day_mismatch", ErrorMessages.DAY_MISMATCH);
     }
+
+    public static ConflictException appointmentSlotCannotBeBookedByDoctor() {
+        return new ConflictException("conflict.appointment_slot_cannot_be_booked_by_doctor", ErrorMessages.APPOINTMENT_SLOT_CANNOT_BE_BOOKED_BY_DOCTOR);
+    }
 }
