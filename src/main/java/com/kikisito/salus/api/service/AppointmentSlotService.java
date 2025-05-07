@@ -3,18 +3,19 @@ package com.kikisito.salus.api.service;
 import com.kikisito.salus.api.dto.AppointmentSlotDTO;
 import com.kikisito.salus.api.dto.request.AppointmentSlotRequest;
 import com.kikisito.salus.api.entity.*;
+import com.kikisito.salus.api.exception.BadRequestException;
 import com.kikisito.salus.api.exception.ConflictException;
 import com.kikisito.salus.api.exception.DataNotFoundException;
 import com.kikisito.salus.api.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -25,9 +26,6 @@ public class AppointmentSlotService {
 
     @Autowired
     private final DoctorScheduleRepository doctorScheduleRepository;
-
-    @Autowired
-    private final AusenciaMedicoRepository ausenciaMedicoRepository;
 
     @Autowired
     private final MedicalProfileRepository medicalProfileRepository;
@@ -44,25 +42,105 @@ public class AppointmentSlotService {
     @Autowired
     private ModelMapper modelMapper;
 
-    @Scheduled(cron = "0 0 6 * * *")
-    public void appointmentSlotsAutomatedGeneration() {
-        /*List<AgendaMedicoEntity> agenda = agendaMedicoRepository.findAll();
+    @Transactional
+    public List<AppointmentSlotDTO> generateAppointmentSlotsBetweenDates(LocalDate startDate, LocalDate endDate) {
+        // Obtenemos todos los doctores registrados para generar los huecos de citas
+        List<MedicalProfileEntity> doctors = medicalProfileRepository.findAll();
 
-        for (AgendaMedicoEntity agendaMedicoEntity : agenda) {
-            LocalTime inicio = agendaMedicoEntity.getHoraInicio();
-            LocalTime fin = agendaMedicoEntity.getHoraFin();
-            Integer duracion = agendaMedicoEntity.getDuracionCita();
+        // Generamos las citas
+        List<AppointmentSlotDTO> appointmentSlots = new ArrayList<>();
+        for(MedicalProfileEntity doctor : doctors) {
+            List<AppointmentSlotDTO> dateSlots = this.generateAppointmentSlotsByDoctorBetweenDates(doctor.getId(), startDate, endDate);
+            appointmentSlots.addAll(dateSlots);
+        }
 
-            List<String> citas = new ArrayList<>();
-            while (inicio.isBefore(fin)) {
-                citas.add(inicio.toString());
-                inicio = inicio.plusMinutes(duracion);
+        return appointmentSlots;
+    }
+
+    // Genera los huecos de citas para un médico en un rango de fechas
+    @Transactional
+    public List<AppointmentSlotDTO> generateAppointmentSlotsByDoctorBetweenDates(Integer doctorId, LocalDate startDate, LocalDate endDate) {
+        // Comprobamos que las fechas introducidas no estén en el pasado y que la fecha de fin no sea anterior a la de inicio
+        if(startDate.isBefore(LocalDate.now()) || endDate.isBefore(LocalDate.now()) || endDate.isBefore(startDate)) {
+            throw BadRequestException.invalidDateOrDateRange();
+        }
+
+        // Comprobamos que el médico existe
+        MedicalProfileEntity doctor = medicalProfileRepository.findById(doctorId).orElseThrow(DataNotFoundException::doctorNotFound);
+
+        List<AppointmentSlotDTO> appointmentSlots = new ArrayList<>();
+        for(LocalDate date = startDate; !date.isAfter(endDate); date = date.plusDays(1)) {
+            // Obtiene los turnos del médico para la fecha dada
+            List<DoctorScheduleEntity> schedules = doctorScheduleRepository.findByDoctorAndDayOfWeek(doctor, date.getDayOfWeek());
+
+            // Genera los huecos de citas para cada turno del día
+            for(DoctorScheduleEntity schedule : schedules) {
+                List<AppointmentSlotDTO> dateSlots = this.generateAppointmentSlotsByScheduleId(schedule.getId(), date);
+                appointmentSlots.addAll(dateSlots);
+            }
+        }
+
+        return appointmentSlots;
+    }
+
+    // Genera los huecos de citas de un turno específico para una fecha dada
+    // El día de la semana de la petición DEBE coincidir con el día de la semana del turno registrado
+    @Transactional
+    public List<AppointmentSlotDTO> generateAppointmentSlotsByScheduleId(Integer scheduleId, LocalDate date) {
+        // Comprobamos que la fecha introducida no esté en el pasado
+        if(date.isBefore(LocalDate.now())) {
+            throw BadRequestException.invalidDateOrDateRange();
+        }
+
+        // Obtenemos el turno especificado
+        DoctorScheduleEntity schedule = doctorScheduleRepository.findById(scheduleId).orElseThrow(DataNotFoundException::scheduleNotFound);
+
+        // Comprobamos que el día de la semana de la petición coincida con el del turno
+        if(!schedule.getDayOfWeek().equals(date.getDayOfWeek())) {
+            throw ConflictException.dayMismatch();
+        }
+
+        // Datos básicos del turno
+        LocalTime startTime = schedule.getStartTime();
+        LocalTime endTime = schedule.getEndTime();
+        Integer duration = schedule.getDuration();
+
+        List<AppointmentSlotEntity> generatedSlots = new ArrayList<>();
+        for(LocalTime time = startTime; time.isBefore(endTime); time = time.plusMinutes(duration)) {
+            // Comprobamos que no solapa con otros horarios en la misma consulta
+            RoomEntity room = schedule.getRoom();
+
+            // Comprobamos que no haya conflictos con otros horarios de la consulta
+            boolean roomConflict = appointmentSlotRepository.existsRoomOverlappingSlot(room, date, startTime, endTime);
+
+            // Comprobamos que no haya conflictos con otros horarios del médico
+            boolean doctorConflict = appointmentSlotRepository.existsDoctorOverlappingSlot(schedule.getDoctor(), date, startTime, endTime);
+
+            if(roomConflict || doctorConflict) {
+                throw ConflictException.scheduleConflict();
             }
 
-            for (String cita : citas) {
-                System.out.println(cita);
-            }
-        }*/
+            // Creamos un nuevo AppointmentSlotEntity
+            AppointmentSlotEntity appointmentSlot = AppointmentSlotEntity.builder()
+                    .doctor(schedule.getDoctor())
+                    .specialty(schedule.getSpecialty())
+                    .room(schedule.getRoom())
+                    .date(date)
+                    .startTime(time)
+                    .endTime(time.plusMinutes(duration))
+                    .build();
+
+            // Añadimos el AppointmentSlotEntity a la lista
+            generatedSlots.add(appointmentSlot);
+        }
+
+        // Guardamos los AppointmentSlotEntity en la base de datos
+        List<AppointmentSlotEntity> savedSlots = appointmentSlotRepository.saveAll(generatedSlots);
+
+        // Mapeamos los DTO y devolvemos
+        return savedSlots.stream()
+                .map(appointmentSlot -> modelMapper.map(appointmentSlot, AppointmentSlotDTO.class))
+                .toList();
     }
 
     @Transactional(readOnly = true)
@@ -120,20 +198,11 @@ public class AppointmentSlotService {
         SpecialtyEntity specialty = specialtyRepository.findById(appointmentSlotRequest.getSpecialty()).orElseThrow(DataNotFoundException::specialtyNotFound);
         RoomEntity room = roomRepository.findById(appointmentSlotRequest.getRoom()).orElseThrow(DataNotFoundException::roomNotFound);
 
-        // Comprobamos que no haya conflictos con otros horarios del médico
-        List<AppointmentSlotEntity> appointmentSlots = appointmentSlotRepository.findByDoctorAndDate(doctor, appointmentSlotRequest.getDate());
-        for (AppointmentSlotEntity dbAppointmentSlot : appointmentSlots) {
-            if (timesOverlap(appointmentSlotRequest.getStartTime(), appointmentSlotRequest.getEndTime(), dbAppointmentSlot.getStartTime(), dbAppointmentSlot.getEndTime())) {
-                throw ConflictException.scheduleConflict();
-            }
-        }
-
-        // Comprobamos que no haya conflictos con otros horarios de la consulta
-        List<AppointmentSlotEntity> roomAppointmentSlots = appointmentSlotRepository.findByRoomAndDate(room, appointmentSlotRequest.getDate());
-        for (AppointmentSlotEntity dbAppointmentSlot : roomAppointmentSlots) {
-            if (timesOverlap(appointmentSlotRequest.getStartTime(), appointmentSlotRequest.getEndTime(), dbAppointmentSlot.getStartTime(), dbAppointmentSlot.getEndTime())) {
-                throw ConflictException.scheduleConflict();
-            }
+        // Comprobamos que no haya conflictos con otros horarios
+        boolean roomConflict = appointmentSlotRepository.existsRoomOverlappingSlot(room, appointmentSlotRequest.getDate(), appointmentSlotRequest.getStartTime(), appointmentSlotRequest.getEndTime());
+        boolean doctorConflict = appointmentSlotRepository.existsDoctorOverlappingSlot(doctor, appointmentSlotRequest.getDate(), appointmentSlotRequest.getStartTime(), appointmentSlotRequest.getEndTime());
+        if(roomConflict || doctorConflict) {
+            throw ConflictException.scheduleConflict();
         }
 
         // Creamos la CitaSlot
@@ -160,17 +229,5 @@ public class AppointmentSlotService {
         }
 
         appointmentSlotRepository.deleteById(id);
-    }
-
-    private boolean timesOverlap(LocalTime start1, LocalTime end1, LocalTime start2, LocalTime end2) {
-        // Casos de colisión:
-        // 1. start1 está dentro del rango [start2, end2)
-        // 2. end1 está dentro del rango (start2, end2]
-        // 3. inicio2 está dentro del rango [inicio1, fin1)
-        // 4. fin2 está dentro del rango (inicio1, fin1]
-        return  (start1.equals(start2) || start1.isAfter(start2) && start1.isBefore(end2)) ||
-                (end1.isAfter(start2) && end1.isBefore(end2) || end1.equals(end2)) ||
-                (start2.isAfter(start1) && start2.isBefore(end1)) ||
-                (end2.isAfter(start1) && end2.isBefore(end1));
     }
 }

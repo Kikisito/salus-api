@@ -115,6 +115,17 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
         );
     }
 
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(BadRequestException.class)
+    public ExceptionResponse handleBadRequestException(final BadRequestException ex) {
+        logger.error("Bad request", ex);
+        return new ExceptionResponse(
+                "Bad request",
+                List.of(new ErrorDetails(ex.getCode(), ex.getMessage())),
+                LocalDateTime.now()
+        );
+    }
+
     private String getMessage(ObjectError error) {
         return String.format(
                 error.getDefaultMessage() == null ? ErrorMessages.FIELD_IS_NOT_VALID : error.getDefaultMessage(), ((FieldError) error).getField()

@@ -10,4 +10,8 @@ public class BadRequestException extends ApiRuntimeException {
     public static BadRequestException attachmentNotFound() {
         return new BadRequestException("data_not_found.attachment", ErrorMessages.ATTACHMENT_NOT_FOUND);
     }
+
+    public static BadRequestException invalidDateOrDateRange() {
+        return new BadRequestException("bad_request.invalid_date_or_date_range", ErrorMessages.INVALID_DATE_OR_DATE_RANGE);
+    }
 }

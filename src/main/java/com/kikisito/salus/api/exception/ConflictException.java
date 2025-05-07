@@ -36,7 +36,7 @@ public class ConflictException extends ApiRuntimeException {
     }
 
     public static ConflictException scheduleConflict() {
-        return new ConflictException("conflict.horario_colapsa", ErrorMessages.SCHEDULE_CONFLICT);
+        return new ConflictException("conflict.schedule_conflict", ErrorMessages.SCHEDULE_CONFLICT);
     }
 
     public static ConflictException appointmentSlotIsAlreadyTaken() {
@@ -57,5 +57,9 @@ public class ConflictException extends ApiRuntimeException {
 
     public static ConflictException cannotCreateChatWithSameSenderAndReceiver() {
         return new ConflictException("conflict.cannot_create_chat_with_same_sender_and_receiver", ErrorMessages.CANNOT_CREATE_CHAT_WITH_SAME_SENDER_AND_RECEIVER);
+    }
+
+    public static ConflictException dayMismatch() {
+        return new ConflictException("conflict.day_mismatch", ErrorMessages.DAY_MISMATCH);
     }
 }

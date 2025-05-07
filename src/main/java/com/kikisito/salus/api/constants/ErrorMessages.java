@@ -45,4 +45,6 @@ public final class ErrorMessages {
     public static final String DATE_IN_PAST = "Date is in the past";
     public static final String CHAT_NOT_FOUND = "Chat not found";
     public static final String CANNOT_CREATE_CHAT_WITH_SAME_SENDER_AND_RECEIVER = "Cannot create a chat with the same sender and receiver";
+    public static final String DAY_MISMATCH = "The selected day does not match the appointment date";
+    public static final String INVALID_DATE_OR_DATE_RANGE = "Invalid date or date range";
 }
