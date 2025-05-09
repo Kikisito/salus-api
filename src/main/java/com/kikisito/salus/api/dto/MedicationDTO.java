@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @AllArgsConstructor
@@ -15,7 +16,7 @@ public class MedicationDTO {
     private Integer id;
     private String name;
     private String dosage;
-    private String frequency;
+    private BigDecimal frequency;
     private LocalDate startDate;
     private LocalDate endDate;
     private String instructions;

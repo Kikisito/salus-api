@@ -48,4 +48,5 @@ public final class ErrorMessages {
     public static final String DAY_MISMATCH = "The selected day does not match the appointment date";
     public static final String INVALID_DATE_OR_DATE_RANGE = "Invalid date or date range";
     public static final String APPOINTMENT_SLOT_CANNOT_BE_BOOKED_BY_DOCTOR = "Appointment slot cannot be booked by the doctor";
+    public static final String INVALID_FREQUENCY = "Frequency must be a number with up to 2 decimal places";
 }
