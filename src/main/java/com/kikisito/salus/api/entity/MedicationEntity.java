@@ -1,8 +1,10 @@
 package com.kikisito.salus.api.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Digits;
 import lombok.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @AllArgsConstructor
@@ -23,8 +25,8 @@ public class MedicationEntity {
     @Column(nullable = false)
     private String dosage;
 
-    @Column(nullable = false)
-    private String frequency;
+    @Column(nullable = false, precision = 4, scale = 2)
+    private BigDecimal frequency;
 
     @Column(nullable = false)
     private LocalDate startDate;
