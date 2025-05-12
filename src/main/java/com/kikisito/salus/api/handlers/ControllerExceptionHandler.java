@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.authentication.LockedException;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -122,6 +123,17 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
         return new ExceptionResponse(
                 "Bad request",
                 List.of(new ErrorDetails(ex.getCode(), ex.getMessage())),
+                LocalDateTime.now()
+        );
+    }
+
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    @ExceptionHandler(LockedException.class)
+    public ExceptionResponse handleLockedException(final LockedException ex) {
+        logger.error("Account locked", ex);
+        return new ExceptionResponse(
+                "Account locked",
+                List.of(new ErrorDetails("generic.account_locked", ErrorMessages.ACCOUNT_LOCKED)),
                 LocalDateTime.now()
         );
     }

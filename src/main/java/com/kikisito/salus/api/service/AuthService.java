@@ -20,6 +20,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -111,6 +112,9 @@ public class AuthService {
         if(userEntity.getAccountStatusType() == AccountStatusType.NOT_VERIFIED) {
             userEntity.setAccountStatusType(AccountStatusType.VERIFIED);
         }
+
+        // Restablecemos el número de intentos de login a 0
+        userEntity.setLoginAttempts(0);
 
         // Guardamos el usuario
         userRepository.save(userEntity);
@@ -211,12 +215,25 @@ public class AuthService {
         this.sendVerificationEmail(savedUser);
     }
 
-    @Transactional
+    @Transactional(noRollbackFor = BadCredentialsException.class)
     public AuthenticationResponse login(LoginRequest request) {
         UserEntity userEntity = userRepository.findByNif(request.getNif())
                 .orElseThrow(DataNotFoundException::userNotFound);
 
-        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(userEntity.getEmail(), request.getPassword()));
+        try {
+            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(userEntity.getEmail(), request.getPassword()));
+
+            // Restablecemos el número de intentos de login a 0
+            userEntity.setLoginAttempts(0);
+            userRepository.save(userEntity);
+        } catch (BadCredentialsException ex) {
+            // Sumamos uno al contador de intentos de login fallidos
+            userEntity.setLoginAttempts(userEntity.getLoginAttempts() + 1);
+            userRepository.save(userEntity);
+
+            // Relanzamos la excepción
+            throw ex;
+        }
 
         return this.createToken(userEntity);
     }
@@ -296,11 +313,8 @@ public class AuthService {
         }
     }
 
-    private UserEntity saveCredentials(UserEntity userEntity) {
-        return userRepository.save(userEntity);
-    }
-
-    private AuthenticationResponse createToken(UserEntity userEntity) {
+    @Transactional
+    public AuthenticationResponse createToken(UserEntity userEntity) {
         String accessToken = jwtService.generateAccessToken(userEntity);
         String refreshToken = jwtService.generateRefreshToken(userEntity);
         String publicId = getPublicId();
@@ -312,6 +326,10 @@ public class AuthService {
         return AuthenticationResponse.builder()
                 .jwt(jwt)
                 .build();
+    }
+
+    private UserEntity saveCredentials(UserEntity userEntity) {
+        return userRepository.save(userEntity);
     }
 
     private void saveUserSession(UserEntity userEntity, String accessToken, String refreshToken, String publicId) {

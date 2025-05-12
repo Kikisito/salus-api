@@ -90,9 +90,13 @@ public class UserEntity implements UserDetails {
     private List<PrescriptionEntity> prescriptions;
 
     // Impide que el usuario pueda crear nuevas citas
-    @Column
+    @Column(nullable = false)
     @Builder.Default
     private Boolean restricted = false;
+
+    @Column(nullable = false)
+    @Builder.Default
+    private Integer loginAttempts = 0;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -115,7 +119,8 @@ public class UserEntity implements UserDetails {
 
     @Override
     public boolean isAccountNonLocked() {
-        return true;
+        // El usuario se bloquea si ha superado el número máximo de intentos de login
+        return loginAttempts < 5;
     }
 
     @Override
