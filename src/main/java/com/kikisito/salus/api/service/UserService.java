@@ -56,12 +56,6 @@ public class UserService {
     private ModelMapper modelMapper;
 
     private final static String WELCOME_EMAIL_NO_PASSWORD_TEXT_SUBJECT = "Te damos la bienvenida";
-    private final static String WELCOME_EMAIL_NO_PASSWORD_TEXT_BODY = "Hola %s,\n\n" +
-            "¡Te damos la bienvenida! Tu cuenta ha sido creada con éxito. \n" +
-            "Para establecer una contraseña en tu cuenta y poder acceder, por favor, utiliza el siguiente enlace:\n" +
-            "%s\n\n" +
-            "Si tienes alguna pregunta, no dudes en ponerte en contacto con nosotros.\n\n" +
-            "Saludos.";
 
     @Transactional(readOnly = true)
     public UsersListResponse getAllUsers(Integer page, Integer limit) {
@@ -208,7 +202,6 @@ public class UserService {
 
         return modelMapper.map(userEntity, UserDTO.class);
     }
-
 
     @Transactional
     public UserDTO createUser(CreateUserRequest request) {
