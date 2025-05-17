@@ -130,7 +130,7 @@ public class MedicalCenterService {
     }
 
     @Transactional
-    public MedicalCenterDTO updateMedicaslCenter(Integer id, NewMedicalCenterRequest centroMedicoDTO) {
+    public MedicalCenterDTO updateMedicalCenter(Integer id, NewMedicalCenterRequest centroMedicoDTO) {
         MedicalCenterEntity medicalCenter = medicalCenterRepository.findById(id).orElseThrow(DataNotFoundException::medicalCenterNotFound);
         modelMapper.map(centroMedicoDTO, medicalCenter);
         medicalCenter = medicalCenterRepository.save(medicalCenter);

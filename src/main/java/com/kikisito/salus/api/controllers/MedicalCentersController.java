@@ -7,13 +7,11 @@ import com.kikisito.salus.api.service.MedicalCenterService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDate;
 import java.util.Optional;
 
 @RestController
@@ -71,7 +69,7 @@ public class MedicalCentersController {
     @PutMapping("/{id}")
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<MedicalCenterDTO> updateMedicalCenter(@PathVariable("id") Integer id, @RequestBody @Valid NewMedicalCenterRequest centroMedicoDTO) {
-        return ResponseEntity.ok(medicalCenterService.updateMedicaslCenter(id, centroMedicoDTO));
+        return ResponseEntity.ok(medicalCenterService.updateMedicalCenter(id, centroMedicoDTO));
     }
 
     @DeleteMapping("/{id}")
