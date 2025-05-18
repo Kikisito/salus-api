@@ -157,7 +157,7 @@ public class ChatService {
 
     private ChatEntity getOrCreateConversation(UserEntity patient, MedicalProfileEntity doctor) {
         // Comprobamos que el paciente y el médico no sean la misma persona
-        if(patient.getId().equals(doctor.getId())) {
+        if(patient.getId().equals(doctor.getUser().getId())) {
             throw ConflictException.cannotCreateChatWithSameSenderAndReceiver();
         }
 
