@@ -56,9 +56,6 @@ public class ReportServiceTest {
     private UserEntity testPatient;
     private MedicalProfileEntity testDoctor;
     private SpecialtyEntity testSpecialty;
-    private MedicalCenterEntity testMedicalCenter;
-    private RoomEntity testRoom;
-    private AppointmentSlotEntity testSlot;
     private AppointmentEntity testAppointment;
     private ReportEntity testReport;
     private ReportDTO testReportDTO;
@@ -100,7 +97,7 @@ public class ReportServiceTest {
                 .build();
 
         // Centro médico de prueba
-        testMedicalCenter = MedicalCenterEntity.builder()
+        MedicalCenterEntity testMedicalCenter = MedicalCenterEntity.builder()
                 .id(1)
                 .name("Hospital de Pruebas")
                 .email("test@salus.com")
@@ -114,14 +111,14 @@ public class ReportServiceTest {
                 .build();
 
         // Consulta de prueba
-        testRoom = RoomEntity.builder()
+        RoomEntity testRoom = RoomEntity.builder()
                 .id(1)
                 .name("Consulta 1")
                 .medicalCenter(testMedicalCenter)
                 .build();
 
         // AppointmentSlot de prueba
-        testSlot = AppointmentSlotEntity.builder()
+        AppointmentSlotEntity testSlot = AppointmentSlotEntity.builder()
                 .id(1)
                 .doctor(testDoctor)
                 .date(LocalDate.now())
