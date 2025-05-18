@@ -30,7 +30,7 @@ public class ChatController {
     }
 
     @GetMapping("/doctor/{doctorId}")
-    @PreAuthorize("hasAuthority('PROFESSIONAL') and #doctorId == authentication.principal.id")
+    @PreAuthorize("hasAuthority('PROFESSIONAL') and @medicalProfileService.getAsUser(#doctorId).id == authentication.principal.id")
     public ResponseEntity<List<ChatDTO>> getDoctorChats(@PathVariable Integer doctorId) {
         return ResponseEntity.ok(chatService.getDoctorChats(doctorId));
     }
@@ -38,7 +38,7 @@ public class ChatController {
     @GetMapping("/doctor/{doctorId}/patient/{patientId}/info")
     @PreAuthorize("""
             (hasAuthority('USER') and #patientId == authentication.principal.id) or
-            (hasAuthority('PROFESSIONAL') and #doctorId == authentication.principal.id)
+            (hasAuthority('PROFESSIONAL') and @medicalProfileService.getAsUser(#doctorId).id == authentication.principal.id)
             """)
     public ResponseEntity<ChatDTO> getChatInfo(@PathVariable Integer doctorId, @PathVariable Integer patientId, @AuthenticationPrincipal UserEntity userRequest) {
         return ResponseEntity.ok(chatService.getChatInfo(doctorId, patientId, userRequest));
@@ -47,7 +47,7 @@ public class ChatController {
     @GetMapping("/doctor/{doctorId}/patient/{patientId}")
     @PreAuthorize("""
             (hasAuthority('USER') and #patientId == authentication.principal.id) or
-            (hasAuthority('PROFESSIONAL') and #doctorId == authentication.principal.id)
+            (hasAuthority('PROFESSIONAL') and @medicalProfileService.getAsUser(#doctorId).id == authentication.principal.id)
             """)
     public ResponseEntity<List<ChatMessageDTO>> getChatMessages(@PathVariable Integer doctorId, @PathVariable Integer patientId, @AuthenticationPrincipal UserEntity userRequest) {
         return ResponseEntity.ok(chatService.getChatMessages(doctorId, patientId, userRequest));
@@ -56,7 +56,7 @@ public class ChatController {
     @PostMapping("/doctor/{doctorId}/patient/{patientId}")
     @PreAuthorize("""
             (hasAuthority('USER') and #patientId == authentication.principal.id) or
-            (hasAuthority('PROFESSIONAL') and #doctorId == authentication.principal.id)
+            (hasAuthority('PROFESSIONAL') and @medicalProfileService.getAsUser(#doctorId).id == authentication.principal.id)
             """)
     public ResponseEntity<ChatMessageDTO> sendMessage(@PathVariable Integer doctorId, @PathVariable Integer patientId, @RequestBody @Valid ChatMessageRequest chatMessageRequest, @AuthenticationPrincipal UserEntity sender) {
         return ResponseEntity.ok(chatService.sendMessage(doctorId, patientId, chatMessageRequest, sender));

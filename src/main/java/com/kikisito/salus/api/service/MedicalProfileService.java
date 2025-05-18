@@ -203,4 +203,10 @@ public class MedicalProfileService {
         medicalProfileRepository.delete(medicalProfile);
         return true;
     }
+
+    @Transactional
+    public UserEntity getAsUser(Integer doctorId) {
+        MedicalProfileEntity medicalProfileEntity = medicalProfileRepository.findById(doctorId).orElseThrow(DataNotFoundException::doctorNotFound);
+        return medicalProfileEntity.getUser();
+    }
 }

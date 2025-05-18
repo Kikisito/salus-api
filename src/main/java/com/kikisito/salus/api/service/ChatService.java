@@ -73,7 +73,11 @@ public class ChatService {
         UserEntity patient = userRepository.findById(userId).orElseThrow(DataNotFoundException::userNotFound);
         MedicalProfileEntity doctor = medicalProfileRepository.findById(doctorId).orElseThrow(DataNotFoundException::doctorNotFound);
 
-        MessageSenderType senderType = userRequest.getId().equals(doctor.getUser().getId()) ? MessageSenderType.DOCTOR : MessageSenderType.PATIENT;
+        MessageSenderType senderType = userRequest.getId().equals(doctor.getUser().getId()) ? MessageSenderType.DOCTOR : userRequest.getId().equals(patient.getId()) ? MessageSenderType.PATIENT : null;
+
+        if (senderType == null) {
+            throw new AccessDeniedException("User is neither the doctor nor the patient of this chat");
+        }
 
         ChatEntity chat;
         if(senderType == MessageSenderType.PATIENT) {
@@ -93,7 +97,7 @@ public class ChatService {
         ChatEntity chat = chatRepository.findByPatientAndDoctor(patient, doctor).orElseThrow(DataNotFoundException::chatNotFound);
 
         // El senderType será contrario por que será el tipo que se utiliza para marcar los mensajes como leídos
-        MessageSenderType senderType = userRequest.getId().equals(chat.getPatient().getId()) ? MessageSenderType.DOCTOR : userRequest.getId().equals(chat.getDoctor().getId()) ? MessageSenderType.PATIENT : null;
+        MessageSenderType senderType = userRequest.getId().equals(chat.getPatient().getId()) ? MessageSenderType.DOCTOR : userRequest.getId().equals(chat.getDoctor().getUser().getId()) ? MessageSenderType.PATIENT : null;
 
         if(senderType != null) {
             this.markMessagesAsRead(chat, senderType);
@@ -110,19 +114,19 @@ public class ChatService {
 
     @Transactional
     public ChatMessageDTO sendMessage(Integer doctorId, Integer patientId, ChatMessageRequest request, UserEntity sender) {
-        // Determinamos si el remitente es el doctor o el paciente
-        MessageSenderType senderType = sender.getId().equals(doctorId) ? MessageSenderType.DOCTOR :
-                sender.getId().equals(patientId) ? MessageSenderType.PATIENT : null;
-
-        if (senderType == null) {
-            throw new AccessDeniedException("Sender is neither the doctor nor the patient");
-        }
-
         // Obtenemos los participantes del chat
         MedicalProfileEntity doctor = medicalProfileRepository.findById(doctorId)
                 .orElseThrow(DataNotFoundException::doctorNotFound);
         UserEntity patient = userRepository.findById(patientId)
                 .orElseThrow(DataNotFoundException::userNotFound);
+
+        // Determinamos si el remitente es el doctor o el paciente
+        MessageSenderType senderType = sender.getId().equals(doctor.getUser().getId()) ? MessageSenderType.DOCTOR :
+                sender.getId().equals(patient.getId()) ? MessageSenderType.PATIENT : null;
+
+        if (senderType == null) {
+            throw new AccessDeniedException("Sender is neither the doctor nor the patient");
+        }
 
         // El médico puede obtener o crear un chat, pero el paciente solo puede obtenerlo
         ChatEntity chat;
