@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.time.format.DateTimeFormatter;
+import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -238,10 +239,12 @@ public class PrescriptionService {
         }
     }
 
-    private String getLogoPath() {
+    private String getLogo() {
         try {
             ClassPathResource logo = new ClassPathResource("pdf-templates/logo.png");
-            return "file:///" + logo.getFile().getAbsolutePath();
+            byte[] imageBytes = StreamUtils.copyToByteArray(logo.getInputStream());
+            String base64 = Base64.getEncoder().encodeToString(imageBytes);
+            return "data:image/png;base64," + base64;
         } catch (IOException ex) {
             throw new RuntimeException("Error loading logo", ex);
         }
@@ -251,7 +254,7 @@ public class PrescriptionService {
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
 
-        html = html.replace("${LOGO}", getLogoPath());
+        html = html.replace("${LOGO}", this.getLogo());
 
         // Paciente
         html = html.replace("${PATIENT_NAME}", prescription.getPatient().getNombre());

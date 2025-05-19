@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.time.format.DateTimeFormatter;
+import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
 
@@ -200,10 +201,12 @@ public class ReportService {
         }
     }
 
-    private String getLogoPath() {
+    private String getLogo() {
         try {
             ClassPathResource logo = new ClassPathResource("pdf-templates/logo.png");
-            return "file:///" + logo.getFile().getAbsolutePath();
+            byte[] imageBytes = StreamUtils.copyToByteArray(logo.getInputStream());
+            String base64 = Base64.getEncoder().encodeToString(imageBytes);
+            return "data:image/png;base64," + base64;
         } catch (IOException ex) {
             throw new RuntimeException("Error loading logo", ex);
         }
@@ -214,7 +217,7 @@ public class ReportService {
         DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
 
         // Logo
-        html = html.replace("${LOGO}", this.getLogoPath());
+        html = html.replace("${LOGO}", this.getLogo());
 
         // Datos del paciente
         html = html.replace("${PATIENT_NAME}", report.getPatient().getNombre());
@@ -226,9 +229,9 @@ public class ReportService {
         html = html.replace("${APPOINTMENT_DATE}", report.getAppointment() != null ? report.getAppointment().getSlot().getDate().format(dateFormatter) + " " + report.getAppointment().getSlot().getStartTime().format(timeFormatter) : "Sin consulta asociada");
 
         // Datos del informe
-        html = html.replace("${DIAGNOSIS}", report.getDiagnosis());
-        html = html.replace("${TREATMENT}", report.getTreatment());
-        html = html.replace("${OBSERVATIONS}", report.getObservations());
+        html = html.replace("${DIAGNOSIS}", (report.getDiagnosis() != null && !report.getDiagnosis().isEmpty()) ? report.getDiagnosis() : "Sin diagnóstico");
+        html = html.replace("${TREATMENT}", (report.getTreatment() != null && !report.getTreatment().isEmpty()) ? report.getTreatment() : "Sin tratamiento");
+        html = html.replace("${OBSERVATIONS}", (report.getObservations() != null && !report.getObservations().isEmpty()) ? report.getObservations() : "Sin observaciones");
 
         // Datos del centro médico
         MedicalCenterEntity medicalCenter = report.getAppointment() != null ? report.getAppointment().getSlot().getRoom().getMedicalCenter() : medicalCenterRepository.findFirst().orElseThrow(DataNotFoundException::medicalCenterNotFound);
